@@ -1,0 +1,801 @@
+assetId,name,type,department,corridorId,ageYears,installDate,condition,criticality,degradationLatent,latitude,longitude,historicalFailures
+AST-0001,Signal Section 1,Signal,S&T,COR-004,12.3,2014-05-19,Fair,9,0.54,20.3603,73.0004,2
+AST-0002,Track Section 2,Track,Engineering,COR-005,10.1,2016-07-30,Fair,9,0.439,24.4932,87.8591,2
+AST-0003,Signal Section 3,Signal,S&T,COR-006,17.8,2008-11-18,Good,10,0.196,23.466,74.8641,1
+AST-0004,Track Section 4,Track,Engineering,COR-006,7.3,2019-05-18,Fair,8,0.362,24.1219,78.1545,0
+AST-0005,Track Section 5,Track,Engineering,COR-002,1.1,2025-07-28,Good,7,0.326,21.1536,78.6567,0
+AST-0006,Track Section 6,Track,Engineering,COR-001,18.0,2008-09-06,Warning,8,0.572,28.3861,80.3309,2
+AST-0007,Signal Section 7,Signal,S&T,COR-003,6.1,2020-07-29,Fair,9,0.4,25.3859,85.0671,4
+AST-0008,Track Section 8,Track,Engineering,COR-005,4.6,2022-01-28,Good,9,0.241,27.996,72.5974,1
+AST-0009,Station Equipment Section 9,Station Equipment,S&T,COR-002,1.2,2025-06-21,Good,5,0.204,20.0927,87.4196,1
+AST-0010,Signal Section 10,Signal,S&T,COR-002,17.0,2009-09-06,Good,9,0.225,25.2285,82.8358,0
+AST-0011,Track Section 11,Track,Engineering,COR-009,0.6,2026-01-26,Good,8,0.113,27.4946,87.7104,1
+AST-0012,Signal Section 12,Signal,S&T,COR-004,22.6,2004-02-01,Good,10,0.302,22.3092,85.5782,4
+AST-0013,Track Section 13,Track,Engineering,COR-006,7.9,2018-10-11,Good,9,0.25,20.9514,87.3454,2
+AST-0014,Station Equipment Section 14,Station Equipment,S&T,COR-006,17.6,2009-01-30,Fair,5,0.38,21.6502,82.116,2
+AST-0015,Signal Section 15,Signal,S&T,COR-008,13.6,2013-01-29,Fair,10,0.502,21.7293,78.2169,3
+AST-0016,OHE Section 16,OHE,Traction Distribution,COR-008,31.2,1995-06-29,Warning,8,0.732,23.472,79.5866,7
+AST-0017,Track Section 17,Track,Engineering,COR-003,13.4,2013-04-12,Good,8,0.313,22.2596,83.0285,4
+AST-0018,Signal Section 18,Signal,S&T,COR-009,22.1,2004-08-02,Good,9,0.22,21.7127,79.3309,1
+AST-0019,Signal Section 19,Signal,S&T,COR-004,6.6,2020-01-28,Good,9,0.197,25.4851,84.2068,0
+AST-0020,Station Equipment Section 20,Station Equipment,S&T,COR-009,2.4,2024-04-09,Good,4,0.021,19.5303,73.9696,0
+AST-0021,Signal Section 21,Signal,S&T,COR-005,19.4,2007-04-15,Warning,10,0.671,22.4036,85.7798,3
+AST-0022,Signal Section 22,Signal,S&T,COR-002,2.4,2024-04-09,Good,10,0.252,25.8975,75.767,2
+AST-0023,Track Section 23,Track,Engineering,COR-008,16.9,2009-10-13,Warning,8,0.566,20.7585,87.6032,1
+AST-0024,Track Section 24,Track,Engineering,COR-001,4.1,2022-07-29,Good,8,0.101,21.2093,74.9887,0
+AST-0025,Signal Section 25,Signal,S&T,COR-008,12.4,2014-04-12,Good,9,0.049,21.0067,74.5666,0
+AST-0026,Signal Section 26,Signal,S&T,COR-001,31.5,1995-03-12,Fair,9,0.356,19.0093,85.49,4
+AST-0027,Track Section 27,Track,Engineering,COR-003,16.0,2010-09-06,Fair,9,0.487,23.7377,85.5992,3
+AST-0028,Bridge Section 28,Bridge,Engineering,COR-007,8.7,2017-12-23,Good,9,0.206,19.3896,84.3202,0
+AST-0029,Bridge Section 29,Bridge,Engineering,COR-010,13.8,2012-11-17,Good,9,0.16,21.7294,87.8685,0
+AST-0030,Track Section 30,Track,Engineering,COR-005,6.8,2019-11-16,Warning,8,0.591,28.948,76.8286,3
+AST-0031,Signal Section 31,Signal,S&T,COR-002,39.2,1987-07-01,Critical,8,0.769,28.184,85.7264,3
+AST-0032,Track Section 32,Track,Engineering,COR-003,5.7,2020-12-22,Good,7,0.177,21.1508,78.1326,0
+AST-0033,OHE Section 33,OHE,Traction Distribution,COR-009,9.5,2017-03-06,Good,7,0.173,22.1,81.0984,1
+AST-0034,Track Section 34,Track,Engineering,COR-008,15.1,2011-08-01,Fair,10,0.399,23.637,79.6296,0
+AST-0035,OHE Section 35,OHE,Traction Distribution,COR-002,13.2,2013-06-24,Good,6,0.287,27.4441,72.5936,0
+AST-0036,OHE Section 36,OHE,Traction Distribution,COR-004,14.2,2012-06-24,Fair,6,0.531,27.0265,81.6914,2
+AST-0037,OHE Section 37,OHE,Traction Distribution,COR-003,6.9,2019-10-11,Good,7,0.242,20.2624,84.4601,0
+AST-0038,Track Section 38,Track,Engineering,COR-002,8.5,2018-03-06,Good,7,0.282,20.2445,75.2928,2
+AST-0039,Station Equipment Section 39,Station Equipment,S&T,COR-009,18.8,2007-11-19,Fair,5,0.477,23.1673,87.4065,1
+AST-0040,Track Section 40,Track,Engineering,COR-007,18.2,2008-06-25,Good,8,0.245,27.701,80.9864,1
+AST-0041,Track Section 41,Track,Engineering,COR-002,13.4,2013-04-12,Fair,7,0.353,27.8208,75.3519,1
+AST-0042,Signal Section 42,Signal,S&T,COR-007,23.8,2002-11-20,Fair,9,0.427,20.0737,82.8352,2
+AST-0043,Signal Section 43,Signal,S&T,COR-005,19.3,2007-05-21,Good,10,0.263,24.743,75.5708,1
+AST-0044,Bridge Section 44,Bridge,Engineering,COR-001,17.8,2008-11-18,Good,10,0.124,20.5568,73.5165,1
+AST-0045,Bridge Section 45,Bridge,Engineering,COR-005,2.3,2024-05-16,Good,10,0.209,25.8613,83.465,2
+AST-0046,Track Section 46,Track,Engineering,COR-002,13.3,2013-05-19,Good,7,0.325,28.1643,74.2711,1
+AST-0047,Station Equipment Section 47,Station Equipment,S&T,COR-003,11.7,2014-12-24,Good,4,0.271,23.5477,74.1995,3
+AST-0048,Track Section 48,Track,Engineering,COR-009,25.8,2000-11-20,Fair,8,0.455,19.8308,84.3391,1
+AST-0049,Signal Section 49,Signal,S&T,COR-008,9.1,2017-07-30,Warning,8,0.566,24.7925,73.3832,0
+AST-0050,Track Section 50,Track,Engineering,COR-002,11.0,2015-09-05,Good,7,0.077,23.0852,85.4563,1
+AST-0051,Station Equipment Section 51,Station Equipment,S&T,COR-009,4.1,2022-07-29,Good,5,0.131,27.109,85.2384,0
+AST-0052,Track Section 52,Track,Engineering,COR-006,4.8,2021-11-15,Good,9,0.322,22.4034,74.7623,1
+AST-0053,Track Section 53,Track,Engineering,COR-009,25.9,2000-10-15,Good,8,0.346,27.749,80.7941,0
+AST-0054,Signal Section 54,Signal,S&T,COR-008,14.1,2012-07-31,Fair,9,0.404,21.737,74.046,1
+AST-0055,Station Equipment Section 55,Station Equipment,S&T,COR-004,31.6,1995-02-03,Fair,6,0.387,20.5752,82.6211,2
+AST-0056,Bridge Section 56,Bridge,Engineering,COR-006,9.0,2017-09-04,Fair,10,0.512,22.0648,73.5069,1
+AST-0057,OHE Section 57,OHE,Traction Distribution,COR-006,2.9,2023-10-10,Good,8,0.177,19.3492,87.6117,1
+AST-0058,Bridge Section 58,Bridge,Engineering,COR-008,8.0,2018-09-04,Warning,10,0.561,21.8125,75.8237,5
+AST-0059,Bridge Section 59,Bridge,Engineering,COR-003,7.0,2019-09-04,Good,10,0.188,25.6012,83.4263,1
+AST-0060,Signal Section 60,Signal,S&T,COR-004,16.4,2010-04-14,Fair,9,0.493,20.4228,74.5527,5
+AST-0061,Track Section 61,Track,Engineering,COR-003,16.0,2010-09-06,Good,7,0.31,20.1136,75.8535,1
+AST-0062,OHE Section 62,OHE,Traction Distribution,COR-003,14.6,2012-01-30,Good,7,0.293,20.3239,79.7152,1
+AST-0063,OHE Section 63,OHE,Traction Distribution,COR-002,37.8,1988-11-24,Fair,7,0.528,19.7755,81.6695,6
+AST-0064,Signal Section 64,Signal,S&T,COR-001,23.0,2003-09-08,Fair,10,0.466,27.7464,88.4818,1
+AST-0065,Track Section 65,Track,Engineering,COR-010,5.1,2021-07-29,Good,7,0.168,28.4412,72.9148,1
+AST-0066,OHE Section 66,OHE,Traction Distribution,COR-001,19.7,2006-12-26,Good,6,0.312,19.4656,72.505,3
+AST-0067,Track Section 67,Track,Engineering,COR-009,10.5,2016-03-06,Good,8,0.207,26.6007,78.1059,1
+AST-0068,Station Equipment Section 68,Station Equipment,S&T,COR-001,8.8,2017-11-16,Good,5,0.183,26.3715,78.3585,2
+AST-0069,Track Section 69,Track,Engineering,COR-008,24.8,2001-11-20,Critical,7,0.824,28.9691,86.6414,3
+AST-0070,Track Section 70,Track,Engineering,COR-004,4.8,2021-11-15,Good,8,0.199,22.4787,87.1013,0
+AST-0071,Bridge Section 71,Bridge,Engineering,COR-006,18.9,2007-10-14,Warning,9,0.664,21.8551,86.5884,2
+AST-0072,Track Section 72,Track,Engineering,COR-003,16.9,2009-10-13,Good,7,0.305,23.5308,74.7909,2
+AST-0073,Track Section 73,Track,Engineering,COR-005,4.7,2021-12-22,Fair,10,0.396,27.5658,79.0937,0
+AST-0074,Signal Section 74,Signal,S&T,COR-005,2.2,2024-06-21,Good,10,0.172,26.2859,84.4342,3
+AST-0075,Bridge Section 75,Bridge,Engineering,COR-006,9.7,2016-12-23,Good,10,0.299,23.7162,77.5018,2
+AST-0076,Track Section 76,Track,Engineering,COR-004,21.2,2005-06-26,Fair,8,0.461,21.4456,83.1118,2
+AST-0077,Track Section 77,Track,Engineering,COR-006,13.2,2013-06-24,Warning,8,0.591,26.2702,76.2943,1
+AST-0078,OHE Section 78,OHE,Traction Distribution,COR-009,25.3,2001-05-22,Fair,8,0.453,27.5453,77.6747,0
+AST-0079,Station Equipment Section 79,Station Equipment,S&T,COR-005,12.6,2014-01-29,Warning,6,0.639,22.9995,86.2669,2
+AST-0080,Signal Section 80,Signal,S&T,COR-004,26.4,2000-04-15,Warning,9,0.584,25.6859,76.5081,3
+AST-0081,Track Section 81,Track,Engineering,COR-002,6.4,2020-04-10,Fair,8,0.361,23.0021,87.9292,3
+AST-0082,Track Section 82,Track,Engineering,COR-004,14.6,2012-01-30,Good,8,0.338,23.7849,77.4002,2
+AST-0083,Track Section 83,Track,Engineering,COR-002,7.6,2019-01-28,Fair,8,0.469,24.2491,72.8764,3
+AST-0084,Track Section 84,Track,Engineering,COR-002,9.4,2017-04-11,Good,7,0.149,26.7573,76.5784,0
+AST-0085,OHE Section 85,OHE,Traction Distribution,COR-010,11.0,2015-09-05,Good,6,0.119,28.7751,75.2393,0
+AST-0086,Track Section 86,Track,Engineering,COR-001,13.2,2013-06-24,Good,7,0.171,23.4437,80.6092,1
+AST-0087,Signal Section 87,Signal,S&T,COR-005,5.7,2020-12-22,Warning,9,0.658,22.4232,74.3035,5
+AST-0088,OHE Section 88,OHE,Traction Distribution,COR-009,14.1,2012-07-31,Fair,7,0.37,22.7359,82.5168,1
+AST-0089,Signal Section 89,Signal,S&T,COR-010,10.6,2016-01-29,Good,8,0.166,20.3389,86.4984,1
+AST-0090,Track Section 90,Track,Engineering,COR-002,3.1,2023-07-29,Good,7,0.271,21.9694,78.3003,2
+AST-0091,Bridge Section 91,Bridge,Engineering,COR-002,1.9,2024-10-09,Good,9,0.187,19.8645,75.1959,4
+AST-0092,OHE Section 92,OHE,Traction Distribution,COR-004,21.3,2005-05-21,Warning,7,0.673,23.2789,78.9004,7
+AST-0093,OHE Section 93,OHE,Traction Distribution,COR-006,9.1,2017-07-30,Good,8,0.158,20.6736,85.0755,0
+AST-0094,Track Section 94,Track,Engineering,COR-010,2.7,2023-12-22,Good,8,0.065,22.4641,81.9638,0
+AST-0095,Track Section 95,Track,Engineering,COR-003,29.2,1997-06-28,Fair,6,0.442,26.9358,74.1183,1
+AST-0096,Station Equipment Section 96,Station Equipment,S&T,COR-002,15.1,2011-08-01,Good,4,0.049,21.4593,81.095,1
+AST-0097,Signal Section 97,Signal,S&T,COR-003,13.0,2013-09-05,Fair,9,0.402,25.1189,79.9894,2
+AST-0098,Track Section 98,Track,Engineering,COR-009,5.3,2021-05-17,Good,7,0.118,28.0118,77.7338,0
+AST-0099,Signal Section 99,Signal,S&T,COR-001,3.0,2023-09-03,Good,9,0.265,24.6693,74.2626,1
+AST-0100,OHE Section 100,OHE,Traction Distribution,COR-004,11.7,2014-12-24,Warning,7,0.588,20.9379,88.1978,0
+AST-0101,Station Equipment Section 101,Station Equipment,S&T,COR-002,10.1,2016-07-30,Good,4,0.174,22.4477,75.3167,0
+AST-0102,Track Section 102,Track,Engineering,COR-002,4.1,2022-07-29,Good,7,0.084,24.9037,75.5839,0
+AST-0103,Station Equipment Section 103,Station Equipment,S&T,COR-010,4.0,2022-09-03,Good,4,0.129,24.0661,74.8293,0
+AST-0104,Track Section 104,Track,Engineering,COR-001,3.8,2022-11-15,Good,9,0.306,20.4862,81.6231,3
+AST-0105,Signal Section 105,Signal,S&T,COR-004,3.7,2022-12-22,Good,9,0.127,23.468,79.5987,2
+AST-0106,OHE Section 106,OHE,Traction Distribution,COR-010,6.3,2020-05-17,Good,6,0.071,24.4307,76.4929,0
+AST-0107,Track Section 107,Track,Engineering,COR-007,13.0,2013-09-05,Fair,8,0.441,21.6733,79.3708,3
+AST-0108,Track Section 108,Track,Engineering,COR-001,14.5,2012-03-07,Fair,9,0.38,25.1245,83.2763,2
+AST-0109,Signal Section 109,Signal,S&T,COR-005,9.9,2016-10-11,Good,10,0.191,19.7016,77.0072,0
+AST-0110,Station Equipment Section 110,Station Equipment,S&T,COR-010,11.3,2015-05-19,Good,5,0.068,22.3661,87.1439,0
+AST-0111,Signal Section 111,Signal,S&T,COR-005,15.0,2011-09-06,Warning,10,0.686,27.0428,77.4015,3
+AST-0112,Station Equipment Section 112,Station Equipment,S&T,COR-006,1.4,2025-04-10,Good,5,0.286,21.5928,75.6709,1
+AST-0113,Bridge Section 113,Bridge,Engineering,COR-006,11.9,2014-10-12,Good,10,0.291,25.0518,87.7731,1
+AST-0114,Signal Section 114,Signal,S&T,COR-007,23.6,2003-02-01,Fair,9,0.439,23.1003,85.469,4
+AST-0115,OHE Section 115,OHE,Traction Distribution,COR-002,8.9,2017-10-11,Good,6,0.202,22.1646,77.9902,2
+AST-0116,Track Section 116,Track,Engineering,COR-009,20.7,2005-12-26,Fair,8,0.451,28.1613,85.9629,2
+AST-0117,Track Section 117,Track,Engineering,COR-010,9.0,2017-09-04,Good,8,0.021,22.4326,80.801,0
+AST-0118,Bridge Section 118,Bridge,Engineering,COR-002,15.6,2011-01-30,Good,10,0.192,21.3668,78.048,0
+AST-0119,OHE Section 119,OHE,Traction Distribution,COR-009,12.8,2013-11-17,Good,6,0.287,28.093,85.9338,1
+AST-0120,Track Section 120,Track,Engineering,COR-009,3.8,2022-11-15,Good,7,0.118,26.4594,84.5346,0
+AST-0121,Signal Section 121,Signal,S&T,COR-008,4.6,2022-01-28,Good,10,0.339,25.818,77.266,1
+AST-0122,OHE Section 122,OHE,Traction Distribution,COR-004,26.4,2000-04-15,Fair,7,0.359,19.4953,82.2069,3
+AST-0123,Bridge Section 123,Bridge,Engineering,COR-005,18.0,2008-09-06,Warning,10,0.59,20.312,78.4102,4
+AST-0124,OHE Section 124,OHE,Traction Distribution,COR-009,9.5,2017-03-06,Good,7,0.34,25.3834,72.5168,1
+AST-0125,Signal Section 125,Signal,S&T,COR-002,8.6,2018-01-28,Good,9,0.255,21.0943,87.8891,1
+AST-0126,Signal Section 126,Signal,S&T,COR-009,5.3,2021-05-17,Good,9,0.168,21.2564,81.2941,0
+AST-0127,Signal Section 127,Signal,S&T,COR-010,13.5,2013-03-07,Good,8,0.234,26.7914,82.0749,2
+AST-0128,OHE Section 128,OHE,Traction Distribution,COR-007,5.7,2020-12-22,Good,7,0.113,21.8592,82.0983,1
+AST-0129,Bridge Section 129,Bridge,Engineering,COR-004,7.8,2018-11-16,Good,10,0.243,19.7159,81.3103,1
+AST-0130,Signal Section 130,Signal,S&T,COR-006,6.2,2020-06-22,Fair,9,0.455,19.3643,77.1408,0
+AST-0131,Track Section 131,Track,Engineering,COR-001,17.2,2009-06-25,Fair,8,0.357,23.4318,88.0452,1
+AST-0132,Track Section 132,Track,Engineering,COR-010,9.2,2017-06-24,Good,8,0.08,25.1713,82.4467,2
+AST-0133,OHE Section 133,OHE,Traction Distribution,COR-004,11.4,2015-04-12,Good,8,0.242,27.6889,83.2347,1
+AST-0134,Bridge Section 134,Bridge,Engineering,COR-001,3.8,2022-11-15,Good,10,0.211,20.108,79.7767,2
+AST-0135,Track Section 135,Track,Engineering,COR-008,6.2,2020-06-22,Good,7,0.247,20.9667,77.1058,2
+AST-0136,Track Section 136,Track,Engineering,COR-007,11.5,2015-03-07,Fair,8,0.351,24.298,73.5296,1
+AST-0137,Signal Section 137,Signal,S&T,COR-007,2.4,2024-04-09,Good,10,0.231,22.6411,78.1037,0
+AST-0138,Track Section 138,Track,Engineering,COR-001,8.7,2017-12-23,Fair,8,0.361,23.8254,75.3176,2
+AST-0139,Bridge Section 139,Bridge,Engineering,COR-008,10.2,2016-06-24,Fair,10,0.518,28.2412,83.0934,3
+AST-0140,Track Section 140,Track,Engineering,COR-007,3.4,2023-04-10,Good,8,0.301,24.4489,86.5641,2
+AST-0141,Track Section 141,Track,Engineering,COR-008,20.1,2006-08-02,Fair,8,0.371,23.1512,77.3441,1
+AST-0142,Station Equipment Section 142,Station Equipment,S&T,COR-009,13.1,2013-07-31,Good,4,0.15,28.8944,77.8261,2
+AST-0143,Track Section 143,Track,Engineering,COR-003,9.2,2017-06-24,Good,7,0.213,19.6522,83.2258,2
+AST-0144,Track Section 144,Track,Engineering,COR-003,5.8,2020-11-15,Good,8,0.122,28.3211,74.8883,0
+AST-0145,Track Section 145,Track,Engineering,COR-010,2.3,2024-05-16,Good,6,0.0,24.0166,87.371,0
+AST-0146,Track Section 146,Track,Engineering,COR-006,19.1,2007-08-02,Fair,8,0.429,24.0376,78.3215,1
+AST-0147,Track Section 147,Track,Engineering,COR-005,7.2,2019-06-23,Good,9,0.342,28.2196,74.1192,1
+AST-0148,Track Section 148,Track,Engineering,COR-003,2.9,2023-10-10,Good,7,0.055,24.0732,75.2949,1
+AST-0149,Track Section 149,Track,Engineering,COR-007,5.7,2020-12-22,Good,8,0.175,23.3841,87.4239,0
+AST-0150,Track Section 150,Track,Engineering,COR-008,14.1,2012-07-31,Fair,8,0.542,21.7249,76.4539,0
+AST-0151,Signal Section 151,Signal,S&T,COR-001,12.2,2014-06-24,Good,9,0.327,25.5882,83.0963,0
+AST-0152,OHE Section 152,OHE,Traction Distribution,COR-006,4.2,2022-06-22,Warning,7,0.573,24.6965,74.9986,4
+AST-0153,Signal Section 153,Signal,S&T,COR-010,21.3,2005-05-21,Fair,9,0.373,21.1435,75.6056,0
+AST-0154,Track Section 154,Track,Engineering,COR-003,2.9,2023-10-10,Good,7,0.101,26.0941,86.5678,0
+AST-0155,Signal Section 155,Signal,S&T,COR-003,24.2,2002-06-27,Fair,8,0.429,25.4409,74.8685,2
+AST-0156,Bridge Section 156,Bridge,Engineering,COR-009,11.8,2014-11-17,Good,10,0.271,22.9733,72.8,1
+AST-0157,Bridge Section 157,Bridge,Engineering,COR-001,7.6,2019-01-28,Good,10,0.292,19.044,80.5197,3
+AST-0158,Track Section 158,Track,Engineering,COR-004,8.5,2018-03-06,Fair,8,0.51,23.4658,86.3036,0
+AST-0159,Track Section 159,Track,Engineering,COR-005,10.9,2015-10-12,Good,9,0.348,19.0606,77.7159,2
+AST-0160,Track Section 160,Track,Engineering,COR-008,14.8,2011-11-18,Fair,8,0.514,19.75,74.5506,3
+AST-0161,Track Section 161,Track,Engineering,COR-002,1.9,2024-10-09,Good,7,0.129,23.3061,88.2157,0
+AST-0162,Signal Section 162,Signal,S&T,COR-005,5.5,2021-03-05,Good,10,0.187,19.8192,83.3278,1
+AST-0163,Signal Section 163,Signal,S&T,COR-002,10.6,2016-01-29,Good,8,0.316,21.7567,86.1111,1
+AST-0164,Track Section 164,Track,Engineering,COR-008,21.9,2004-10-14,Warning,8,0.66,25.5549,84.5342,3
+AST-0165,Signal Section 165,Signal,S&T,COR-007,21.3,2005-05-21,Good,9,0.325,22.0862,83.6719,2
+AST-0166,Signal Section 166,Signal,S&T,COR-005,27.5,1999-03-11,Warning,9,0.677,28.9765,78.653,5
+AST-0167,Track Section 167,Track,Engineering,COR-004,20.7,2005-12-26,Good,8,0.222,28.163,77.6894,0
+AST-0168,Bridge Section 168,Bridge,Engineering,COR-002,5.2,2021-06-22,Good,9,0.0,24.8531,83.9713,0
+AST-0169,Track Section 169,Track,Engineering,COR-010,10.1,2016-07-30,Good,8,0.325,28.6695,83.9674,0
+AST-0170,Station Equipment Section 170,Station Equipment,S&T,COR-007,20.8,2005-11-19,Fair,5,0.365,27.6802,87.7094,2
+AST-0171,Track Section 171,Track,Engineering,COR-004,19.5,2007-03-09,Good,9,0.279,22.189,81.5986,1
+AST-0172,Bridge Section 172,Bridge,Engineering,COR-005,8.8,2017-11-16,Fair,10,0.449,26.496,77.2139,0
+AST-0173,Station Equipment Section 173,Station Equipment,S&T,COR-008,14.5,2012-03-07,Good,6,0.344,20.3683,80.3325,2
+AST-0174,Station Equipment Section 174,Station Equipment,S&T,COR-008,7.2,2019-06-23,Good,5,0.25,25.8455,82.3194,1
+AST-0175,Bridge Section 175,Bridge,Engineering,COR-005,2.6,2024-01-27,Fair,10,0.424,23.9108,79.3277,0
+AST-0176,OHE Section 176,OHE,Traction Distribution,COR-004,9.4,2017-04-11,Good,6,0.134,19.1683,85.1581,3
+AST-0177,OHE Section 177,OHE,Traction Distribution,COR-007,9.0,2017-09-04,Good,7,0.15,21.7423,81.8538,0
+AST-0178,OHE Section 178,OHE,Traction Distribution,COR-007,6.9,2019-10-11,Good,7,0.248,28.5538,72.651,2
+AST-0179,Track Section 179,Track,Engineering,COR-006,14.8,2011-11-18,Fair,8,0.539,22.1583,81.6174,5
+AST-0180,Signal Section 180,Signal,S&T,COR-001,8.6,2018-01-28,Fair,8,0.402,20.8145,82.6377,3
+AST-0181,Signal Section 181,Signal,S&T,COR-005,13.5,2013-03-07,Fair,9,0.406,20.8753,87.1442,3
+AST-0182,Bridge Section 182,Bridge,Engineering,COR-007,17.0,2009-09-06,Fair,8,0.481,23.7921,79.1195,0
+AST-0183,Signal Section 183,Signal,S&T,COR-010,40.0,1986-09-12,Fair,8,0.516,27.4265,81.6915,2
+AST-0184,Signal Section 184,Signal,S&T,COR-006,9.5,2017-03-06,Warning,10,0.569,26.58,80.1,2
+AST-0185,OHE Section 185,OHE,Traction Distribution,COR-004,22.1,2004-08-02,Good,6,0.312,23.3685,81.0065,1
+AST-0186,Track Section 186,Track,Engineering,COR-006,12.0,2014-09-05,Fair,8,0.543,21.0873,73.5769,4
+AST-0187,Track Section 187,Track,Engineering,COR-002,12.5,2014-03-07,Good,9,0.171,19.4606,86.8565,0
+AST-0188,Signal Section 188,Signal,S&T,COR-001,9.6,2017-01-28,Fair,9,0.509,23.6263,87.0666,1
+AST-0189,Signal Section 189,Signal,S&T,COR-007,11.3,2015-05-19,Fair,9,0.361,27.1478,81.269,1
+AST-0190,Track Section 190,Track,Engineering,COR-010,8.7,2017-12-23,Good,8,0.058,26.2968,81.4049,0
+AST-0191,Signal Section 191,Signal,S&T,COR-009,19.6,2007-01-31,Good,9,0.285,23.086,73.4209,1
+AST-0192,Signal Section 192,Signal,S&T,COR-006,5.7,2020-12-22,Fair,9,0.391,24.947,82.0672,2
+AST-0193,Track Section 193,Track,Engineering,COR-001,2.6,2024-01-27,Good,8,0.297,23.3625,79.3664,1
+AST-0194,Signal Section 194,Signal,S&T,COR-010,6.7,2019-12-23,Good,7,0.144,24.7902,83.8447,0
+AST-0195,OHE Section 195,OHE,Traction Distribution,COR-005,6.2,2020-06-22,Fair,9,0.391,24.1751,73.254,1
+AST-0196,Track Section 196,Track,Engineering,COR-003,6.7,2019-12-23,Good,7,0.279,25.8097,83.8742,0
+AST-0197,Station Equipment Section 197,Station Equipment,S&T,COR-009,9.2,2017-06-24,Good,4,0.22,24.0771,77.0903,1
+AST-0198,Station Equipment Section 198,Station Equipment,S&T,COR-008,6.7,2019-12-23,Good,5,0.144,28.4061,82.9273,0
+AST-0199,Signal Section 199,Signal,S&T,COR-008,9.1,2017-07-30,Good,8,0.235,23.2803,82.534,1
+AST-0200,Track Section 200,Track,Engineering,COR-003,6.8,2019-11-16,Good,8,0.218,19.1592,76.1295,1
+AST-0201,Signal Section 201,Signal,S&T,COR-010,13.7,2012-12-24,Fair,10,0.394,21.3637,79.5472,3
+AST-0202,Bridge Section 202,Bridge,Engineering,COR-005,40.0,1986-09-12,Critical,10,1.0,24.0061,85.8701,4
+AST-0203,OHE Section 203,OHE,Traction Distribution,COR-006,11.9,2014-10-12,Fair,7,0.476,24.4057,82.1895,4
+AST-0204,Bridge Section 204,Bridge,Engineering,COR-008,7.0,2019-09-04,Good,9,0.338,24.5238,73.5998,1
+AST-0205,Signal Section 205,Signal,S&T,COR-007,0.8,2025-11-14,Good,9,0.236,26.1455,79.5865,0
+AST-0206,OHE Section 206,OHE,Traction Distribution,COR-002,32.2,1994-06-29,Fair,6,0.441,21.7465,77.4883,0
+AST-0207,Track Section 207,Track,Engineering,COR-004,12.3,2014-05-19,Good,8,0.295,25.649,82.7663,2
+AST-0208,OHE Section 208,OHE,Traction Distribution,COR-004,9.1,2017-07-30,Good,7,0.17,26.0403,82.333,1
+AST-0209,Track Section 209,Track,Engineering,COR-010,0.9,2025-10-09,Good,8,0.0,23.1128,72.6664,0
+AST-0210,OHE Section 210,OHE,Traction Distribution,COR-008,9.4,2017-04-11,Fair,8,0.376,23.0217,82.2231,1
+AST-0211,Bridge Section 211,Bridge,Engineering,COR-004,11.2,2015-06-25,Good,10,0.32,20.7892,84.2576,2
+AST-0212,Track Section 212,Track,Engineering,COR-008,6.8,2019-11-16,Fair,8,0.383,23.1399,84.7997,1
+AST-0213,OHE Section 213,OHE,Traction Distribution,COR-008,3.1,2023-07-29,Good,8,0.315,26.8682,73.4436,3
+AST-0214,Track Section 214,Track,Engineering,COR-004,2.9,2023-10-10,Good,8,0.213,28.0897,77.3585,1
+AST-0215,OHE Section 215,OHE,Traction Distribution,COR-005,32.6,1994-02-03,Critical,9,0.815,24.9361,79.2404,1
+AST-0216,Track Section 216,Track,Engineering,COR-009,11.0,2015-09-05,Good,8,0.224,21.9937,75.3763,1
+AST-0217,Station Equipment Section 217,Station Equipment,S&T,COR-006,6.8,2019-11-16,Fair,5,0.362,25.8229,79.2317,1
+AST-0218,Track Section 218,Track,Engineering,COR-002,10.6,2016-01-29,Good,7,0.137,26.4015,73.6381,0
+AST-0219,Station Equipment Section 219,Station Equipment,S&T,COR-008,10.0,2016-09-04,Fair,5,0.389,22.3221,74.3115,1
+AST-0220,Bridge Section 220,Bridge,Engineering,COR-006,2.8,2023-11-16,Good,10,0.338,27.2655,83.1991,0
+AST-0221,Signal Section 221,Signal,S&T,COR-006,18.8,2007-11-19,Fair,10,0.397,19.737,76.7012,0
+AST-0222,OHE Section 222,OHE,Traction Distribution,COR-008,8.9,2017-10-11,Good,8,0.336,19.1075,83.8825,2
+AST-0223,OHE Section 223,OHE,Traction Distribution,COR-010,11.1,2015-07-31,Good,7,0.138,20.2297,73.2697,1
+AST-0224,Station Equipment Section 224,Station Equipment,S&T,COR-004,25.9,2000-10-15,Fair,5,0.437,20.5601,81.5032,2
+AST-0225,Track Section 225,Track,Engineering,COR-005,3.2,2023-06-22,Good,9,0.209,27.7893,78.7632,1
+AST-0226,Signal Section 226,Signal,S&T,COR-002,5.5,2021-03-05,Good,9,0.306,23.2498,85.2515,0
+AST-0227,Track Section 227,Track,Engineering,COR-007,12.8,2013-11-17,Fair,8,0.439,21.7493,85.0432,1
+AST-0228,OHE Section 228,OHE,Traction Distribution,COR-005,18.5,2008-03-08,Warning,8,0.619,23.2908,78.509,1
+AST-0229,Track Section 229,Track,Engineering,COR-004,6.3,2020-05-17,Fair,9,0.467,22.9484,82.4634,1
+AST-0230,Signal Section 230,Signal,S&T,COR-007,6.6,2020-01-28,Good,9,0.203,22.0146,76.1408,1
+AST-0231,Signal Section 231,Signal,S&T,COR-005,15.8,2010-11-18,Critical,10,0.881,20.379,81.7865,4
+AST-0232,Signal Section 232,Signal,S&T,COR-005,38.5,1988-03-13,Critical,9,0.802,25.5592,73.8002,2
+AST-0233,Signal Section 233,Signal,S&T,COR-005,10.8,2015-11-17,Fair,10,0.479,20.366,79.4537,5
+AST-0234,OHE Section 234,OHE,Traction Distribution,COR-003,5.5,2021-03-05,Good,7,0.124,26.7542,75.4236,0
+AST-0235,OHE Section 235,OHE,Traction Distribution,COR-002,4.2,2022-06-22,Good,6,0.18,21.0169,86.6341,0
+AST-0236,Signal Section 236,Signal,S&T,COR-009,9.2,2017-06-24,Good,9,0.305,26.3137,79.6184,3
+AST-0237,Signal Section 237,Signal,S&T,COR-001,18.0,2008-09-06,Fair,8,0.369,27.0559,81.9524,1
+AST-0238,Station Equipment Section 238,Station Equipment,S&T,COR-004,40.0,1986-09-12,Critical,5,0.907,20.2533,78.2661,6
+AST-0239,Track Section 239,Track,Engineering,COR-007,8.1,2018-07-30,Good,8,0.275,19.8675,77.1199,4
+AST-0240,Track Section 240,Track,Engineering,COR-002,10.8,2015-11-17,Good,7,0.259,28.4957,75.7467,1
+AST-0241,Track Section 241,Track,Engineering,COR-007,29.2,1997-06-28,Fair,9,0.427,23.6305,87.0899,3
+AST-0242,OHE Section 242,OHE,Traction Distribution,COR-008,12.7,2013-12-24,Fair,7,0.432,25.3024,85.2915,0
+AST-0243,Signal Section 243,Signal,S&T,COR-007,11.9,2014-10-12,Good,9,0.283,19.2326,74.6322,0
+AST-0244,OHE Section 244,OHE,Traction Distribution,COR-004,25.6,2001-02-01,Fair,7,0.423,21.7871,84.4476,1
+AST-0245,OHE Section 245,OHE,Traction Distribution,COR-001,11.0,2015-09-05,Good,6,0.193,24.054,79.1965,1
+AST-0246,Track Section 246,Track,Engineering,COR-009,4.5,2022-03-05,Fair,7,0.46,27.8622,72.7463,1
+AST-0247,Bridge Section 247,Bridge,Engineering,COR-004,22.3,2004-05-21,Fair,10,0.419,21.7144,80.9539,1
+AST-0248,OHE Section 248,OHE,Traction Distribution,COR-009,2.3,2024-05-16,Good,6,0.0,26.7519,74.5807,0
+AST-0249,Track Section 249,Track,Engineering,COR-002,19.9,2006-10-14,Good,7,0.268,25.6221,75.8589,1
+AST-0250,Signal Section 250,Signal,S&T,COR-002,10.2,2016-06-24,Good,9,0.212,20.1527,83.6367,1
+AST-0251,Track Section 251,Track,Engineering,COR-008,8.2,2018-06-24,Fair,9,0.385,21.9338,76.6143,3
+AST-0252,Track Section 252,Track,Engineering,COR-010,8.0,2018-09-04,Good,8,0.237,21.3786,86.7702,0
+AST-0253,Track Section 253,Track,Engineering,COR-009,9.2,2017-06-24,Good,7,0.286,23.4253,83.0147,1
+AST-0254,Station Equipment Section 254,Station Equipment,S&T,COR-008,7.3,2019-05-18,Good,5,0.23,25.3533,85.8165,1
+AST-0255,Signal Section 255,Signal,S&T,COR-003,14.0,2012-09-05,Good,8,0.329,23.3342,82.343,3
+AST-0256,Signal Section 256,Signal,S&T,COR-010,7.5,2019-03-06,Good,8,0.058,21.4454,86.4016,0
+AST-0257,OHE Section 257,OHE,Traction Distribution,COR-007,10.3,2016-05-18,Good,6,0.202,25.9588,78.287,0
+AST-0258,Signal Section 258,Signal,S&T,COR-002,1.4,2025-04-10,Good,8,0.0,24.8447,81.2862,1
+AST-0259,Station Equipment Section 259,Station Equipment,S&T,COR-002,10.2,2016-06-24,Good,4,0.076,24.1931,80.7542,0
+AST-0260,OHE Section 260,OHE,Traction Distribution,COR-009,7.2,2019-06-23,Good,6,0.305,24.5442,86.9607,2
+AST-0261,Signal Section 261,Signal,S&T,COR-003,19.0,2007-09-07,Fair,9,0.44,21.219,75.1386,4
+AST-0262,Signal Section 262,Signal,S&T,COR-008,8.4,2018-04-11,Fair,10,0.44,25.8043,81.749,3
+AST-0263,Station Equipment Section 263,Station Equipment,S&T,COR-002,17.2,2009-06-25,Good,6,0.319,22.875,84.5709,2
+AST-0264,OHE Section 264,OHE,Traction Distribution,COR-003,15.9,2010-10-13,Fair,6,0.408,22.6347,78.4208,2
+AST-0265,Station Equipment Section 265,Station Equipment,S&T,COR-003,16.2,2010-06-25,Good,5,0.107,20.4973,86.3813,2
+AST-0266,Track Section 266,Track,Engineering,COR-003,8.7,2017-12-23,Good,8,0.319,24.9684,78.4682,0
+AST-0267,Bridge Section 267,Bridge,Engineering,COR-007,10.7,2015-12-24,Good,10,0.303,25.0266,75.2729,3
+AST-0268,OHE Section 268,OHE,Traction Distribution,COR-010,13.7,2012-12-24,Good,7,0.324,22.403,81.8448,0
+AST-0269,Track Section 269,Track,Engineering,COR-010,10.9,2015-10-12,Good,8,0.255,27.5985,79.2291,1
+AST-0270,Signal Section 270,Signal,S&T,COR-008,8.4,2018-04-11,Good,10,0.204,27.4546,72.743,1
+AST-0271,OHE Section 271,OHE,Traction Distribution,COR-003,4.9,2021-10-10,Good,6,0.0,20.0905,73.6174,0
+AST-0272,Track Section 272,Track,Engineering,COR-010,10.3,2016-05-18,Good,7,0.116,25.9504,75.6244,0
+AST-0273,Signal Section 273,Signal,S&T,COR-006,2.6,2024-01-27,Good,9,0.323,22.9383,84.8093,1
+AST-0274,Bridge Section 274,Bridge,Engineering,COR-006,1.3,2025-05-16,Good,10,0.32,28.9971,86.7726,2
+AST-0275,Track Section 275,Track,Engineering,COR-008,3.9,2022-10-10,Good,8,0.096,21.2502,81.2303,1
+AST-0276,Signal Section 276,Signal,S&T,COR-008,16.1,2010-08-01,Good,9,0.311,21.8052,74.189,0
+AST-0277,Signal Section 277,Signal,S&T,COR-010,12.1,2014-07-31,Good,9,0.14,23.4211,81.0507,0
+AST-0278,Track Section 278,Track,Engineering,COR-006,16.2,2010-06-25,Fair,9,0.399,21.6872,86.1897,1
+AST-0279,Station Equipment Section 279,Station Equipment,S&T,COR-007,5.9,2020-10-10,Good,4,0.053,25.9199,84.4916,2
+AST-0280,OHE Section 280,OHE,Traction Distribution,COR-008,20.3,2006-05-21,Good,8,0.315,23.8091,77.1576,1
+AST-0281,Track Section 281,Track,Engineering,COR-003,2.9,2023-10-10,Good,7,0.037,21.2088,74.4822,0
+AST-0282,Station Equipment Section 282,Station Equipment,S&T,COR-004,4.1,2022-07-29,Good,5,0.211,24.0637,86.9109,2
+AST-0283,Bridge Section 283,Bridge,Engineering,COR-007,20.0,2006-09-07,Good,9,0.268,27.8879,86.1654,1
+AST-0284,Track Section 284,Track,Engineering,COR-001,11.5,2015-03-07,Good,8,0.279,26.924,73.3594,2
+AST-0285,Bridge Section 285,Bridge,Engineering,COR-004,16.3,2010-05-20,Fair,10,0.495,23.9883,85.6788,3
+AST-0286,Track Section 286,Track,Engineering,COR-008,12.1,2014-07-31,Good,9,0.217,21.8849,74.0554,1
+AST-0287,Station Equipment Section 287,Station Equipment,S&T,COR-010,6.6,2020-01-28,Good,4,0.126,20.7989,73.5125,0
+AST-0288,OHE Section 288,OHE,Traction Distribution,COR-006,3.7,2022-12-22,Fair,7,0.393,27.7838,84.6376,2
+AST-0289,OHE Section 289,OHE,Traction Distribution,COR-004,1.7,2024-12-21,Good,6,0.117,26.1017,81.081,0
+AST-0290,Track Section 290,Track,Engineering,COR-005,30.7,1995-12-29,Warning,9,0.653,24.7216,79.1328,3
+AST-0291,Bridge Section 291,Bridge,Engineering,COR-007,2.3,2024-05-16,Good,10,0.306,27.7943,86.9618,2
+AST-0292,Track Section 292,Track,Engineering,COR-006,25.1,2001-08-03,Fair,9,0.527,20.2169,85.9289,4
+AST-0293,Track Section 293,Track,Engineering,COR-001,11.0,2015-09-05,Fair,9,0.419,25.8249,73.422,2
+AST-0294,Track Section 294,Track,Engineering,COR-006,12.4,2014-04-12,Fair,9,0.441,21.1671,82.3574,2
+AST-0295,OHE Section 295,OHE,Traction Distribution,COR-005,11.8,2014-11-17,Fair,8,0.421,20.2058,84.8563,0
+AST-0296,Track Section 296,Track,Engineering,COR-008,14.9,2011-10-13,Fair,8,0.469,23.6561,81.3078,2
+AST-0297,Station Equipment Section 297,Station Equipment,S&T,COR-009,5.4,2021-04-10,Good,5,0.191,22.8739,88.2281,2
+AST-0298,OHE Section 298,OHE,Traction Distribution,COR-010,1.1,2025-07-28,Good,6,0.198,28.4117,83.4768,0
+AST-0299,Track Section 299,Track,Engineering,COR-007,6.5,2020-03-05,Good,9,0.159,22.2398,74.1663,0
+AST-0300,Track Section 300,Track,Engineering,COR-004,14.1,2012-07-31,Good,8,0.343,27.149,75.6728,2
+AST-0301,Track Section 301,Track,Engineering,COR-005,4.1,2022-07-29,Good,9,0.349,26.4883,85.7199,0
+AST-0302,OHE Section 302,OHE,Traction Distribution,COR-002,20.6,2006-01-31,Fair,7,0.446,25.6792,88.4481,5
+AST-0303,Bridge Section 303,Bridge,Engineering,COR-010,9.3,2017-05-18,Good,10,0.065,28.204,74.0734,0
+AST-0304,Track Section 304,Track,Engineering,COR-009,3.8,2022-11-15,Good,8,0.252,23.0792,74.1053,1
+AST-0305,Bridge Section 305,Bridge,Engineering,COR-009,11.4,2015-04-12,Good,9,0.291,22.8967,84.7142,2
+AST-0306,Track Section 306,Track,Engineering,COR-004,13.9,2012-10-12,Good,9,0.177,20.6095,73.5297,1
+AST-0307,Bridge Section 307,Bridge,Engineering,COR-004,14.6,2012-01-30,Fair,10,0.49,21.7576,73.597,3
+AST-0308,Station Equipment Section 308,Station Equipment,S&T,COR-009,20.1,2006-08-02,Warning,4,0.622,27.7978,86.7211,3
+AST-0309,OHE Section 309,OHE,Traction Distribution,COR-006,2.7,2023-12-22,Fair,7,0.376,23.7438,85.3072,2
+AST-0310,OHE Section 310,OHE,Traction Distribution,COR-008,20.1,2006-08-02,Warning,7,0.655,22.4135,86.605,7
+AST-0311,Bridge Section 311,Bridge,Engineering,COR-005,21.3,2005-05-21,Warning,10,0.603,21.1611,82.9082,2
+AST-0312,Track Section 312,Track,Engineering,COR-005,3.7,2022-12-22,Good,8,0.151,23.8496,77.6606,0
+AST-0313,Track Section 313,Track,Engineering,COR-007,4.4,2022-04-10,Good,7,0.0,26.1667,87.001,0
+AST-0314,Track Section 314,Track,Engineering,COR-009,16.8,2009-11-18,Good,7,0.34,21.8669,77.2796,1
+AST-0315,Signal Section 315,Signal,S&T,COR-004,7.5,2019-03-06,Good,8,0.176,26.5772,76.9082,1
+AST-0316,OHE Section 316,OHE,Traction Distribution,COR-009,23.4,2003-04-15,Good,6,0.29,25.2979,86.6824,1
+AST-0317,OHE Section 317,OHE,Traction Distribution,COR-003,27.7,1998-12-28,Fair,7,0.469,26.8756,83.3932,3
+AST-0318,Bridge Section 318,Bridge,Engineering,COR-005,3.8,2022-11-15,Fair,10,0.426,21.5091,86.8308,1
+AST-0319,Track Section 319,Track,Engineering,COR-010,5.3,2021-05-17,Good,8,0.0,25.3103,74.9944,0
+AST-0320,OHE Section 320,OHE,Traction Distribution,COR-010,11.0,2015-09-05,Good,6,0.157,20.5374,87.7367,1
+AST-0321,Track Section 321,Track,Engineering,COR-010,1.1,2025-07-28,Good,7,0.256,22.638,82.3039,0
+AST-0322,Track Section 322,Track,Engineering,COR-004,1.8,2024-11-14,Good,8,0.04,26.2436,83.1886,0
+AST-0323,OHE Section 323,OHE,Traction Distribution,COR-009,4.8,2021-11-15,Good,7,0.248,25.3167,87.125,1
+AST-0324,Station Equipment Section 324,Station Equipment,S&T,COR-010,33.8,1992-11-23,Fair,4,0.467,20.8786,78.592,2
+AST-0325,OHE Section 325,OHE,Traction Distribution,COR-010,12.2,2014-06-24,Good,6,0.293,27.5834,84.0132,1
+AST-0326,Track Section 326,Track,Engineering,COR-001,6.1,2020-07-29,Fair,9,0.351,19.5335,82.7454,2
+AST-0327,OHE Section 327,OHE,Traction Distribution,COR-008,4.3,2022-05-17,Fair,7,0.355,24.9522,85.104,0
+AST-0328,Track Section 328,Track,Engineering,COR-010,3.6,2023-01-27,Good,7,0.219,28.8382,86.8511,2
+AST-0329,Bridge Section 329,Bridge,Engineering,COR-008,6.5,2020-03-05,Good,10,0.158,24.315,83.381,0
+AST-0330,OHE Section 330,OHE,Traction Distribution,COR-003,6.2,2020-06-22,Good,7,0.315,27.0067,73.5822,1
+AST-0331,Track Section 331,Track,Engineering,COR-008,8.6,2018-01-28,Good,8,0.223,24.9518,75.4302,1
+AST-0332,Track Section 332,Track,Engineering,COR-002,14.4,2012-04-12,Good,8,0.307,26.8309,87.7637,0
+AST-0333,Track Section 333,Track,Engineering,COR-005,9.6,2017-01-28,Fair,8,0.463,25.5559,87.9984,2
+AST-0334,Station Equipment Section 334,Station Equipment,S&T,COR-007,17.5,2009-03-08,Fair,4,0.434,25.9113,87.9786,5
+AST-0335,Signal Section 335,Signal,S&T,COR-005,8.1,2018-07-30,Fair,10,0.452,21.2781,73.0888,4
+AST-0336,OHE Section 336,OHE,Traction Distribution,COR-007,29.0,1997-09-09,Fair,7,0.432,26.4182,78.6192,2
+AST-0337,OHE Section 337,OHE,Traction Distribution,COR-003,17.2,2009-06-25,Good,6,0.171,21.3791,84.6548,1
+AST-0338,Signal Section 338,Signal,S&T,COR-007,12.0,2014-09-05,Fair,9,0.405,28.8064,84.5462,1
+AST-0339,Track Section 339,Track,Engineering,COR-007,14.4,2012-04-12,Fair,8,0.355,21.2779,73.8745,1
+AST-0340,Station Equipment Section 340,Station Equipment,S&T,COR-007,6.6,2020-01-28,Fair,5,0.364,21.3668,82.2518,3
+AST-0341,Track Section 341,Track,Engineering,COR-003,8.5,2018-03-06,Good,8,0.208,27.5867,74.7859,1
+AST-0342,Signal Section 342,Signal,S&T,COR-004,8.2,2018-06-24,Good,9,0.088,21.4299,80.3913,1
+AST-0343,OHE Section 343,OHE,Traction Distribution,COR-003,5.5,2021-03-05,Good,6,0.288,22.609,76.335,4
+AST-0344,OHE Section 344,OHE,Traction Distribution,COR-005,3.1,2023-07-29,Good,8,0.298,26.1464,73.3506,0
+AST-0345,Station Equipment Section 345,Station Equipment,S&T,COR-006,14.9,2011-10-13,Fair,6,0.465,20.5875,73.7803,2
+AST-0346,Track Section 346,Track,Engineering,COR-004,19.4,2007-04-15,Good,8,0.333,20.5907,87.0743,4
+AST-0347,Signal Section 347,Signal,S&T,COR-005,13.5,2013-03-07,Warning,10,0.683,23.8636,84.4143,1
+AST-0348,Signal Section 348,Signal,S&T,COR-003,9.6,2017-01-28,Good,9,0.123,21.437,87.4092,1
+AST-0349,Signal Section 349,Signal,S&T,COR-003,37.5,1989-03-13,Warning,9,0.571,21.3566,80.0198,3
+AST-0350,Track Section 350,Track,Engineering,COR-007,6.0,2020-09-03,Good,8,0.23,19.0924,79.1127,2
+AST-0351,Track Section 351,Track,Engineering,COR-009,12.3,2014-05-19,Good,8,0.116,22.7045,78.2345,2
+AST-0352,Track Section 352,Track,Engineering,COR-003,21.2,2005-06-26,Fair,7,0.427,22.1825,82.3609,2
+AST-0353,Track Section 353,Track,Engineering,COR-009,4.0,2022-09-03,Good,7,0.326,19.3116,78.125,1
+AST-0354,Signal Section 354,Signal,S&T,COR-006,15.7,2010-12-25,Fair,10,0.376,25.2123,84.4404,3
+AST-0355,OHE Section 355,OHE,Traction Distribution,COR-002,30.2,1996-06-28,Fair,7,0.541,25.2666,85.3211,0
+AST-0356,OHE Section 356,OHE,Traction Distribution,COR-004,10.2,2016-06-24,Good,6,0.0,19.708,86.5135,0
+AST-0357,Signal Section 357,Signal,S&T,COR-001,11.5,2015-03-07,Good,9,0.288,22.1704,76.3848,2
+AST-0358,Signal Section 358,Signal,S&T,COR-001,6.1,2020-07-29,Good,9,0.181,27.7281,80.9324,1
+AST-0359,Track Section 359,Track,Engineering,COR-004,14.3,2012-05-19,Good,7,0.242,24.8217,76.0751,1
+AST-0360,Signal Section 360,Signal,S&T,COR-005,5.4,2021-04-10,Fair,10,0.504,23.1197,73.1009,1
+AST-0361,Track Section 361,Track,Engineering,COR-008,9.8,2016-11-16,Good,8,0.303,23.651,83.8252,3
+AST-0362,Track Section 362,Track,Engineering,COR-002,2.7,2023-12-22,Good,7,0.094,21.0828,81.2837,1
+AST-0363,Signal Section 363,Signal,S&T,COR-009,0.5,2026-03-04,Good,9,0.04,27.1188,84.0828,1
+AST-0364,Signal Section 364,Signal,S&T,COR-003,7.1,2019-07-30,Good,8,0.0,28.14,73.902,0
+AST-0365,Track Section 365,Track,Engineering,COR-002,7.0,2019-09-04,Good,7,0.038,28.1066,88.4284,0
+AST-0366,Signal Section 366,Signal,S&T,COR-007,7.6,2019-01-28,Fair,7,0.355,21.2393,88.4096,3
+AST-0367,Signal Section 367,Signal,S&T,COR-008,16.9,2009-10-13,Good,9,0.186,22.1074,79.94,1
+AST-0368,OHE Section 368,OHE,Traction Distribution,COR-007,19.7,2006-12-26,Good,7,0.314,20.6062,86.3569,2
+AST-0369,OHE Section 369,OHE,Traction Distribution,COR-002,12.6,2014-01-29,Good,6,0.203,22.072,76.3971,0
+AST-0370,OHE Section 370,OHE,Traction Distribution,COR-002,16.1,2010-08-01,Fair,7,0.509,22.3281,84.3011,0
+AST-0371,Track Section 371,Track,Engineering,COR-004,5.5,2021-03-05,Good,8,0.312,25.3311,86.5676,2
+AST-0372,OHE Section 372,OHE,Traction Distribution,COR-005,4.5,2022-03-05,Good,8,0.295,20.8965,85.5347,0
+AST-0373,Signal Section 373,Signal,S&T,COR-010,14.5,2012-03-07,Fair,8,0.416,28.194,85.4884,0
+AST-0374,Signal Section 374,Signal,S&T,COR-003,3.9,2022-10-10,Good,9,0.061,20.031,79.9084,0
+AST-0375,OHE Section 375,OHE,Traction Distribution,COR-002,3.5,2023-03-05,Good,7,0.247,19.0688,85.6198,1
+AST-0376,Signal Section 376,Signal,S&T,COR-010,40.0,1986-09-12,Fair,8,0.447,27.5495,83.5513,2
+AST-0377,Signal Section 377,Signal,S&T,COR-002,10.7,2015-12-24,Fair,7,0.354,26.0377,74.6192,0
+AST-0378,OHE Section 378,OHE,Traction Distribution,COR-001,7.0,2019-09-04,Good,7,0.183,22.5536,74.327,3
+AST-0379,Bridge Section 379,Bridge,Engineering,COR-005,6.4,2020-04-10,Good,10,0.265,24.955,84.8508,1
+AST-0380,Station Equipment Section 380,Station Equipment,S&T,COR-005,2.8,2023-11-16,Good,7,0.312,21.2354,82.5074,1
+AST-0381,Signal Section 381,Signal,S&T,COR-007,12.5,2014-03-07,Good,9,0.34,20.6839,80.81,0
+AST-0382,Signal Section 382,Signal,S&T,COR-009,8.1,2018-07-30,Good,8,0.13,23.7115,87.0162,0
+AST-0383,OHE Section 383,OHE,Traction Distribution,COR-010,19.4,2007-04-15,Fair,6,0.393,22.5319,83.0534,3
+AST-0384,Track Section 384,Track,Engineering,COR-003,14.8,2011-11-18,Good,8,0.23,25.1523,78.8383,1
+AST-0385,Bridge Section 385,Bridge,Engineering,COR-010,7.9,2018-10-11,Good,8,0.243,21.1815,79.1229,2
+AST-0386,Signal Section 386,Signal,S&T,COR-007,1.4,2025-04-10,Good,9,0.207,25.6293,82.1839,1
+AST-0387,Track Section 387,Track,Engineering,COR-001,10.7,2015-12-24,Good,8,0.275,26.6686,84.6644,2
+AST-0388,Track Section 388,Track,Engineering,COR-010,10.0,2016-09-04,Good,8,0.145,20.6664,81.5297,0
+AST-0389,Bridge Section 389,Bridge,Engineering,COR-002,1.1,2025-07-28,Good,9,0.111,19.4386,80.6402,0
+AST-0390,Track Section 390,Track,Engineering,COR-006,13.6,2013-01-29,Fair,9,0.472,23.3959,84.1304,0
+AST-0391,Track Section 391,Track,Engineering,COR-008,3.8,2022-11-15,Fair,8,0.507,26.7402,83.7842,3
+AST-0392,Track Section 392,Track,Engineering,COR-003,20.0,2006-09-07,Fair,7,0.484,25.5078,85.7855,2
+AST-0393,Track Section 393,Track,Engineering,COR-003,9.6,2017-01-28,Good,9,0.345,26.0188,73.5008,2
+AST-0394,Track Section 394,Track,Engineering,COR-005,6.2,2020-06-22,Critical,9,0.756,23.0284,84.5792,2
+AST-0395,OHE Section 395,OHE,Traction Distribution,COR-009,11.8,2014-11-17,Good,7,0.302,21.3495,80.7202,1
+AST-0396,Track Section 396,Track,Engineering,COR-003,11.3,2015-05-19,Good,6,0.31,24.3178,73.6951,4
+AST-0397,Bridge Section 397,Bridge,Engineering,COR-007,11.0,2015-09-05,Fair,10,0.371,21.0437,83.3642,0
+AST-0398,Bridge Section 398,Bridge,Engineering,COR-005,18.3,2008-05-20,Fair,10,0.431,26.2623,83.9646,3
+AST-0399,Signal Section 399,Signal,S&T,COR-002,12.3,2014-05-19,Good,9,0.194,20.9697,80.878,1
+AST-0400,Track Section 400,Track,Engineering,COR-008,5.8,2020-11-15,Good,9,0.226,21.9126,85.2008,4
+AST-0401,OHE Section 401,OHE,Traction Distribution,COR-009,8.3,2018-05-18,Good,7,0.27,24.0654,77.304,1
+AST-0402,Track Section 402,Track,Engineering,COR-006,24.8,2001-11-20,Fair,8,0.539,23.8671,75.7305,4
+AST-0403,Signal Section 403,Signal,S&T,COR-002,5.4,2021-04-10,Good,9,0.169,25.0085,78.1117,0
+AST-0404,Station Equipment Section 404,Station Equipment,S&T,COR-002,13.5,2013-03-07,Fair,4,0.394,23.3744,79.0608,4
+AST-0405,Station Equipment Section 405,Station Equipment,S&T,COR-005,18.7,2007-12-26,Warning,6,0.661,28.1947,83.6349,3
+AST-0406,OHE Section 406,OHE,Traction Distribution,COR-006,14.4,2012-04-12,Fair,8,0.398,27.3993,86.0283,0
+AST-0407,Track Section 407,Track,Engineering,COR-006,10.7,2015-12-24,Good,9,0.286,27.7911,84.0347,3
+AST-0408,OHE Section 408,OHE,Traction Distribution,COR-003,12.0,2014-09-05,Fair,6,0.397,25.2952,75.2838,2
+AST-0409,OHE Section 409,OHE,Traction Distribution,COR-006,15.0,2011-09-06,Fair,7,0.518,25.3501,78.3595,1
+AST-0410,Signal Section 410,Signal,S&T,COR-003,5.3,2021-05-17,Good,8,0.0,25.092,75.0346,0
+AST-0411,OHE Section 411,OHE,Traction Distribution,COR-007,10.1,2016-07-30,Good,7,0.236,23.3488,83.4876,1
+AST-0412,Track Section 412,Track,Engineering,COR-008,37.4,1989-04-18,Warning,8,0.741,22.2211,76.4708,4
+AST-0413,Track Section 413,Track,Engineering,COR-007,13.8,2012-11-17,Fair,8,0.418,24.92,80.9062,2
+AST-0414,Signal Section 414,Signal,S&T,COR-001,11.0,2015-09-05,Fair,9,0.395,19.2553,85.1693,0
+AST-0415,Track Section 415,Track,Engineering,COR-010,7.7,2018-12-23,Good,7,0.2,19.0746,83.235,2
+AST-0416,Track Section 416,Track,Engineering,COR-001,5.4,2021-04-10,Good,9,0.279,27.5164,77.274,2
+AST-0417,Bridge Section 417,Bridge,Engineering,COR-010,12.3,2014-05-19,Good,9,0.237,19.4642,77.8259,1
+AST-0418,Station Equipment Section 418,Station Equipment,S&T,COR-001,12.9,2013-10-12,Good,5,0.232,24.248,82.9538,3
+AST-0419,Signal Section 419,Signal,S&T,COR-006,9.6,2017-01-28,Good,9,0.32,25.1499,81.2915,2
+AST-0420,Bridge Section 420,Bridge,Engineering,COR-002,40.0,1986-09-12,Warning,10,0.63,20.9817,74.0423,3
+AST-0421,Station Equipment Section 421,Station Equipment,S&T,COR-001,5.8,2020-11-15,Good,4,0.211,27.9573,86.4839,0
+AST-0422,Track Section 422,Track,Engineering,COR-007,4.7,2021-12-22,Good,8,0.0,20.901,80.7018,0
+AST-0423,Signal Section 423,Signal,S&T,COR-008,7.8,2018-11-16,Good,9,0.267,27.8451,80.0738,1
+AST-0424,Signal Section 424,Signal,S&T,COR-002,9.8,2016-11-16,Good,8,0.219,26.6299,75.675,1
+AST-0425,Track Section 425,Track,Engineering,COR-010,5.1,2021-07-29,Good,7,0.096,21.4074,78.5319,0
+AST-0426,OHE Section 426,OHE,Traction Distribution,COR-004,12.0,2014-09-05,Good,8,0.279,20.5074,77.8252,1
+AST-0427,Signal Section 427,Signal,S&T,COR-004,13.0,2013-09-05,Fair,9,0.381,22.1623,76.8318,1
+AST-0428,Signal Section 428,Signal,S&T,COR-003,16.2,2010-06-25,Good,8,0.189,22.9795,81.5785,0
+AST-0429,Track Section 429,Track,Engineering,COR-005,6.8,2019-11-16,Good,9,0.198,21.4578,79.8964,0
+AST-0430,Track Section 430,Track,Engineering,COR-002,23.5,2003-03-10,Fair,7,0.359,28.9889,86.7272,0
+AST-0431,Station Equipment Section 431,Station Equipment,S&T,COR-005,15.5,2011-03-08,Warning,8,0.605,21.2965,87.5615,2
+AST-0432,Track Section 432,Track,Engineering,COR-003,5.7,2020-12-22,Fair,8,0.377,27.3063,76.0116,3
+AST-0433,Track Section 433,Track,Engineering,COR-001,5.1,2021-07-29,Good,8,0.299,20.5912,74.1017,4
+AST-0434,Track Section 434,Track,Engineering,COR-004,8.2,2018-06-24,Good,9,0.081,28.8024,85.0654,1
+AST-0435,Signal Section 435,Signal,S&T,COR-007,13.0,2013-09-05,Good,8,0.286,21.2552,88.4178,1
+AST-0436,Signal Section 436,Signal,S&T,COR-008,14.3,2012-05-19,Fair,9,0.434,23.2169,86.3176,0
+AST-0437,Signal Section 437,Signal,S&T,COR-004,15.5,2011-03-08,Fair,10,0.378,24.5856,72.8792,2
+AST-0438,Track Section 438,Track,Engineering,COR-004,35.9,1990-10-18,Warning,8,0.702,20.2029,76.5202,7
+AST-0439,Track Section 439,Track,Engineering,COR-008,2.0,2024-09-02,Good,7,0.124,27.1682,73.1935,0
+AST-0440,Bridge Section 440,Bridge,Engineering,COR-007,9.4,2017-04-11,Good,10,0.272,21.7469,85.6325,2
+AST-0441,OHE Section 441,OHE,Traction Distribution,COR-009,34.0,1992-09-10,Warning,7,0.596,24.4927,81.8025,1
+AST-0442,OHE Section 442,OHE,Traction Distribution,COR-010,16.7,2009-12-25,Fair,7,0.389,24.4963,80.7195,0
+AST-0443,OHE Section 443,OHE,Traction Distribution,COR-009,4.4,2022-04-10,Good,6,0.042,25.0264,81.3712,0
+AST-0444,OHE Section 444,OHE,Traction Distribution,COR-010,11.6,2015-01-29,Good,6,0.178,19.5549,76.5392,0
+AST-0445,Track Section 445,Track,Engineering,COR-005,9.0,2017-09-04,Good,9,0.099,20.6862,82.1262,0
+AST-0446,Signal Section 446,Signal,S&T,COR-004,8.7,2017-12-23,Good,9,0.189,20.6119,72.9907,3
+AST-0447,Signal Section 447,Signal,S&T,COR-004,6.7,2019-12-23,Good,10,0.173,22.0205,82.8362,1
+AST-0448,Track Section 448,Track,Engineering,COR-003,11.0,2015-09-05,Good,8,0.125,20.4491,84.2509,0
+AST-0449,Bridge Section 449,Bridge,Engineering,COR-008,20.7,2005-12-26,Fair,10,0.511,28.2192,83.2684,4
+AST-0450,Signal Section 450,Signal,S&T,COR-008,7.2,2019-06-23,Good,9,0.299,24.1295,77.8139,1
+AST-0451,OHE Section 451,OHE,Traction Distribution,COR-009,15.6,2011-01-30,Good,6,0.021,25.2358,85.7202,0
+AST-0452,Bridge Section 452,Bridge,Engineering,COR-002,17.4,2009-04-14,Good,10,0.343,22.5749,83.9487,2
+AST-0453,Signal Section 453,Signal,S&T,COR-005,23.4,2003-04-15,Fair,9,0.51,21.7625,74.5528,1
+AST-0454,Station Equipment Section 454,Station Equipment,S&T,COR-003,5.0,2021-09-03,Good,5,0.223,24.0318,75.6223,2
+AST-0455,Signal Section 455,Signal,S&T,COR-009,10.4,2016-04-11,Good,9,0.067,21.9432,82.6937,1
+AST-0456,Bridge Section 456,Bridge,Engineering,COR-003,6.1,2020-07-29,Good,9,0.183,22.4365,77.1307,4
+AST-0457,Track Section 457,Track,Engineering,COR-002,11.0,2015-09-05,Good,7,0.195,23.5275,74.4109,0
+AST-0458,Signal Section 458,Signal,S&T,COR-006,10.9,2015-10-12,Fair,9,0.405,24.0573,74.9795,2
+AST-0459,Signal Section 459,Signal,S&T,COR-009,4.0,2022-09-03,Good,9,0.148,28.8431,75.1499,0
+AST-0460,Track Section 460,Track,Engineering,COR-010,11.4,2015-04-12,Good,8,0.186,21.2332,80.1447,0
+AST-0461,Signal Section 461,Signal,S&T,COR-001,37.0,1989-09-11,Fair,9,0.459,23.8798,82.2182,1
+AST-0462,Station Equipment Section 462,Station Equipment,S&T,COR-004,14.4,2012-04-12,Good,5,0.165,20.4951,75.3224,0
+AST-0463,OHE Section 463,OHE,Traction Distribution,COR-002,3.3,2023-05-17,Good,6,0.053,22.5,83.8999,0
+AST-0464,Track Section 464,Track,Engineering,COR-004,4.8,2021-11-15,Good,7,0.209,26.1731,76.9962,3
+AST-0465,Track Section 465,Track,Engineering,COR-006,10.0,2016-09-04,Good,8,0.284,20.7446,77.4849,3
+AST-0466,Track Section 466,Track,Engineering,COR-003,4.9,2021-10-10,Good,8,0.238,24.8135,76.076,1
+AST-0467,Track Section 467,Track,Engineering,COR-001,22.6,2004-02-01,Fair,8,0.412,23.167,85.0633,2
+AST-0468,Station Equipment Section 468,Station Equipment,S&T,COR-006,3.0,2023-09-03,Good,4,0.144,19.5158,87.857,2
+AST-0469,Signal Section 469,Signal,S&T,COR-001,14.4,2012-04-12,Good,8,0.3,28.3308,80.38,0
+AST-0470,Track Section 470,Track,Engineering,COR-003,2.4,2024-04-09,Good,8,0.156,23.136,73.1725,1
+AST-0471,Signal Section 471,Signal,S&T,COR-001,9.9,2016-10-11,Good,9,0.31,26.8393,76.6691,1
+AST-0472,Track Section 472,Track,Engineering,COR-001,4.3,2022-05-17,Fair,7,0.42,23.1631,75.0288,2
+AST-0473,Track Section 473,Track,Engineering,COR-005,16.2,2010-06-25,Fair,10,0.442,28.3736,85.9842,1
+AST-0474,OHE Section 474,OHE,Traction Distribution,COR-009,20.2,2006-06-26,Good,7,0.347,21.9047,73.8577,2
+AST-0475,OHE Section 475,OHE,Traction Distribution,COR-008,13.0,2013-09-05,Fair,8,0.437,23.1223,87.9636,1
+AST-0476,Station Equipment Section 476,Station Equipment,S&T,COR-001,20.8,2005-11-19,Fair,5,0.418,26.5886,81.9162,2
+AST-0477,OHE Section 477,OHE,Traction Distribution,COR-001,0.8,2025-11-14,Good,7,0.086,22.4367,80.7838,1
+AST-0478,Signal Section 478,Signal,S&T,COR-004,11.3,2015-05-19,Good,9,0.113,22.6436,86.0576,2
+AST-0479,OHE Section 479,OHE,Traction Distribution,COR-007,14.3,2012-05-19,Good,8,0.27,28.9482,72.9408,1
+AST-0480,Station Equipment Section 480,Station Equipment,S&T,COR-008,15.6,2011-01-30,Good,6,0.293,24.5561,84.9344,0
+AST-0481,OHE Section 481,OHE,Traction Distribution,COR-009,13.7,2012-12-24,Good,7,0.059,25.8938,74.3657,0
+AST-0482,Station Equipment Section 482,Station Equipment,S&T,COR-004,15.8,2010-11-18,Good,5,0.266,25.4346,85.9524,3
+AST-0483,OHE Section 483,OHE,Traction Distribution,COR-002,11.2,2015-06-25,Good,6,0.106,27.2792,80.9668,0
+AST-0484,Bridge Section 484,Bridge,Engineering,COR-001,3.3,2023-05-17,Good,10,0.25,27.6183,73.4781,0
+AST-0485,Track Section 485,Track,Engineering,COR-002,6.7,2019-12-23,Good,7,0.242,24.6326,85.8319,0
+AST-0486,OHE Section 486,OHE,Traction Distribution,COR-001,22.6,2004-02-01,Good,7,0.337,21.9456,72.937,0
+AST-0487,Signal Section 487,Signal,S&T,COR-009,21.0,2005-09-07,Good,8,0.336,19.228,74.7139,2
+AST-0488,Signal Section 488,Signal,S&T,COR-003,14.1,2012-07-31,Good,7,0.067,25.144,85.2652,0
+AST-0489,OHE Section 489,OHE,Traction Distribution,COR-009,16.5,2010-03-08,Good,7,0.246,27.2547,79.9379,1
+AST-0490,Station Equipment Section 490,Station Equipment,S&T,COR-006,19.4,2007-04-15,Fair,5,0.534,23.5054,86.6022,2
+AST-0491,Station Equipment Section 491,Station Equipment,S&T,COR-006,14.0,2012-09-05,Fair,4,0.51,20.6471,82.6669,4
+AST-0492,Track Section 492,Track,Engineering,COR-005,22.2,2004-06-26,Fair,9,0.52,21.8808,82.4765,4
+AST-0493,OHE Section 493,OHE,Traction Distribution,COR-009,21.7,2004-12-26,Fair,8,0.503,24.0999,77.1758,1
+AST-0494,OHE Section 494,OHE,Traction Distribution,COR-001,40.0,1986-09-12,Fair,8,0.503,27.3668,74.6389,2
+AST-0495,Track Section 495,Track,Engineering,COR-001,6.9,2019-10-11,Good,8,0.08,20.7175,87.8788,1
+AST-0496,Track Section 496,Track,Engineering,COR-005,7.0,2019-09-04,Fair,9,0.481,25.1215,74.1768,2
+AST-0497,Track Section 497,Track,Engineering,COR-004,13.3,2013-05-19,Fair,8,0.527,26.5337,80.9642,4
+AST-0498,OHE Section 498,OHE,Traction Distribution,COR-006,32.8,1993-11-23,Warning,8,0.729,28.3605,76.8611,3
+AST-0499,Signal Section 499,Signal,S&T,COR-008,23.3,2003-05-22,Fair,9,0.523,20.167,76.7263,2
+AST-0500,Station Equipment Section 500,Station Equipment,S&T,COR-006,17.8,2008-11-18,Good,5,0.2,28.2639,82.0134,0
+AST-0501,Signal Section 501,Signal,S&T,COR-003,24.4,2002-04-15,Good,9,0.189,25.0147,85.2669,0
+AST-0502,Station Equipment Section 502,Station Equipment,S&T,COR-004,14.5,2012-03-07,Fair,5,0.359,26.667,84.9349,3
+AST-0503,Signal Section 503,Signal,S&T,COR-008,8.2,2018-06-24,Good,9,0.277,19.5377,86.4008,0
+AST-0504,OHE Section 504,OHE,Traction Distribution,COR-003,37.9,1988-10-18,Fair,7,0.484,24.0615,77.1864,1
+AST-0505,Track Section 505,Track,Engineering,COR-006,13.8,2012-11-17,Fair,9,0.417,25.2263,79.952,1
+AST-0506,Signal Section 506,Signal,S&T,COR-006,21.4,2005-04-15,Fair,10,0.527,22.0683,72.6494,2
+AST-0507,Bridge Section 507,Bridge,Engineering,COR-008,0.8,2025-11-14,Good,10,0.331,23.3165,84.4497,3
+AST-0508,Station Equipment Section 508,Station Equipment,S&T,COR-008,1.0,2025-09-02,Good,6,0.237,24.543,77.3375,2
+AST-0509,Bridge Section 509,Bridge,Engineering,COR-005,11.6,2015-01-29,Warning,10,0.607,24.5255,81.4839,1
+AST-0510,Track Section 510,Track,Engineering,COR-004,4.9,2021-10-10,Good,9,0.212,19.4186,75.2088,0
+AST-0511,Signal Section 511,Signal,S&T,COR-004,12.4,2014-04-12,Good,9,0.301,23.3948,85.6104,0
+AST-0512,Track Section 512,Track,Engineering,COR-005,7.0,2019-09-04,Fair,10,0.524,21.1382,85.5764,4
+AST-0513,Track Section 513,Track,Engineering,COR-003,40.0,1986-09-12,Fair,7,0.529,28.167,86.5392,2
+AST-0514,OHE Section 514,OHE,Traction Distribution,COR-007,20.3,2006-05-21,Critical,6,0.752,28.7658,73.235,6
+AST-0515,OHE Section 515,OHE,Traction Distribution,COR-003,25.9,2000-10-15,Fair,7,0.497,21.9965,88.3793,2
+AST-0516,OHE Section 516,OHE,Traction Distribution,COR-007,1.3,2025-05-16,Good,7,0.199,20.7519,76.4645,1
+AST-0517,Bridge Section 517,Bridge,Engineering,COR-008,17.7,2008-12-25,Fair,10,0.513,21.195,77.4509,1
+AST-0518,OHE Section 518,OHE,Traction Distribution,COR-010,9.0,2017-09-04,Fair,6,0.409,23.7775,76.4894,2
+AST-0519,Bridge Section 519,Bridge,Engineering,COR-002,26.2,2000-06-27,Fair,10,0.533,27.7451,76.7805,2
+AST-0520,Track Section 520,Track,Engineering,COR-008,16.0,2010-09-06,Good,9,0.234,24.0004,81.3426,1
+AST-0521,Track Section 521,Track,Engineering,COR-001,10.0,2016-09-04,Fair,8,0.441,19.5539,76.337,2
+AST-0522,OHE Section 522,OHE,Traction Distribution,COR-004,3.7,2022-12-22,Good,6,0.154,19.3989,78.8003,0
+AST-0523,Bridge Section 523,Bridge,Engineering,COR-002,11.4,2015-04-12,Good,10,0.248,21.2739,82.9897,0
+AST-0524,Track Section 524,Track,Engineering,COR-002,22.3,2004-05-21,Good,8,0.231,27.4277,85.8764,1
+AST-0525,Signal Section 525,Signal,S&T,COR-002,27.2,1999-06-28,Fair,9,0.515,25.2148,83.5839,1
+AST-0526,OHE Section 526,OHE,Traction Distribution,COR-001,7.8,2018-11-16,Good,7,0.164,24.6296,82.0092,1
+AST-0527,Track Section 527,Track,Engineering,COR-009,40.0,1986-09-12,Warning,8,0.64,22.1897,74.8637,4
+AST-0528,Signal Section 528,Signal,S&T,COR-001,21.2,2005-06-26,Fair,9,0.392,28.2943,85.5578,5
+AST-0529,Bridge Section 529,Bridge,Engineering,COR-004,5.0,2021-09-03,Fair,10,0.444,22.3118,73.0964,1
+AST-0530,OHE Section 530,OHE,Traction Distribution,COR-007,4.0,2022-09-03,Fair,7,0.428,27.3494,76.7271,5
+AST-0531,Track Section 531,Track,Engineering,COR-010,9.4,2017-04-11,Good,7,0.195,27.959,73.4129,0
+AST-0532,Bridge Section 532,Bridge,Engineering,COR-009,7.8,2018-11-16,Good,9,0.193,23.8334,83.1789,0
+AST-0533,Track Section 533,Track,Engineering,COR-002,14.5,2012-03-07,Good,7,0.233,27.9429,78.3939,1
+AST-0534,Bridge Section 534,Bridge,Engineering,COR-010,10.6,2016-01-29,Good,10,0.338,21.768,82.9328,3
+AST-0535,Track Section 535,Track,Engineering,COR-007,8.3,2018-05-18,Good,8,0.21,25.5843,78.0525,1
+AST-0536,Signal Section 536,Signal,S&T,COR-002,2.5,2024-03-04,Good,9,0.062,19.8796,79.7919,0
+AST-0537,Signal Section 537,Signal,S&T,COR-005,16.3,2010-05-20,Warning,10,0.642,23.7393,79.8274,4
+AST-0538,Track Section 538,Track,Engineering,COR-010,2.3,2024-05-16,Good,7,0.027,21.1733,73.2293,0
+AST-0539,Bridge Section 539,Bridge,Engineering,COR-004,21.2,2005-06-26,Fair,10,0.431,19.6276,79.3836,1
+AST-0540,Track Section 540,Track,Engineering,COR-002,1.5,2025-03-04,Good,7,0.0,19.0373,82.757,0
+AST-0541,Track Section 541,Track,Engineering,COR-009,2.2,2024-06-21,Good,7,0.193,22.2475,81.2368,0
+AST-0542,Track Section 542,Track,Engineering,COR-010,4.9,2021-10-10,Fair,8,0.36,24.8953,73.7045,2
+AST-0543,OHE Section 543,OHE,Traction Distribution,COR-010,7.3,2019-05-18,Good,5,0.247,23.5523,83.1889,1
+AST-0544,Bridge Section 544,Bridge,Engineering,COR-010,6.1,2020-07-29,Good,9,0.319,22.0177,77.4418,2
+AST-0545,Station Equipment Section 545,Station Equipment,S&T,COR-009,7.3,2019-05-18,Good,5,0.077,28.912,72.731,0
+AST-0546,Track Section 546,Track,Engineering,COR-005,12.5,2014-03-07,Fair,8,0.5,28.3953,74.9895,5
+AST-0547,Signal Section 547,Signal,S&T,COR-002,5.0,2021-09-03,Good,9,0.034,20.2565,80.461,0
+AST-0548,Track Section 548,Track,Engineering,COR-007,12.6,2014-01-29,Good,9,0.281,23.1511,77.4664,0
+AST-0549,Signal Section 549,Signal,S&T,COR-003,0.8,2025-11-14,Good,8,0.2,25.4885,83.6101,2
+AST-0550,Station Equipment Section 550,Station Equipment,S&T,COR-005,4.9,2021-10-10,Fair,6,0.38,26.3349,76.3505,2
+AST-0551,OHE Section 551,OHE,Traction Distribution,COR-007,2.1,2024-07-28,Good,8,0.0,22.6637,84.8647,0
+AST-0552,Signal Section 552,Signal,S&T,COR-010,21.1,2005-08-02,Good,8,0.192,26.4628,77.0836,0
+AST-0553,Signal Section 553,Signal,S&T,COR-003,5.6,2021-01-28,Good,9,0.007,20.2415,82.4338,0
+AST-0554,Station Equipment Section 554,Station Equipment,S&T,COR-003,15.6,2011-01-30,Fair,4,0.369,22.3181,85.2875,3
+AST-0555,Signal Section 555,Signal,S&T,COR-008,1.7,2024-12-21,Fair,9,0.478,26.1643,78.6689,1
+AST-0556,Track Section 556,Track,Engineering,COR-001,26.9,1999-10-16,Warning,7,0.668,25.2568,73.2489,2
+AST-0557,Signal Section 557,Signal,S&T,COR-006,11.0,2015-09-05,Good,10,0.143,27.3721,81.0671,2
+AST-0558,Track Section 558,Track,Engineering,COR-008,10.1,2016-07-30,Fair,9,0.516,19.4686,88.4265,0
+AST-0559,Track Section 559,Track,Engineering,COR-006,2.6,2024-01-27,Fair,8,0.367,20.7439,88.0039,0
+AST-0560,Track Section 560,Track,Engineering,COR-004,4.4,2022-04-10,Good,7,0.019,19.4849,76.0364,0
+AST-0561,Signal Section 561,Signal,S&T,COR-009,8.5,2018-03-06,Good,8,0.158,20.9211,84.5911,0
+AST-0562,OHE Section 562,OHE,Traction Distribution,COR-004,4.5,2022-03-05,Good,7,0.337,19.0428,78.0192,2
+AST-0563,Track Section 563,Track,Engineering,COR-008,19.7,2006-12-26,Fair,9,0.544,24.0421,75.0644,1
+AST-0564,Signal Section 564,Signal,S&T,COR-005,10.8,2015-11-17,Good,10,0.291,24.2831,83.1546,1
+AST-0565,Station Equipment Section 565,Station Equipment,S&T,COR-001,4.6,2022-01-28,Good,5,0.272,25.5789,80.5139,2
+AST-0566,OHE Section 566,OHE,Traction Distribution,COR-006,17.7,2008-12-25,Good,8,0.206,22.8491,81.1277,2
+AST-0567,Signal Section 567,Signal,S&T,COR-001,7.7,2018-12-23,Good,9,0.214,19.0321,85.7383,2
+AST-0568,Track Section 568,Track,Engineering,COR-010,17.2,2009-06-25,Fair,7,0.433,25.7389,77.8847,1
+AST-0569,Bridge Section 569,Bridge,Engineering,COR-007,6.7,2019-12-23,Good,9,0.229,19.5429,83.1735,0
+AST-0570,Track Section 570,Track,Engineering,COR-004,14.9,2011-10-13,Good,9,0.289,27.6617,78.3591,0
+AST-0571,Track Section 571,Track,Engineering,COR-005,7.5,2019-03-06,Fair,7,0.51,19.2265,73.1836,3
+AST-0572,Station Equipment Section 572,Station Equipment,S&T,COR-007,19.7,2006-12-26,Fair,5,0.523,24.3048,78.5482,4
+AST-0573,Signal Section 573,Signal,S&T,COR-003,1.7,2024-12-21,Good,8,0.277,27.9492,87.7006,1
+AST-0574,OHE Section 574,OHE,Traction Distribution,COR-003,3.4,2023-04-10,Good,6,0.248,24.7249,80.2322,1
+AST-0575,Signal Section 575,Signal,S&T,COR-005,9.1,2017-07-30,Warning,10,0.555,25.0842,74.2317,3
+AST-0576,OHE Section 576,OHE,Traction Distribution,COR-003,5.8,2020-11-15,Good,6,0.264,25.8161,83.5052,1
+AST-0577,Track Section 577,Track,Engineering,COR-008,7.3,2019-05-18,Good,8,0.339,20.2241,87.9141,3
+AST-0578,Track Section 578,Track,Engineering,COR-002,16.1,2010-08-01,Good,7,0.31,25.7493,87.0271,0
+AST-0579,Track Section 579,Track,Engineering,COR-009,7.2,2019-06-23,Good,8,0.149,27.8035,81.6514,1
+AST-0580,Track Section 580,Track,Engineering,COR-004,12.9,2013-10-12,Good,8,0.176,28.7422,78.5205,1
+AST-0581,Bridge Section 581,Bridge,Engineering,COR-006,4.8,2021-11-15,Good,10,0.17,23.4305,81.7908,3
+AST-0582,Track Section 582,Track,Engineering,COR-002,1.3,2025-05-16,Good,7,0.062,22.445,85.5549,0
+AST-0583,Signal Section 583,Signal,S&T,COR-004,17.1,2009-08-01,Fair,10,0.408,26.5331,86.2798,3
+AST-0584,OHE Section 584,OHE,Traction Distribution,COR-008,30.9,1995-10-17,Critical,7,0.805,24.4287,85.6015,4
+AST-0585,OHE Section 585,OHE,Traction Distribution,COR-003,12.0,2014-09-05,Good,7,0.256,21.573,79.7876,0
+AST-0586,Signal Section 586,Signal,S&T,COR-002,9.5,2017-03-06,Good,8,0.329,20.7216,74.4017,3
+AST-0587,Signal Section 587,Signal,S&T,COR-006,11.1,2015-07-31,Fair,9,0.501,20.7023,81.6068,2
+AST-0588,Station Equipment Section 588,Station Equipment,S&T,COR-002,24.5,2002-03-10,Fair,6,0.387,23.5918,75.0029,3
+AST-0589,OHE Section 589,OHE,Traction Distribution,COR-004,12.1,2014-07-31,Fair,7,0.382,20.7012,73.4753,3
+AST-0590,Bridge Section 590,Bridge,Engineering,COR-005,17.7,2008-12-25,Fair,10,0.514,19.1972,80.4787,3
+AST-0591,Station Equipment Section 591,Station Equipment,S&T,COR-006,17.2,2009-06-25,Warning,6,0.614,19.5209,82.986,0
+AST-0592,OHE Section 592,OHE,Traction Distribution,COR-007,20.8,2005-11-19,Fair,6,0.497,28.2988,86.1664,1
+AST-0593,Track Section 593,Track,Engineering,COR-007,9.4,2017-04-11,Good,8,0.121,19.7296,85.0254,2
+AST-0594,Signal Section 594,Signal,S&T,COR-009,6.7,2019-12-23,Good,9,0.19,19.7318,86.2158,1
+AST-0595,Track Section 595,Track,Engineering,COR-001,15.0,2011-09-06,Fair,8,0.539,23.5119,84.6611,2
+AST-0596,OHE Section 596,OHE,Traction Distribution,COR-004,19.9,2006-10-14,Fair,7,0.396,21.451,83.7518,1
+AST-0597,Station Equipment Section 597,Station Equipment,S&T,COR-001,22.4,2004-04-15,Fair,6,0.497,28.6269,72.6622,4
+AST-0598,Signal Section 598,Signal,S&T,COR-001,26.5,2000-03-10,Warning,9,0.565,28.1099,82.5176,4
+AST-0599,Signal Section 599,Signal,S&T,COR-003,18.7,2007-12-26,Good,7,0.229,23.0474,74.4277,0
+AST-0600,Track Section 600,Track,Engineering,COR-006,6.4,2020-04-10,Fair,9,0.368,23.4873,73.4387,1
+AST-0601,Station Equipment Section 601,Station Equipment,S&T,COR-009,12.0,2014-09-05,Good,5,0.076,22.7511,75.0026,0
+AST-0602,Track Section 602,Track,Engineering,COR-008,11.2,2015-06-25,Good,8,0.286,19.3787,85.6727,0
+AST-0603,Track Section 603,Track,Engineering,COR-007,10.3,2016-05-18,Fair,8,0.406,21.9285,84.4016,1
+AST-0604,Track Section 604,Track,Engineering,COR-008,15.0,2011-09-06,Fair,8,0.456,20.2267,87.6804,2
+AST-0605,Track Section 605,Track,Engineering,COR-002,8.7,2017-12-23,Good,7,0.161,20.0237,88.1636,0
+AST-0606,Signal Section 606,Signal,S&T,COR-009,8.7,2017-12-23,Good,9,0.251,24.6086,86.7925,2
+AST-0607,Signal Section 607,Signal,S&T,COR-009,32.1,1994-08-05,Fair,8,0.512,19.9876,74.6268,2
+AST-0608,Track Section 608,Track,Engineering,COR-001,9.7,2016-12-23,Good,7,0.27,20.0293,86.5541,3
+AST-0609,Track Section 609,Track,Engineering,COR-005,20.7,2005-12-26,Warning,10,0.663,23.8051,85.9182,6
+AST-0610,Track Section 610,Track,Engineering,COR-009,21.5,2005-03-09,Good,7,0.286,23.4228,86.4374,4
+AST-0611,Signal Section 611,Signal,S&T,COR-005,12.2,2014-06-24,Fair,10,0.473,20.3763,74.927,1
+AST-0612,Track Section 612,Track,Engineering,COR-009,9.0,2017-09-04,Good,7,0.164,19.0445,74.3687,1
+AST-0613,OHE Section 613,OHE,Traction Distribution,COR-010,5.0,2021-09-03,Good,6,0.0,20.9297,87.2809,0
+AST-0614,Track Section 614,Track,Engineering,COR-005,2.3,2024-05-16,Good,8,0.221,21.3589,75.2812,4
+AST-0615,Track Section 615,Track,Engineering,COR-001,15.8,2010-11-18,Fair,8,0.54,27.0025,78.3979,4
+AST-0616,Signal Section 616,Signal,S&T,COR-004,13.6,2013-01-29,Fair,10,0.377,28.1544,79.7958,2
+AST-0617,Signal Section 617,Signal,S&T,COR-003,17.4,2009-04-14,Good,9,0.176,23.0594,74.4911,0
+AST-0618,Track Section 618,Track,Engineering,COR-005,7.0,2019-09-04,Good,9,0.211,23.0503,72.8301,0
+AST-0619,Track Section 619,Track,Engineering,COR-006,34.2,1992-06-29,Warning,7,0.676,26.1248,88.4054,3
+AST-0620,Bridge Section 620,Bridge,Engineering,COR-005,14.5,2012-03-07,Warning,10,0.687,25.2692,86.5265,3
+AST-0621,Track Section 621,Track,Engineering,COR-002,9.5,2017-03-06,Good,7,0.186,20.8414,87.0974,1
+AST-0622,Signal Section 622,Signal,S&T,COR-004,1.2,2025-06-21,Good,10,0.317,20.0769,77.053,3
+AST-0623,Signal Section 623,Signal,S&T,COR-007,7.7,2018-12-23,Good,10,0.283,23.3761,76.0216,1
+AST-0624,Track Section 624,Track,Engineering,COR-001,18.0,2008-09-06,Fair,8,0.439,24.6483,79.3139,0
+AST-0625,Signal Section 625,Signal,S&T,COR-003,26.0,2000-09-08,Good,8,0.293,20.3871,79.7531,3
+AST-0626,OHE Section 626,OHE,Traction Distribution,COR-009,10.6,2016-01-29,Good,7,0.336,21.9327,72.5896,3
+AST-0627,Bridge Section 627,Bridge,Engineering,COR-001,28.8,1997-11-21,Fair,10,0.491,22.0594,84.968,1
+AST-0628,Track Section 628,Track,Engineering,COR-005,4.7,2021-12-22,Fair,9,0.468,21.613,88.4467,2
+AST-0629,Track Section 629,Track,Engineering,COR-003,13.9,2012-10-12,Good,7,0.189,23.6076,80.9591,0
+AST-0630,Track Section 630,Track,Engineering,COR-002,14.2,2012-06-24,Good,6,0.294,25.5306,78.7121,0
+AST-0631,Signal Section 631,Signal,S&T,COR-005,15.9,2010-10-13,Warning,10,0.561,24.0939,78.784,3
+AST-0632,OHE Section 632,OHE,Traction Distribution,COR-006,11.7,2014-12-24,Fair,7,0.361,21.0146,74.0372,2
+AST-0633,Track Section 633,Track,Engineering,COR-002,13.4,2013-04-12,Good,7,0.311,20.0294,76.7586,1
+AST-0634,Track Section 634,Track,Engineering,COR-001,4.6,2022-01-28,Good,8,0.166,27.2187,80.5341,0
+AST-0635,Station Equipment Section 635,Station Equipment,S&T,COR-002,24.4,2002-04-15,Good,5,0.336,23.793,79.4096,1
+AST-0636,Track Section 636,Track,Engineering,COR-007,19.4,2007-04-15,Warning,7,0.594,19.6214,81.2206,4
+AST-0637,Signal Section 637,Signal,S&T,COR-009,13.0,2013-09-05,Fair,7,0.383,21.5812,86.0851,1
+AST-0638,OHE Section 638,OHE,Traction Distribution,COR-002,19.7,2006-12-26,Good,7,0.258,27.0403,76.1039,0
+AST-0639,Track Section 639,Track,Engineering,COR-004,24.9,2001-10-15,Warning,8,0.555,26.5173,72.9426,1
+AST-0640,Track Section 640,Track,Engineering,COR-004,15.7,2010-12-25,Good,8,0.271,27.7582,73.1116,4
+AST-0641,Track Section 641,Track,Engineering,COR-004,36.5,1990-03-13,Fair,7,0.504,25.0209,74.6467,2
+AST-0642,Station Equipment Section 642,Station Equipment,S&T,COR-003,16.6,2010-01-30,Fair,5,0.448,23.2291,81.6277,3
+AST-0643,Track Section 643,Track,Engineering,COR-001,5.2,2021-06-22,Good,7,0.002,23.2663,85.431,0
+AST-0644,Track Section 644,Track,Engineering,COR-006,12.6,2014-01-29,Fair,8,0.503,20.94,86.6889,3
+AST-0645,Track Section 645,Track,Engineering,COR-004,20.2,2006-06-26,Fair,8,0.391,25.508,82.6618,2
+AST-0646,Track Section 646,Track,Engineering,COR-004,24.9,2001-10-15,Fair,8,0.461,24.8507,78.9503,0
+AST-0647,OHE Section 647,OHE,Traction Distribution,COR-003,11.9,2014-10-12,Good,6,0.309,20.5486,74.9722,0
+AST-0648,Track Section 648,Track,Engineering,COR-010,4.9,2021-10-10,Good,7,0.197,27.8566,78.9227,1
+AST-0649,Signal Section 649,Signal,S&T,COR-007,8.9,2017-10-11,Good,10,0.158,22.6847,77.8186,1
+AST-0650,Signal Section 650,Signal,S&T,COR-005,3.2,2023-06-22,Fair,10,0.43,19.4974,86.4204,3
+AST-0651,Bridge Section 651,Bridge,Engineering,COR-003,17.8,2008-11-18,Fair,10,0.354,22.2788,80.2875,1
+AST-0652,Track Section 652,Track,Engineering,COR-009,7.6,2019-01-28,Good,7,0.032,27.6986,76.1191,0
+AST-0653,Bridge Section 653,Bridge,Engineering,COR-009,6.0,2020-09-03,Good,9,0.14,28.1696,77.1208,1
+AST-0654,OHE Section 654,OHE,Traction Distribution,COR-001,19.0,2007-09-07,Warning,6,0.562,23.904,74.6835,3
+AST-0655,Track Section 655,Track,Engineering,COR-010,28.4,1998-04-16,Warning,8,0.652,28.5634,87.1974,4
+AST-0656,OHE Section 656,OHE,Traction Distribution,COR-007,5.9,2020-10-10,Good,7,0.302,27.7524,73.3055,1
+AST-0657,Bridge Section 657,Bridge,Engineering,COR-001,11.9,2014-10-12,Good,10,0.156,27.2523,72.7055,0
+AST-0658,Track Section 658,Track,Engineering,COR-008,9.1,2017-07-30,Fair,8,0.391,27.5971,75.4278,4
+AST-0659,Station Equipment Section 659,Station Equipment,S&T,COR-002,25.7,2000-12-27,Fair,5,0.533,22.8188,85.474,4
+AST-0660,Signal Section 660,Signal,S&T,COR-001,10.0,2016-09-04,Fair,8,0.36,26.5647,80.8755,2
+AST-0661,OHE Section 661,OHE,Traction Distribution,COR-002,4.5,2022-03-05,Good,6,0.234,24.7734,82.5135,1
+AST-0662,Station Equipment Section 662,Station Equipment,S&T,COR-005,10.3,2016-05-18,Fair,5,0.485,26.1968,78.2237,1
+AST-0663,Signal Section 663,Signal,S&T,COR-007,22.3,2004-05-21,Fair,10,0.433,20.7779,73.5988,1
+AST-0664,Bridge Section 664,Bridge,Engineering,COR-005,8.7,2017-12-23,Good,10,0.347,26.3139,86.1985,1
+AST-0665,Track Section 665,Track,Engineering,COR-002,6.5,2020-03-05,Good,6,0.0,28.5759,75.5703,0
+AST-0666,OHE Section 666,OHE,Traction Distribution,COR-002,9.6,2017-01-28,Good,6,0.251,22.0266,73.0289,0
+AST-0667,OHE Section 667,OHE,Traction Distribution,COR-009,4.6,2022-01-28,Good,6,0.164,28.8616,81.6633,2
+AST-0668,Track Section 668,Track,Engineering,COR-010,9.1,2017-07-30,Good,7,0.252,22.7838,73.8326,0
+AST-0669,Signal Section 669,Signal,S&T,COR-008,6.9,2019-10-11,Good,9,0.141,20.9972,74.0322,1
+AST-0670,Track Section 670,Track,Engineering,COR-002,40.0,1986-09-12,Warning,9,0.705,20.1229,85.306,2
+AST-0671,Track Section 671,Track,Engineering,COR-009,1.6,2025-01-26,Good,8,0.347,26.8496,80.3658,1
+AST-0672,Track Section 672,Track,Engineering,COR-007,5.2,2021-06-22,Good,8,0.216,24.5483,76.3641,0
+AST-0673,Track Section 673,Track,Engineering,COR-006,6.5,2020-03-05,Good,8,0.301,22.0713,78.078,1
+AST-0674,Track Section 674,Track,Engineering,COR-002,4.7,2021-12-22,Good,8,0.18,25.0845,84.1679,2
+AST-0675,Track Section 675,Track,Engineering,COR-010,14.0,2012-09-05,Fair,7,0.496,22.321,73.5617,2
+AST-0676,OHE Section 676,OHE,Traction Distribution,COR-005,5.9,2020-10-10,Good,8,0.258,23.4836,74.3637,2
+AST-0677,OHE Section 677,OHE,Traction Distribution,COR-001,2.8,2023-11-16,Good,7,0.198,27.6266,82.3602,2
+AST-0678,OHE Section 678,OHE,Traction Distribution,COR-003,11.2,2015-06-25,Good,6,0.154,25.6817,82.2115,1
+AST-0679,Track Section 679,Track,Engineering,COR-005,8.4,2018-04-11,Good,10,0.35,26.624,88.0594,1
+AST-0680,Bridge Section 680,Bridge,Engineering,COR-001,6.1,2020-07-29,Good,10,0.213,24.8349,78.4928,1
+AST-0681,Signal Section 681,Signal,S&T,COR-004,25.3,2001-05-22,Warning,10,0.654,28.914,73.5412,2
+AST-0682,Track Section 682,Track,Engineering,COR-005,14.4,2012-04-12,Warning,8,0.714,21.4141,81.1006,5
+AST-0683,Track Section 683,Track,Engineering,COR-010,13.3,2013-05-19,Good,7,0.297,21.6229,82.7135,3
+AST-0684,OHE Section 684,OHE,Traction Distribution,COR-001,14.6,2012-01-30,Good,6,0.291,19.9256,74.7336,1
+AST-0685,Track Section 685,Track,Engineering,COR-006,14.1,2012-07-31,Warning,9,0.712,24.5402,81.3458,2
+AST-0686,Signal Section 686,Signal,S&T,COR-010,8.7,2017-12-23,Good,8,0.128,25.1336,75.6643,0
+AST-0687,Station Equipment Section 687,Station Equipment,S&T,COR-009,5.9,2020-10-10,Good,4,0.091,26.2596,86.0157,1
+AST-0688,Track Section 688,Track,Engineering,COR-010,11.4,2015-04-12,Good,7,0.004,22.3545,85.8626,0
+AST-0689,Track Section 689,Track,Engineering,COR-002,8.6,2018-01-28,Fair,7,0.364,19.1226,79.3741,1
+AST-0690,Station Equipment Section 690,Station Equipment,S&T,COR-009,1.6,2025-01-26,Good,4,0.216,25.3223,87.9679,2
+AST-0691,Signal Section 691,Signal,S&T,COR-010,4.3,2022-05-17,Fair,8,0.409,28.987,88.1764,2
+AST-0692,Track Section 692,Track,Engineering,COR-004,7.8,2018-11-16,Good,8,0.085,21.9455,74.568,0
+AST-0693,Bridge Section 693,Bridge,Engineering,COR-005,19.2,2007-06-26,Warning,10,0.739,20.8393,78.3834,3
+AST-0694,Bridge Section 694,Bridge,Engineering,COR-006,11.4,2015-04-12,Fair,10,0.384,21.8177,82.1051,0
+AST-0695,Signal Section 695,Signal,S&T,COR-005,5.1,2021-07-29,Fair,10,0.467,23.2542,73.8574,3
+AST-0696,OHE Section 696,OHE,Traction Distribution,COR-003,4.0,2022-09-03,Good,6,0.0,21.5091,78.6225,0
+AST-0697,Track Section 697,Track,Engineering,COR-010,22.0,2004-09-07,Fair,8,0.539,22.4696,76.6788,3
+AST-0698,Track Section 698,Track,Engineering,COR-010,9.0,2017-09-04,Good,7,0.278,25.3821,87.7328,0
+AST-0699,Signal Section 699,Signal,S&T,COR-004,0.3,2026-05-16,Good,8,0.143,22.4503,79.0854,0
+AST-0700,Track Section 700,Track,Engineering,COR-009,9.4,2017-04-11,Good,8,0.285,22.9606,84.7027,2
+AST-0701,OHE Section 701,OHE,Traction Distribution,COR-004,16.5,2010-03-08,Good,7,0.279,19.4003,78.6873,1
+AST-0702,Bridge Section 702,Bridge,Engineering,COR-008,3.9,2022-10-10,Good,10,0.191,28.1794,74.609,2
+AST-0703,Track Section 703,Track,Engineering,COR-006,10.8,2015-11-17,Good,8,0.312,23.0689,86.3104,2
+AST-0704,Signal Section 704,Signal,S&T,COR-005,11.5,2015-03-07,Good,10,0.236,22.2814,72.5067,0
+AST-0705,Track Section 705,Track,Engineering,COR-002,4.1,2022-07-29,Good,7,0.238,19.8648,73.3951,1
+AST-0706,Bridge Section 706,Bridge,Engineering,COR-007,23.3,2003-05-22,Warning,10,0.598,25.3418,78.3302,2
+AST-0707,Track Section 707,Track,Engineering,COR-004,11.7,2014-12-24,Good,8,0.221,27.6382,83.4904,1
+AST-0708,OHE Section 708,OHE,Traction Distribution,COR-003,7.7,2018-12-23,Good,7,0.244,19.4115,77.9673,1
+AST-0709,Signal Section 709,Signal,S&T,COR-002,9.0,2017-09-04,Good,9,0.17,20.4527,73.561,1
+AST-0710,Signal Section 710,Signal,S&T,COR-010,3.4,2023-04-10,Good,9,0.146,20.4639,77.5854,2
+AST-0711,OHE Section 711,OHE,Traction Distribution,COR-002,3.3,2023-05-17,Good,7,0.048,25.0227,76.4197,1
+AST-0712,OHE Section 712,OHE,Traction Distribution,COR-008,7.2,2019-06-23,Good,7,0.2,28.2123,72.5867,4
+AST-0713,Signal Section 713,Signal,S&T,COR-009,7.5,2019-03-06,Good,8,0.307,23.3777,81.0568,1
+AST-0714,OHE Section 714,OHE,Traction Distribution,COR-001,8.6,2018-01-28,Good,6,0.246,22.4381,74.3663,0
+AST-0715,Station Equipment Section 715,Station Equipment,S&T,COR-006,24.7,2001-12-27,Critical,6,0.801,26.6584,77.0999,3
+AST-0716,Signal Section 716,Signal,S&T,COR-006,15.9,2010-10-13,Fair,10,0.443,26.4257,82.759,2
+AST-0717,Signal Section 717,Signal,S&T,COR-004,1.9,2024-10-09,Good,8,0.059,21.4676,84.1019,1
+AST-0718,Track Section 718,Track,Engineering,COR-007,21.7,2004-12-26,Warning,8,0.581,20.6083,76.7153,3
+AST-0719,OHE Section 719,OHE,Traction Distribution,COR-005,7.1,2019-07-30,Fair,7,0.473,22.5781,77.7671,5
+AST-0720,Signal Section 720,Signal,S&T,COR-005,17.0,2009-09-06,Warning,10,0.621,26.756,76.4505,0
+AST-0721,Signal Section 721,Signal,S&T,COR-005,7.6,2019-01-28,Fair,9,0.547,25.9506,87.8102,3
+AST-0722,Track Section 722,Track,Engineering,COR-009,11.1,2015-07-31,Good,8,0.152,25.6585,75.5483,1
+AST-0723,Bridge Section 723,Bridge,Engineering,COR-007,3.6,2023-01-27,Good,10,0.169,27.2943,75.4309,0
+AST-0724,Signal Section 724,Signal,S&T,COR-004,13.0,2013-09-05,Good,10,0.302,21.7713,79.6206,0
+AST-0725,OHE Section 725,OHE,Traction Distribution,COR-010,18.3,2008-05-20,Good,7,0.157,22.3968,75.5289,0
+AST-0726,Track Section 726,Track,Engineering,COR-009,2.3,2024-05-16,Good,7,0.078,19.4234,75.0073,1
+AST-0727,Station Equipment Section 727,Station Equipment,S&T,COR-010,18.5,2008-03-08,Fair,5,0.475,27.6875,74.0341,3
+AST-0728,Track Section 728,Track,Engineering,COR-008,5.9,2020-10-10,Good,8,0.317,24.8243,82.7427,2
+AST-0729,Track Section 729,Track,Engineering,COR-004,29.9,1996-10-16,Fair,7,0.394,21.9812,82.2933,1
+AST-0730,Bridge Section 730,Bridge,Engineering,COR-008,17.2,2009-06-25,Good,10,0.257,19.6942,82.9026,2
+AST-0731,Station Equipment Section 731,Station Equipment,S&T,COR-004,15.2,2011-06-25,Warning,4,0.553,26.2341,84.8728,2
+AST-0732,Track Section 732,Track,Engineering,COR-003,9.1,2017-07-30,Good,8,0.21,26.4874,77.7217,0
+AST-0733,Signal Section 733,Signal,S&T,COR-005,40.0,1986-09-12,Critical,9,0.772,25.6618,87.1948,8
+AST-0734,OHE Section 734,OHE,Traction Distribution,COR-010,7.2,2019-06-23,Good,6,0.126,21.0378,84.2313,0
+AST-0735,Bridge Section 735,Bridge,Engineering,COR-006,4.4,2022-04-10,Good,10,0.102,28.1322,85.3753,0
+AST-0736,Signal Section 736,Signal,S&T,COR-004,6.1,2020-07-29,Fair,9,0.399,26.5316,84.0354,1
+AST-0737,Signal Section 737,Signal,S&T,COR-005,20.5,2006-03-09,Fair,10,0.535,25.5776,78.2353,4
+AST-0738,OHE Section 738,OHE,Traction Distribution,COR-003,11.0,2015-09-05,Fair,7,0.411,25.5094,77.0285,1
+AST-0739,OHE Section 739,OHE,Traction Distribution,COR-007,9.8,2016-11-16,Good,7,0.276,28.0436,79.2603,3
+AST-0740,OHE Section 740,OHE,Traction Distribution,COR-004,7.2,2019-06-23,Fair,6,0.415,28.2831,74.0525,1
+AST-0741,Signal Section 741,Signal,S&T,COR-006,9.5,2017-03-06,Fair,9,0.38,24.9564,79.7205,2
+AST-0742,Track Section 742,Track,Engineering,COR-004,6.9,2019-10-11,Good,7,0.341,23.1667,73.1903,0
+AST-0743,Station Equipment Section 743,Station Equipment,S&T,COR-004,16.2,2010-06-25,Fair,5,0.453,22.6373,72.5631,1
+AST-0744,Bridge Section 744,Bridge,Engineering,COR-010,8.5,2018-03-06,Good,10,0.252,27.1908,87.404,1
+AST-0745,OHE Section 745,OHE,Traction Distribution,COR-004,6.2,2020-06-22,Good,8,0.271,25.4461,83.5294,0
+AST-0746,Track Section 746,Track,Engineering,COR-001,19.4,2007-04-15,Fair,8,0.374,19.7727,81.4896,2
+AST-0747,Track Section 747,Track,Engineering,COR-004,4.5,2022-03-05,Fair,8,0.436,20.4219,77.9576,1
+AST-0748,OHE Section 748,OHE,Traction Distribution,COR-006,11.1,2015-07-31,Good,7,0.263,28.0019,81.6286,3
+AST-0749,Track Section 749,Track,Engineering,COR-001,1.6,2025-01-26,Good,8,0.158,27.845,86.7652,0
+AST-0750,Station Equipment Section 750,Station Equipment,S&T,COR-004,3.0,2023-09-03,Good,5,0.187,28.5183,82.9381,1
+AST-0751,Signal Section 751,Signal,S&T,COR-002,7.8,2018-11-16,Good,8,0.234,23.2785,82.1397,2
+AST-0752,OHE Section 752,OHE,Traction Distribution,COR-006,6.8,2019-11-16,Good,8,0.261,26.8406,79.8633,0
+AST-0753,Bridge Section 753,Bridge,Engineering,COR-008,6.7,2019-12-23,Good,10,0.337,27.2823,78.0312,1
+AST-0754,Signal Section 754,Signal,S&T,COR-010,17.3,2009-05-20,Good,9,0.278,22.157,83.6768,2
+AST-0755,Track Section 755,Track,Engineering,COR-004,18.0,2008-09-06,Good,8,0.202,20.4534,88.1957,2
+AST-0756,OHE Section 756,OHE,Traction Distribution,COR-009,12.7,2013-12-24,Good,7,0.254,28.9703,79.2961,2
+AST-0757,Signal Section 757,Signal,S&T,COR-003,4.3,2022-05-17,Good,8,0.023,19.3022,78.7753,0
+AST-0758,Signal Section 758,Signal,S&T,COR-008,9.4,2017-04-11,Good,10,0.128,24.9734,79.3498,0
+AST-0759,OHE Section 759,OHE,Traction Distribution,COR-006,32.6,1994-02-03,Warning,7,0.684,25.5021,79.3087,3
+AST-0760,Station Equipment Section 760,Station Equipment,S&T,COR-008,40.0,1986-09-12,Critical,6,0.816,25.8179,88.35,1
+AST-0761,Signal Section 761,Signal,S&T,COR-008,19.5,2007-03-09,Fair,9,0.538,21.5563,83.8085,2
+AST-0762,Track Section 762,Track,Engineering,COR-006,4.5,2022-03-05,Good,10,0.349,26.2158,78.247,0
+AST-0763,Signal Section 763,Signal,S&T,COR-003,9.5,2017-03-06,Good,9,0.0,21.164,78.444,0
+AST-0764,Signal Section 764,Signal,S&T,COR-006,12.1,2014-07-31,Good,9,0.222,27.2904,79.3928,1
+AST-0765,Track Section 765,Track,Engineering,COR-009,10.8,2015-11-17,Fair,8,0.463,21.1912,73.0874,2
+AST-0766,Track Section 766,Track,Engineering,COR-010,20.9,2005-10-14,Good,8,0.222,25.9671,80.9451,2
+AST-0767,OHE Section 767,OHE,Traction Distribution,COR-010,16.8,2009-11-18,Fair,6,0.364,26.8341,85.4821,1
+AST-0768,Track Section 768,Track,Engineering,COR-002,4.2,2022-06-22,Good,8,0.053,20.8895,83.0691,0
+AST-0769,Station Equipment Section 769,Station Equipment,S&T,COR-006,6.3,2020-05-17,Good,6,0.315,21.3799,75.6747,1
+AST-0770,Track Section 770,Track,Engineering,COR-002,19.5,2007-03-09,Good,8,0.27,26.791,84.1485,1
+AST-0771,Track Section 771,Track,Engineering,COR-007,25.2,2001-06-27,Fair,8,0.549,19.86,84.0113,4
+AST-0772,OHE Section 772,OHE,Traction Distribution,COR-010,12.2,2014-06-24,Good,7,0.244,20.9076,76.7006,3
+AST-0773,Bridge Section 773,Bridge,Engineering,COR-001,27.2,1999-06-28,Fair,10,0.455,23.5553,82.466,2
+AST-0774,Track Section 774,Track,Engineering,COR-007,11.2,2015-06-25,Good,8,0.163,28.3018,82.2752,0
+AST-0775,Track Section 775,Track,Engineering,COR-010,4.9,2021-10-10,Good,7,0.16,24.6188,85.9366,1
+AST-0776,Track Section 776,Track,Engineering,COR-009,15.8,2010-11-18,Good,9,0.15,22.8768,74.6772,2
+AST-0777,Signal Section 777,Signal,S&T,COR-004,40.0,1986-09-12,Warning,8,0.745,28.7837,75.6174,1
+AST-0778,Signal Section 778,Signal,S&T,COR-002,3.4,2023-04-10,Fair,9,0.44,23.6371,80.2755,6
+AST-0779,Track Section 779,Track,Engineering,COR-010,26.6,2000-02-02,Warning,7,0.588,23.3373,73.2063,0
+AST-0780,Track Section 780,Track,Engineering,COR-010,15.2,2011-06-25,Fair,8,0.355,23.1164,79.1495,3
+AST-0781,Signal Section 781,Signal,S&T,COR-006,6.0,2020-09-03,Good,9,0.291,22.1218,85.1115,0
+AST-0782,Station Equipment Section 782,Station Equipment,S&T,COR-010,1.6,2025-01-26,Good,4,0.0,22.2569,74.8794,0
+AST-0783,OHE Section 783,OHE,Traction Distribution,COR-001,1.0,2025-09-02,Good,6,0.0,25.8784,79.8592,0
+AST-0784,Signal Section 784,Signal,S&T,COR-007,6.7,2019-12-23,Fair,9,0.381,19.4084,88.3363,3
+AST-0785,Track Section 785,Track,Engineering,COR-001,13.5,2013-03-07,Good,7,0.226,25.8182,80.5947,1
+AST-0786,Track Section 786,Track,Engineering,COR-010,18.6,2008-01-31,Good,7,0.232,21.012,80.4732,1
+AST-0787,Track Section 787,Track,Engineering,COR-007,21.4,2005-04-15,Fair,7,0.409,22.8421,81.4407,1
+AST-0788,OHE Section 788,OHE,Traction Distribution,COR-010,12.7,2013-12-24,Good,7,0.107,20.4654,75.4761,0
+AST-0789,Bridge Section 789,Bridge,Engineering,COR-006,11.4,2015-04-12,Good,10,0.229,24.5275,74.8546,2
+AST-0790,Station Equipment Section 790,Station Equipment,S&T,COR-001,8.0,2018-09-04,Good,4,0.239,26.2935,83.3377,3
+AST-0791,Station Equipment Section 791,Station Equipment,S&T,COR-001,13.8,2012-11-17,Good,6,0.218,22.5466,78.8323,2
+AST-0792,Station Equipment Section 792,Station Equipment,S&T,COR-004,6.0,2020-09-03,Good,4,0.138,20.6342,77.1385,0
+AST-0793,Station Equipment Section 793,Station Equipment,S&T,COR-008,3.6,2023-01-27,Good,6,0.163,21.2651,73.0023,1
+AST-0794,Track Section 794,Track,Engineering,COR-002,10.9,2015-10-12,Good,7,0.291,27.1811,86.0368,2
+AST-0795,Track Section 795,Track,Engineering,COR-009,17.6,2009-01-30,Good,8,0.292,21.6765,73.0173,1
+AST-0796,Track Section 796,Track,Engineering,COR-003,2.9,2023-10-10,Good,8,0.114,26.747,84.4997,0
+AST-0797,Signal Section 797,Signal,S&T,COR-005,6.7,2019-12-23,Fair,9,0.464,22.312,78.6118,3
+AST-0798,Track Section 798,Track,Engineering,COR-003,10.6,2016-01-29,Good,7,0.225,20.8873,82.079,1
+AST-0799,Bridge Section 799,Bridge,Engineering,COR-005,10.4,2016-04-11,Fair,10,0.41,26.2731,76.4628,3
+AST-0800,OHE Section 800,OHE,Traction Distribution,COR-005,14.9,2011-10-13,Warning,8,0.561,23.6855,74.9864,1

@@ -1,0 +1,11 @@
+corridorId,name,lengthKm,trafficLevel,trafficSource
+COR-001,Delhi-Ghaziabad,30,45,real_IR_timetable
+COR-002,Ghaziabad-Meerut,112,26,real_IR_timetable
+COR-003,Delhi-Mathura,98,32,real_IR_timetable
+COR-004,Kalyan-Pune,72,48,real_IR_timetable
+COR-005,Mumbai-Kalyan,71,100,real_IR_timetable
+COR-006,Howrah-Kharagpur,123,73,real_IR_timetable
+COR-007,Chennai-Arakkonam,30,45,real_IR_timetable
+COR-008,Pune-Lonavala,103,69,real_IR_timetable
+COR-009,Delhi-Panipat,44,26,real_IR_timetable
+COR-010,Meerut-Saharanpur,31,20,real_IR_timetable
