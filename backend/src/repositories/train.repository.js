@@ -6,19 +6,37 @@ class TrainRepository extends BaseRepository {
     super('trains', 'id');
   }
 
+  // Matches schema: train objects carry `departure`/`arrival` (pulled from
+  // that train's schedule row for the given date, if provided).
   async findWithFilters(filters = {}) {
-    const conditions = [];
     const params = [];
     let idx = 1;
 
-    if (filters.corridorId) {
-      conditions.push(`corridor_id = $${idx++}`);
-      params.push(filters.corridorId);
+    let dateParamIdx = null;
+    if (filters.date) {
+      params.push(filters.date);
+      dateParamIdx = idx++;
     }
 
-    let sql = `SELECT id, name, number, type, priority, corridor_id, created_at FROM trains`;
-    if (conditions.length > 0) sql += ' WHERE ' + conditions.join(' AND ');
-    sql += ' ORDER BY priority DESC, number ASC';
+    const conditions = [];
+    if (filters.corridorId) {
+      params.push(filters.corridorId);
+      conditions.push(`t.corridor_id = $${idx++}`);
+    }
+
+    const sql = `SELECT t.id, t.name, t.number, t.type, t.priority, t.corridor_id, t.created_at,
+                 ts.arrival_time, ts.departure_time
+                 FROM trains t
+                 LEFT JOIN LATERAL (
+                   SELECT arrival_time, departure_time
+                   FROM train_schedules
+                   WHERE train_id = t.id
+                   ${dateParamIdx ? `AND schedule_date = $${dateParamIdx}` : ''}
+                   ORDER BY arrival_time ASC
+                   LIMIT 1
+                 ) ts ON true
+                 ${conditions.length ? 'WHERE ' + conditions.join(' AND ') : ''}
+                 ORDER BY t.priority DESC, t.number ASC`;
 
     const result = await query(sql, params);
     return result.rows.map((r) => ({
@@ -28,6 +46,8 @@ class TrainRepository extends BaseRepository {
       type: r.type,
       priority: r.priority,
       corridorId: r.corridor_id,
+      departure: r.departure_time || null,
+      arrival: r.arrival_time || null,
     }));
   }
 

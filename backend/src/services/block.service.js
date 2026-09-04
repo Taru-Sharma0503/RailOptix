@@ -21,14 +21,13 @@ class BlockService {
     const id = await nextSequentialId('BLK', () => blockRepo.count());
     const block = await blockRepo.create({ id, ...data });
 
-    // Auto-detect conflicts against other blocks on the same corridor/date.
     try {
       await conflictService.detectConflictsForDate(block.corridorId, block.date);
     } catch (err) {
       console.error(`Conflict detection failed after creating block ${block.id}:`, err.message);
     }
 
-    return { success: true, block };
+    return { success: true, message: 'Block request created', block };
   }
 
   async updateBlock(id, data) {
@@ -58,6 +57,7 @@ class BlockService {
     return { success: true, message: 'Block deleted successfully' };
   }
 
+  // Matches schema key `availableBlocks` (was `availableSlots`).
   async getAvailableSlots({ corridorId, date, duration }) {
     if (!corridorId) throw new ValidationError('corridorId is required');
     if (!date) throw new ValidationError('date is required');
@@ -95,9 +95,10 @@ class BlockService {
       });
     }
 
-    return successResponse({ corridorId, date, requestedDuration: duration, availableSlots: slots });
+    return successResponse({ availableBlocks: slots });
   }
 
+  // Matches schema shape: {id, blockId, departments, reason, severity}.
   async getBlockConflicts(filters = {}) {
     const corridorId = filters.corridorId;
     const date = filters.date;
@@ -111,10 +112,11 @@ class BlockService {
       for (let j = i + 1; j < blocks.length; j++) {
         if (blocks[i].date === blocks[j].date && timesOverlap(blocks[i].start, blocks[i].end, blocks[j].start, blocks[j].end)) {
           conflicts.push({
-            blockA: blocks[i],
-            blockB: blocks[j],
-            overlapStart: blocks[i].start > blocks[j].start ? blocks[i].start : blocks[j].start,
-            overlapEnd: blocks[i].end < blocks[j].end ? blocks[i].end : blocks[j].end,
+            id: `${blocks[i].id}_${blocks[j].id}`,
+            blockId: blocks[i].id,
+            departments: [blocks[i].departmentId, blocks[j].departmentId],
+            reason: `Overlapping maintenance requests: ${blocks[i].reason || blocks[i].id} vs ${blocks[j].reason || blocks[j].id}`,
+            severity: 'high',
           });
         }
       }

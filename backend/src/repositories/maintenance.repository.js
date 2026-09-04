@@ -27,6 +27,17 @@ class MaintenanceRepository extends BaseRepository {
       conditions.push(`EXISTS (SELECT 1 FROM assets a WHERE a.id = maintenance_tasks.asset_id AND a.corridor_id = $${idx++})`);
       params.push(filters.corridorId);
     }
+    // Matches schema's ?priority=critical|high|medium|low filter, bucketed
+    // off the computed priority_score since there's no raw "priority" column.
+    if (filters.priority) {
+      const ranges = {
+        critical: 'mt.priority_score > 70',
+        high: 'mt.priority_score > 50 AND mt.priority_score <= 70',
+        medium: 'mt.priority_score > 30 AND mt.priority_score <= 50',
+        low: 'mt.priority_score <= 30',
+      };
+      if (ranges[filters.priority]) conditions.push(ranges[filters.priority]);
+    }
 
     let sql = `SELECT mt.id, mt.asset_id, mt.department_id, mt.description, mt.severity, mt.estimated_duration, mt.deadline, mt.safety_risk, mt.status, mt.priority_score, mt.failure_risk, mt.external_id, mt.source, mt.created_at, mt.updated_at, a.name as asset_name, a.criticality as asset_criticality, a.condition as asset_condition, a.corridor_id as corridor_id, d.name as department_name
       FROM maintenance_tasks mt
@@ -113,6 +124,15 @@ class MaintenanceRepository extends BaseRepository {
     return parseInt(result.rows[0].count);
   }
 
+  // Matches schema's `recommendedDeadline` field on the task object. Falls
+  // back to a computed suggestion when no explicit deadline is set.
+  _computeRecommendedDeadline(priorityScore) {
+    const days = priorityScore > 70 ? 1 : priorityScore > 50 ? 3 : priorityScore > 30 ? 7 : 14;
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  }
+
   mapRow(r) {
     if (!r) return null;
     return {
@@ -127,6 +147,7 @@ class MaintenanceRepository extends BaseRepository {
       status: r.status,
       priorityScore: r.priority_score,
       failureRisk: r.failure_risk,
+      recommendedDeadline: r.deadline || this._computeRecommendedDeadline(r.priority_score),
       externalId: r.external_id,
       source: r.source,
       createdAt: r.created_at,

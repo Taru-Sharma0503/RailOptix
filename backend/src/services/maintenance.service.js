@@ -47,7 +47,7 @@ class MaintenanceService {
       failureRisk,
     });
 
-    return { success: true, task };
+    return { success: true, message: 'Maintenance task created', task };
   }
 
   async updateTask(id, data) {
@@ -71,7 +71,6 @@ class MaintenanceService {
 
     const task = await maintenanceRepo.update(id, data);
 
-    // Auto-log a maintenance_history entry when a task transitions to completed.
     if (data.status === 'completed' && existing.status !== 'completed') {
       try {
         const historyId = await nextSequentialId('MH', () => this._countHistory());
@@ -138,8 +137,6 @@ class MaintenanceService {
           continue;
         }
 
-        // Each ID is reserved individually and atomically — avoids the
-        // previous "count() + imported" pattern which skipped IDs.
         const id = await nextSequentialId('MT', () => maintenanceRepo.count());
 
         const failureRisk = await this._calculateFailureRisk(taskData.assetId);

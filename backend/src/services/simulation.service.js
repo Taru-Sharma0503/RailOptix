@@ -16,7 +16,7 @@ class SimulationService {
   async createScenario({ corridorId, block, maintenanceTaskIds, trainScheduleDate }) {
     const id = await nextSequentialId('SIM', () => this._countScenarios());
 
-    const scenario = await simRepo.createScenario({
+    await simRepo.createScenario({
       id,
       corridorId,
       blockConfig: block,
@@ -197,12 +197,23 @@ class SimulationService {
     return alternatives.slice(0, 5);
   }
 
+  // Matches schema: nested `block` (was `blockConfig`).
   async getScenario(id) {
     const scenario = await simRepo.findScenarioById(id);
     if (!scenario) throw NotFoundError.resource('Simulation scenario');
-    return successResponse({ scenario });
+    return successResponse({
+      scenario: {
+        id: scenario.id,
+        status: scenario.status,
+        corridorId: scenario.corridorId,
+        block: scenario.blockConfig,
+      },
+    });
   }
 
+  // Matches schema: top-level `results` object with counts (not arrays), a
+  // string `risk` level, minutes-suffixed delay fields, alternativeBlocks
+  // with expectedDelayMinutes/risk, and a top-level `recommendation`.
   async getResults(id) {
     const scenario = await simRepo.findScenarioById(id);
     if (!scenario) throw NotFoundError.resource('Simulation scenario');
@@ -217,18 +228,32 @@ class SimulationService {
       };
     }
 
+    const riskLevel = result.risk >= 0.7 ? 'high' : result.risk >= 0.4 ? 'medium' : 'low';
+
+    const alternativeBlocks = (result.alternativeBlocks || []).map((alt) => ({
+      start: alt.start,
+      end: alt.end,
+      expectedDelayMinutes: 0,
+      risk: 'low',
+    }));
+
+    const bestAlternative = alternativeBlocks[0] || null;
+
     return {
       success: true,
-      scenarioId: id,
-      status: scenario.status,
-      affectedTrains: result.affectedTrains,
-      expectedDelay: result.expectedDelay,
-      affectedAssets: result.affectedAssets,
-      infrastructureAvailability: result.infrastructureAvailability,
-      conflicts: result.conflicts,
-      blockUtilization: result.blockUtilization,
-      risk: result.risk,
-      alternativeBlocks: result.alternativeBlocks,
+      results: {
+        affectedTrains: (result.affectedTrains || []).length,
+        expectedDelayMinutes: result.expectedDelay,
+        affectedAssets: (result.affectedAssets || []).length,
+        infrastructureAvailability: result.infrastructureAvailability,
+        conflicts: (result.conflicts || []).length,
+        blockUtilization: result.blockUtilization,
+        risk: riskLevel,
+      },
+      alternativeBlocks,
+      recommendation: bestAlternative
+        ? { type: 'alternative_block', start: bestAlternative.start, end: bestAlternative.end }
+        : null,
     };
   }
 

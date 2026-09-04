@@ -76,8 +76,9 @@ class AnalyticsService {
     });
   }
 
+  // Matches schema: {data: [{date, delayMinutes}]}.
   async getDelays({ from, to }) {
-    let sql = `SELECT sr.expected_delay, ss.corridor_id, ss.train_schedule_date, ss.id as simulation_id
+    let sql = `SELECT sr.expected_delay, ss.train_schedule_date
                FROM simulation_results sr
                JOIN simulation_scenarios ss ON sr.simulation_id = ss.id`;
     const params = [];
@@ -89,44 +90,44 @@ class AnalyticsService {
 
     const result = await query(sql, params);
 
-    const delays = result.rows.map((r) => ({
-      simulationId: r.simulation_id,
-      corridorId: r.corridor_id,
+    const data = result.rows.map((r) => ({
       date: r.train_schedule_date,
-      expectedDelay: r.expected_delay,
+      delayMinutes: r.expected_delay,
     }));
 
-    const avgDelay = delays.length > 0
-      ? parseFloat((delays.reduce((s, d) => s + d.expectedDelay, 0) / delays.length).toFixed(1))
-      : 0;
-
-    return successResponse({ delays, averageDelay: avgDelay });
+    return successResponse({ data });
   }
 
+  // Matches schema: {data: [{date, availability}]}. Approximated as a daily
+  // trend derived from maintenance/failure event volume vs. total assets,
+  // since there is no dedicated daily-availability-snapshot table.
   async getAvailability({ from, to }) {
-    let sql = `SELECT a.corridor_id, c.name as corridor_name,
-               COUNT(*) as total,
-               COUNT(CASE WHEN a.condition = 'healthy' THEN 1 END) as healthy,
-               COUNT(CASE WHEN a.condition = 'warning' THEN 1 END) as warning,
-               COUNT(CASE WHEN a.condition = 'critical' THEN 1 END) as critical
-               FROM assets a
-               LEFT JOIN corridors c ON a.corridor_id = c.id
-               GROUP BY a.corridor_id, c.name
-               ORDER BY a.corridor_id`;
+    const totalAssetsResult = await query('SELECT COUNT(*) as count FROM assets');
+    const totalAssets = parseInt(totalAssetsResult.rows[0].count) || 1;
 
-    const result = await query(sql);
+    const hasRange = Boolean(from && to);
+    const eventsResult = hasRange
+      ? await query(
+          `SELECT performed_at::date as day, COUNT(*) as count
+           FROM maintenance_history
+           WHERE performed_at >= $1 AND performed_at <= $2
+           GROUP BY performed_at::date
+           ORDER BY performed_at::date ASC`,
+          [from, to + ' 23:59:59']
+        )
+      : await query(
+          `SELECT performed_at::date as day, COUNT(*) as count
+           FROM maintenance_history
+           GROUP BY performed_at::date
+           ORDER BY performed_at::date ASC`
+        );
 
-    const availability = result.rows.map((r) => ({
-      corridorId: r.corridor_id,
-      corridorName: r.corridor_name,
-      total: parseInt(r.total),
-      healthy: parseInt(r.healthy),
-      warning: parseInt(r.warning),
-      critical: parseInt(r.critical),
-      availability: parseInt(r.total) > 0 ? parseFloat(((parseInt(r.healthy) / parseInt(r.total)) * 100).toFixed(1)) : 100,
+    const data = eventsResult.rows.map((r) => ({
+      date: r.day.toISOString ? r.day.toISOString().split('T')[0] : r.day,
+      availability: parseFloat(Math.max(0, 100 - (parseInt(r.count) / totalAssets) * 100).toFixed(1)),
     }));
 
-    return successResponse({ availability });
+    return successResponse({ data });
   }
 }
 

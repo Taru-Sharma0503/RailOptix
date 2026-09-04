@@ -1,8 +1,10 @@
 const maintenanceHistoryRepo = require('../repositories/maintenanceHistory.repository');
 const historicalFailureRepo = require('../repositories/historicalFailure.repository');
 const { successResponse } = require('../utils/helpers');
+const { query } = require('../config/db');
 
 class HistoryService {
+  // Matches schema shape: {date, event, description, downtimeMinutes}.
   async getHistory(filters) {
     const { assetId } = filters;
 
@@ -11,20 +13,23 @@ class HistoryService {
       const failures = await historicalFailureRepo.findByAssetId(assetId);
 
       const combined = [
-        ...maintenanceHistory.map((h) => ({ ...h, category: 'maintenance' })),
-        ...failures.map((f) => ({
-          ...f,
-          category: 'failure',
-          description: f.failureType,
-          performedAt: f.failureDate,
-          type: 'failure',
+        ...maintenanceHistory.map((h) => ({
+          date: h.performedAt,
+          event: h.type,
+          description: h.description,
+          downtimeMinutes: h.durationMinutes || 0,
         })),
-      ].sort((a, b) => new Date(b.performedAt) - new Date(a.performedAt));
+        ...failures.map((f) => ({
+          date: f.failureDate,
+          event: 'failure',
+          description: f.failureType,
+          downtimeMinutes: (f.downtimeHours || 0) * 60,
+        })),
+      ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
       return successResponse({ assetId, history: combined });
     }
 
-    const { query } = require('../config/db');
     const result = await query(
       `SELECT mh.id, mh.asset_id, mh.description, mh.type, mh.status, mh.performed_at, mh.duration_minutes,
        a.name as asset_name, d.name as department_name
@@ -44,29 +49,18 @@ class HistoryService {
 
     const history = [
       ...result.rows.map((r) => ({
-        id: r.id,
-        assetId: r.asset_id,
-        assetName: r.asset_name,
+        date: r.performed_at,
+        event: r.type,
         description: r.description,
-        type: r.type,
-        status: r.status,
-        performedAt: r.performed_at,
-        durationMinutes: r.duration_minutes,
-        departmentName: r.department_name,
-        category: 'maintenance',
+        downtimeMinutes: r.duration_minutes || 0,
       })),
       ...failuresResult.rows.map((r) => ({
-        id: r.id,
-        assetId: r.asset_id,
-        assetName: r.asset_name,
+        date: r.failure_date,
+        event: 'failure',
         description: r.failure_type,
-        type: 'failure',
-        performedAt: r.failure_date,
-        downtimeHours: r.downtime_hours,
-        rootCause: r.root_cause,
-        category: 'failure',
+        downtimeMinutes: (r.downtime_hours || 0) * 60,
       })),
-    ].sort((a, b) => new Date(b.performedAt) - new Date(a.performedAt));
+    ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
     return successResponse({ history });
   }

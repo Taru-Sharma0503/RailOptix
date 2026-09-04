@@ -6,18 +6,76 @@ const { NotFoundError, ValidationError } = require('../utils/errors');
 const { successResponse, timeToMinutes, minutesToTime, timesOverlap, nextSequentialId } = require('../utils/helpers');
 
 class ConflictService {
+  // Matches schema: conflict objects carry `start`/`end` (derived from their
+  // blocks) and `departments` as names, not IDs.
   async getConflicts(filters) {
     const conflicts = await conflictRepo.findWithFilters(filters);
-    return successResponse({ conflicts });
+    const enriched = await Promise.all(conflicts.map((c) => this._enrichConflict(c)));
+    return successResponse({ conflicts: enriched });
   }
 
+  async _enrichConflict(conflict) {
+    const blocks = [];
+    for (const bid of conflict.blockIds || []) {
+      const b = await blockRepo.findById(bid);
+      if (b) blocks.push(b);
+    }
+
+    let start = null;
+    let end = null;
+    if (blocks.length > 0) {
+      start = blocks.reduce((min, b) => (timeToMinutes(b.start) < timeToMinutes(min) ? b.start : min), blocks[0].start);
+      end = blocks.reduce((max, b) => (timeToMinutes(b.end) > timeToMinutes(max) ? b.end : max), blocks[0].end);
+    }
+
+    const departments = [];
+    for (const deptId of conflict.departmentIds || []) {
+      const dept = await departmentRepo.findById(deptId);
+      departments.push(dept ? dept.name : deptId);
+    }
+
+    return {
+      id: conflict.id,
+      corridorId: conflict.corridorId,
+      start,
+      end,
+      departments,
+      severity: conflict.severity,
+    };
+  }
+
+  // Matches schema: {id, requests: [{department, duration}], overlap}.
   async getConflictById(id) {
     const conflict = await conflictRepo.findById(id);
     if (!conflict) throw NotFoundError.resource('Conflict');
-    return successResponse({ conflict });
+
+    const blocks = [];
+    for (const bid of conflict.blockIds || []) {
+      const b = await blockRepo.findById(bid);
+      if (b) blocks.push(b);
+    }
+
+    const requests = [];
+    for (const b of blocks) {
+      const dept = await departmentRepo.findById(b.departmentId);
+      requests.push({
+        department: dept ? dept.name : b.departmentId,
+        duration: b.durationMinutes,
+      });
+    }
+
+    let overlap = null;
+    if (blocks.length >= 2) {
+      const starts = blocks.map((b) => timeToMinutes(b.start));
+      const ends = blocks.map((b) => timeToMinutes(b.end));
+      overlap = Math.max(0, Math.min(...ends) - Math.max(...starts));
+    }
+
+    return successResponse({
+      conflict: { id: conflict.id, requests, overlap },
+    });
   }
 
-  // Public endpoint wrapper — validates input and runs detection on demand.
   async detectConflicts({ corridorId, date }) {
     if (!corridorId) throw new ValidationError('corridorId is required');
     if (!date) throw new ValidationError('date is required');
@@ -26,6 +84,8 @@ class ConflictService {
     return successResponse({ corridorId, date, detected: detected.length, conflicts: detected });
   }
 
+  // Matches schema: `departments` is always [{department, allocatedDuration}]
+  // in both the combined-block path and the insufficient-blocks fallback.
   async negotiate({ conflictId }) {
     const conflict = await conflictRepo.findById(conflictId);
     if (!conflict) throw NotFoundError.resource('Conflict');
@@ -40,12 +100,17 @@ class ConflictService {
     }
 
     if (blocks.length < 2) {
+      const departments = [];
+      for (const deptId of conflict.departmentIds || []) {
+        const dept = await departmentRepo.findById(deptId);
+        departments.push({ department: dept ? dept.name : deptId, allocatedDuration: null });
+      }
       return successResponse({
         recommendation: {
           type: 'reschedule',
           message: 'Insufficient overlapping blocks detected. Recommend rescheduling one block.',
         },
-        departments: conflict.departmentIds,
+        departments,
         reason: 'Only one block found in conflict. Reschedule to a non-overlapping window.',
       });
     }
@@ -54,7 +119,6 @@ class ConflictService {
     const allEnds = blocks.map((b) => timeToMinutes(b.end));
     const combinedStart = Math.min(...allStarts);
     const combinedEnd = Math.max(...allEnds);
-    const combinedDuration = combinedEnd - combinedStart;
 
     const trainSchedules = await trainScheduleRepo.findWithFilters({
       corridorId: conflict.corridorId,
@@ -85,9 +149,12 @@ class ConflictService {
     }
 
     const departments = [];
-    for (const deptId of conflict.departmentIds || []) {
-      const dept = await departmentRepo.findById(deptId);
-      if (dept) departments.push({ id: dept.id, name: dept.name, code: dept.code });
+    for (const b of blocks) {
+      const dept = await departmentRepo.findById(b.departmentId);
+      departments.push({
+        department: dept ? dept.name : b.departmentId,
+        allocatedDuration: b.durationMinutes,
+      });
     }
 
     return successResponse({
@@ -96,13 +163,13 @@ class ConflictService {
         start: minutesToTime(bestStart),
         end: minutesToTime(bestEnd),
         duration: bestEnd - bestStart,
-        trainConflicts: bestConflicts,
       },
       departments,
       reason: 'Combining maintenance activities reduces total block occupancy and minimizes train disruption.',
     });
   }
 
+  // Matches schema: flat {success, message, conflictId, status}.
   async resolve({ conflictId, resolutionType, start, end }) {
     const conflict = await conflictRepo.findById(conflictId);
     if (!conflict) throw NotFoundError.resource('Conflict');
@@ -121,10 +188,12 @@ class ConflictService {
       }
     }
 
-    return successResponse({
-      conflict: updated,
+    return {
+      success: true,
       message: 'Conflict resolved successfully',
-    });
+      conflictId: updated.id,
+      status: updated.status,
+    };
   }
 
   async detectConflictsForDate(corridorId, date) {
