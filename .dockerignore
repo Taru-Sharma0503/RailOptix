@@ -1,0 +1,27 @@
+# Python bytecode & test caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+ai_engine/__pycache__/
+ai_engine/.pytest_cache/
+
+# Git & Docker configuration
+.git/
+.gitignore
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Large raw datasets & archives not required at runtime by AI Engine microservice
+csv/Train_details_22122017.csv
+csv/ir_train-part-004.csv
+csv/files.zip
+csv/old data/
+
+# Virtual environment & IDE artifacts
+.venv/
+venv/
+.idea/
+.vscode/

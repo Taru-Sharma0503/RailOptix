@@ -1,0 +1,15 @@
+services:
+  ai-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: railoptix-ai-engine
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai_engine:/app/ai_engine
+      - ./csv:/app/csv
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+    restart: unless-stopped

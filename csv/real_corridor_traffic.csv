@@ -1,0 +1,11 @@
+corridorName,stationA,stationB,realTrainsOnCorridor,trafficLevel
+Delhi-Ghaziabad,NDLS,GZB,100,45
+Ghaziabad-Meerut,GZB,MTC,57,26
+Delhi-Mathura,NDLS,MTJ,70,32
+Kalyan-Pune,KYN,PUNE,106,48
+Mumbai-Kalyan,CSMT,KYN,225,100
+Howrah-Kharagpur,HWH,KGP,163,73
+Chennai-Arakkonam,MAS,AJJ,99,45
+Pune-Lonavala,PUNE,LNL,154,69
+Delhi-Panipat,NDLS,PNP,56,26
+Meerut-Saharanpur,MTC,SRE,43,20
