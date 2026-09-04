@@ -2,7 +2,7 @@ const assetRepo = require('../repositories/asset.repository');
 const historicalFailureRepo = require('../repositories/historicalFailure.repository');
 const maintenanceHistoryRepo = require('../repositories/maintenanceHistory.repository');
 const { NotFoundError, ValidationError } = require('../utils/errors');
-const { successResponse, generateId, daysBetween } = require('../utils/helpers');
+const { successResponse, nextSequentialId, daysBetween } = require('../utils/helpers');
 const { query } = require('../config/db');
 
 class AssetService {
@@ -18,8 +18,7 @@ class AssetService {
   }
 
   async createAsset(data) {
-    const count = await assetRepo.count();
-    const id = data.id || generateId('AST', count + 1);
+    const id = data.id || await nextSequentialId('AST', () => assetRepo.count());
 
     const asset = await assetRepo.create({
       id,
@@ -112,8 +111,7 @@ class AssetService {
     if (!data.failureType) throw new ValidationError('failureType is required');
     if (!data.failureDate) throw new ValidationError('failureDate is required');
 
-    const totalCount = await this._countAllFailures();
-    const failureId = generateId('HF', totalCount + 1);
+    const failureId = await nextSequentialId('HF', () => this._countAllFailures());
 
     const failure = await historicalFailureRepo.create({
       id: failureId,

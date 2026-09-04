@@ -3,10 +3,9 @@ const { successResponse } = require('../utils/helpers');
 
 class AnalyticsService {
   async getKpis({ from, to }) {
-    const dateFilter = from && to
-      ? `WHERE mt.created_at >= $1 AND mt.created_at <= $2`
-      : '';
-    const params = from && to ? [from, to + ' 23:59:59'] : [];
+    const hasRange = Boolean(from && to);
+    const taskDateFilter = hasRange ? `WHERE mt.created_at >= $1 AND mt.created_at <= $2` : '';
+    const taskParams = hasRange ? [from, to + ' 23:59:59'] : [];
 
     const totalAssetsResult = await query('SELECT COUNT(*) as count FROM assets');
     const healthyAssetsResult = await query("SELECT COUNT(*) as count FROM assets WHERE condition = 'healthy'");
@@ -14,24 +13,55 @@ class AnalyticsService {
     const healthyAssets = parseInt(healthyAssetsResult.rows[0].count);
     const infraAvailability = totalAssets > 0 ? parseFloat(((healthyAssets / totalAssets) * 100).toFixed(1)) : 100;
 
-    const completedResult = await query(`SELECT COUNT(*) as count FROM maintenance_tasks WHERE status = 'completed'`);
-    const totalTasksResult = await query(`SELECT COUNT(*) as count FROM maintenance_tasks`);
+    const completedResult = await query(
+      `SELECT COUNT(*) as count FROM maintenance_tasks mt WHERE mt.status = 'completed' ${hasRange ? 'AND mt.created_at >= $1 AND mt.created_at <= $2' : ''}`,
+      taskParams
+    );
+    const totalTasksResult = await query(
+      `SELECT COUNT(*) as count FROM maintenance_tasks mt ${taskDateFilter}`,
+      taskParams
+    );
     const completedTasks = parseInt(completedResult.rows[0].count);
     const totalTasks = parseInt(totalTasksResult.rows[0].count);
     const completionRate = totalTasks > 0 ? parseFloat(((completedTasks / totalTasks) * 100).toFixed(1)) : 0;
 
-    const delayResult = await query('SELECT COALESCE(AVG(expected_delay), 0) as avg_delay FROM simulation_results');
+    const delayResult = hasRange
+      ? await query(
+          `SELECT COALESCE(AVG(sr.expected_delay), 0) as avg_delay
+           FROM simulation_results sr
+           JOIN simulation_scenarios ss ON sr.simulation_id = ss.id
+           WHERE ss.created_at >= $1 AND ss.created_at <= $2`,
+          [from, to + ' 23:59:59']
+        )
+      : await query('SELECT COALESCE(AVG(expected_delay), 0) as avg_delay FROM simulation_results');
     const avgDelay = parseFloat((parseFloat(delayResult.rows[0].avg_delay) || 0).toFixed(1));
 
-    const blockResult = await query("SELECT COALESCE(AVG(duration_minutes), 0) as avg_duration, COUNT(*) as count FROM blocks WHERE status IN ('approved','active','completed')");
+    const blockResult = hasRange
+      ? await query(
+          `SELECT COALESCE(AVG(duration_minutes), 0) as avg_duration, COUNT(*) as count
+           FROM blocks WHERE status IN ('approved','active','completed')
+           AND date >= $1 AND date <= $2`,
+          [from, to]
+        )
+      : await query("SELECT COALESCE(AVG(duration_minutes), 0) as avg_duration, COUNT(*) as count FROM blocks WHERE status IN ('approved','active','completed')");
     const blockUtilization = blockResult.rows[0].count > 0
       ? parseFloat(Math.min(100, (parseFloat(blockResult.rows[0].avg_duration) / 240) * 100).toFixed(1))
       : 0;
 
-    const conflictsAvoidedResult = await query("SELECT COUNT(*) as count FROM conflicts WHERE status = 'resolved'");
+    const conflictsAvoidedResult = hasRange
+      ? await query(
+          `SELECT COUNT(*) as count FROM conflicts WHERE status = 'resolved' AND resolved_at >= $1 AND resolved_at <= $2`,
+          [from, to + ' 23:59:59']
+        )
+      : await query("SELECT COUNT(*) as count FROM conflicts WHERE status = 'resolved'");
     const conflictsAvoided = parseInt(conflictsAvoidedResult.rows[0].count);
 
-    const downtimeResult = await query("SELECT COALESCE(SUM(duration_minutes), 0) as total FROM maintenance_history");
+    const downtimeResult = hasRange
+      ? await query(
+          `SELECT COALESCE(SUM(duration_minutes), 0) as total FROM maintenance_history WHERE performed_at >= $1 AND performed_at <= $2`,
+          [from, to + ' 23:59:59']
+        )
+      : await query("SELECT COALESCE(SUM(duration_minutes), 0) as total FROM maintenance_history");
     const maintenanceDowntime = parseInt(downtimeResult.rows[0].total);
 
     return successResponse({

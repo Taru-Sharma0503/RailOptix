@@ -3,7 +3,7 @@ const trainScheduleRepo = require('../repositories/trainSchedule.repository');
 const conflictRepo = require('../repositories/conflict.repository');
 const conflictService = require('./conflict.service');
 const { NotFoundError, ValidationError } = require('../utils/errors');
-const { successResponse, generateId, timeToMinutes, minutesToTime, timesOverlap, isValidTime } = require('../utils/helpers');
+const { successResponse, nextSequentialId, timeToMinutes, minutesToTime, timesOverlap, isValidTime } = require('../utils/helpers');
 
 class BlockService {
   async getBlocks(filters) {
@@ -18,8 +18,7 @@ class BlockService {
   }
 
   async createBlock(data) {
-    const count = await blockRepo.count();
-    const id = generateId('BLK', count + 1);
+    const id = await nextSequentialId('BLK', () => blockRepo.count());
     const block = await blockRepo.create({ id, ...data });
 
     // Auto-detect conflicts against other blocks on the same corridor/date.

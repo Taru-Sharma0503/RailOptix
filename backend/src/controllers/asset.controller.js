@@ -21,5 +21,8 @@ async function getAssetHistory(req, res, next) {
 async function getAssetRisk(req, res, next) {
   try { res.json(await assetService.getAssetRisk(req.params.id)); } catch (err) { next(err); }
 }
+async function addAssetFailure(req, res, next) {
+  try { res.status(201).json(await assetService.addAssetFailure(req.params.id, req.body)); } catch (err) { next(err); }
+}
 
-module.exports = { getAssets, getAsset, createAsset, updateAsset, deleteAsset, getAssetHistory, getAssetRisk };
+module.exports = { getAssets, getAsset, createAsset, updateAsset, deleteAsset, getAssetHistory, getAssetRisk, addAssetFailure };

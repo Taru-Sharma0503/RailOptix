@@ -34,6 +34,39 @@ function generateId(prefix, num) {
   return `${prefix}-${String(num).padStart(3, '0')}`;
 }
 
+// Atomically reserves and returns the next sequential ID for a given prefix
+// (e.g. "AST-004"). Uses a single INSERT ... ON CONFLICT ... RETURNING
+// statement against the id_counters table so concurrent requests cannot
+// be handed the same ID — unlike the old "SELECT COUNT(*) + 1" pattern.
+//
+// `legacyCounter` is an async () => number callback (typically
+// repo.count()) used ONLY as a fallback when no direct Postgres pool is
+// configured (i.e. the app is running against the Supabase REST fallback,
+// which cannot execute an ON CONFLICT upsert). In that mode the old,
+// non-atomic behavior is preserved rather than throwing.
+async function nextSequentialId(prefix, legacyCounter) {
+  const { query, pool } = require('../config/db');
+
+  if (pool()) {
+    try {
+      const result = await query(
+        `INSERT INTO id_counters (prefix, next_value) VALUES ($1, 2)
+         ON CONFLICT (prefix) DO UPDATE SET next_value = id_counters.next_value + 1
+         RETURNING (next_value - 1) as value`,
+        [prefix]
+      );
+      const num = parseInt(result.rows[0].value);
+      return generateId(prefix, num);
+    } catch (err) {
+      console.error(`nextSequentialId atomic path failed for prefix ${prefix}, falling back:`, err.message);
+    }
+  }
+
+  // Supabase REST fallback (or atomic path failed): best-effort, non-atomic.
+  const count = await legacyCounter();
+  return generateId(prefix, count + 1);
+}
+
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
@@ -61,6 +94,7 @@ module.exports = {
   minutesToTime,
   timesOverlap,
   generateId,
+  nextSequentialId,
   clamp,
   isValidTime,
   isValidDate,

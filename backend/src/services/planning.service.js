@@ -1,7 +1,8 @@
 const planRepo = require('../repositories/maintenancePlan.repository');
 const optimizationRunRepo = require('../repositories/optimizationRun.repository');
 const { NotFoundError, ValidationError } = require('../utils/errors');
-const { successResponse, generateId, isValidDate } = require('../utils/helpers');
+const { successResponse, nextSequentialId, isValidDate } = require('../utils/helpers');
+const { query } = require('../config/db');
 
 class PlanningService {
   async getWeekly(startDate) {
@@ -34,9 +35,7 @@ class PlanningService {
     if (!run) throw NotFoundError.resource('Optimization run');
     if (run.status !== 'completed') throw new ValidationError('Cannot approve an incomplete optimization run');
 
-    const { query } = require('../config/db');
-    const countResult = await query('SELECT COUNT(*) as count FROM maintenance_plans');
-    const id = generateId('MP', parseInt(countResult.rows[0].count) + 1);
+    const id = await nextSequentialId('MP', () => this._countPlans());
 
     const plan = await planRepo.create({
       id,
@@ -46,7 +45,12 @@ class PlanningService {
       status: 'approved',
     });
 
-    return { success: true, plan, message: 'Plan approved successfully' };
+    return { success: true, planId: plan.id, plan, message: 'Plan approved successfully' };
+  }
+
+  async _countPlans() {
+    const countResult = await query('SELECT COUNT(*) as count FROM maintenance_plans');
+    return parseInt(countResult.rows[0].count);
   }
 }
 

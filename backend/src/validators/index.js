@@ -87,14 +87,26 @@ function validateBlock(req, res, next) {
     if (!date || !isValidDate(date)) errors.push('Valid date is required (YYYY-MM-DD)');
     if (!start || !isValidTime(start)) errors.push('Valid start time is required (HH:MM)');
     if (!end || !isValidTime(end)) errors.push('Valid end time is required (HH:MM)');
-
-    if (start && end && isValidTime(start) && isValidTime(end)) {
-      const { timeToMinutes } = require('../utils/helpers');
-      const sMin = timeToMinutes(start);
-      const eMin = timeToMinutes(end);
-      if (eMin <= sMin) errors.push('End time must be after start time');
-    }
   }
+
+  // Also applied on PUT: any start/end sent must be well-formed and ordered,
+  // even though PUT allows a partial body.
+  if (date !== undefined && !isValidDate(date)) {
+    errors.push('Valid date is required (YYYY-MM-DD)');
+  }
+  if (start !== undefined && !isValidTime(start)) {
+    errors.push('Valid start time is required (HH:MM)');
+  }
+  if (end !== undefined && !isValidTime(end)) {
+    errors.push('Valid end time is required (HH:MM)');
+  }
+  if (start && end && isValidTime(start) && isValidTime(end)) {
+    const { timeToMinutes } = require('../utils/helpers');
+    const sMin = timeToMinutes(start);
+    const eMin = timeToMinutes(end);
+    if (eMin <= sMin) errors.push('End time must be after start time');
+  }
+
   if (errors.length > 0) throw new ValidationError(errors.join('; '));
   next();
 }
@@ -152,6 +164,38 @@ function validateSimulation(req, res, next) {
   next();
 }
 
+function validateConflictDetect(req, res, next) {
+  const { corridorId, date } = req.body;
+  const errors = [];
+  if (!corridorId) errors.push('corridorId is required');
+  if (!date || !isValidDate(date)) errors.push('Valid date is required (YYYY-MM-DD)');
+  if (errors.length > 0) throw new ValidationError(errors.join('; '));
+  next();
+}
+
+function validateConflictNegotiate(req, res, next) {
+  const { conflictId } = req.body;
+  if (!conflictId) throw new ValidationError('conflictId is required');
+  next();
+}
+
+function validateConflictResolve(req, res, next) {
+  const { conflictId, resolutionType } = req.body;
+  const errors = [];
+  const validTypes = ['combined_block', 'reschedule', 'reject'];
+
+  if (!conflictId) errors.push('conflictId is required');
+  if (!resolutionType || !validTypes.includes(resolutionType)) {
+    errors.push(`resolutionType must be one of: ${validTypes.join(', ')}`);
+  }
+  if (resolutionType === 'combined_block') {
+    if (!req.body.start || !isValidTime(req.body.start)) errors.push('Valid start time is required for combined_block (HH:MM)');
+    if (!req.body.end || !isValidTime(req.body.end)) errors.push('Valid end time is required for combined_block (HH:MM)');
+  }
+  if (errors.length > 0) throw new ValidationError(errors.join('; '));
+  next();
+}
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -160,4 +204,7 @@ module.exports = {
   validateBlock,
   validateOptimize,
   validateSimulation,
+  validateConflictDetect,
+  validateConflictNegotiate,
+  validateConflictResolve,
 };

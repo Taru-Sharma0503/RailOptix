@@ -3,7 +3,7 @@ const assetRepo = require('../repositories/asset.repository');
 const historicalFailureRepo = require('../repositories/historicalFailure.repository');
 const maintenanceHistoryRepo = require('../repositories/maintenanceHistory.repository');
 const { NotFoundError, ValidationError } = require('../utils/errors');
-const { successResponse, generateId, daysBetween, clamp } = require('../utils/helpers');
+const { successResponse, nextSequentialId, daysBetween, clamp } = require('../utils/helpers');
 const { query } = require('../config/db');
 
 class MaintenanceService {
@@ -22,8 +22,7 @@ class MaintenanceService {
     const asset = await assetRepo.findById(data.assetId);
     if (!asset) throw NotFoundError.resource('Asset');
 
-    const count = await maintenanceRepo.count();
-    const id = generateId('MT', count + 1);
+    const id = await nextSequentialId('MT', () => maintenanceRepo.count());
 
     const failureRisk = await this._calculateFailureRisk(data.assetId);
     const priorityScore = this._calculatePriorityScore({
@@ -75,9 +74,9 @@ class MaintenanceService {
     // Auto-log a maintenance_history entry when a task transitions to completed.
     if (data.status === 'completed' && existing.status !== 'completed') {
       try {
-        const historyCount = await this._countHistory();
+        const historyId = await nextSequentialId('MH', () => this._countHistory());
         await maintenanceHistoryRepo.create({
-          id: generateId('MH', historyCount + 1),
+          id: historyId,
           assetId: task.assetId,
           taskId: task.id,
           departmentId: task.departmentId,
@@ -110,6 +109,7 @@ class MaintenanceService {
     let imported = 0;
     let failed = 0;
     const errors = [];
+    const importedTasks = [];
 
     for (const taskData of tasks) {
       try {
@@ -138,8 +138,9 @@ class MaintenanceService {
           continue;
         }
 
-        const count = await maintenanceRepo.count();
-        const id = generateId('MT', count + imported + 1);
+        // Each ID is reserved individually and atomically — avoids the
+        // previous "count() + imported" pattern which skipped IDs.
+        const id = await nextSequentialId('MT', () => maintenanceRepo.count());
 
         const failureRisk = await this._calculateFailureRisk(taskData.assetId);
         const priorityScore = this._calculatePriorityScore({
@@ -150,7 +151,7 @@ class MaintenanceService {
           safetyRisk: taskData.safetyRisk || 5,
         });
 
-        await maintenanceRepo.create({
+        const createdTask = await maintenanceRepo.create({
           id,
           assetId: taskData.assetId,
           departmentId: taskData.departmentId,
@@ -166,6 +167,7 @@ class MaintenanceService {
           source,
         });
 
+        importedTasks.push({ id: createdTask.id, externalId: taskData.externalId });
         imported++;
       } catch (err) {
         errors.push(`Task ${taskData.externalId || 'unknown'}: ${err.message}`);
@@ -175,8 +177,10 @@ class MaintenanceService {
 
     return {
       success: true,
+      source,
       imported,
       failed,
+      tasks: importedTasks,
       errors: errors.length > 0 ? errors : undefined,
     };
   }

@@ -6,7 +6,7 @@ const assetRepo = require('../repositories/asset.repository');
 const conflictRepo = require('../repositories/conflict.repository');
 const { query } = require('../config/db');
 const { NotFoundError } = require('../utils/errors');
-const { successResponse, generateId, timeToMinutes, minutesToTime, timesOverlap, clamp } = require('../utils/helpers');
+const { successResponse, nextSequentialId, timeToMinutes, minutesToTime, timesOverlap, clamp } = require('../utils/helpers');
 
 let io = null;
 function setSocketIO(socketInstance) {
@@ -15,8 +15,7 @@ function setSocketIO(socketInstance) {
 
 class OptimizationService {
   async startOptimization({ corridorId, planningDate, maintenanceTaskIds, blockIds, objective }) {
-    const count = await optimizationRunRepo.count();
-    const runId = generateId('OPT', count + 1);
+    const runId = await nextSequentialId('OPT', () => optimizationRunRepo.count());
 
     const run = await optimizationRunRepo.create({
       id: runId,
@@ -108,6 +107,7 @@ class OptimizationService {
           start: blocks[0] ? blocks[0].start : '09:00',
           end: blocks[0] ? minutesToTime(timeToMinutes(blocks[0].start) + t.estimatedDuration) : '12:00',
           score: 0,
+          estimatedDuration: t.estimatedDuration,
         })),
         metrics: this._calculateMetrics(tasks, blocks, [], trainSchedules),
         explanations: [{ factor: 'Default schedule', impact: 'neutral', score: 0 }],
@@ -167,6 +167,7 @@ class OptimizationService {
               start: minutesToTime(startTime),
               end: minutesToTime(endTime),
               score: task.priorityScore,
+              estimatedDuration: task.estimatedDuration,
             });
             cursorInBlock = endTime;
             currentBlockIdx = blockIdx;
@@ -183,6 +184,7 @@ class OptimizationService {
             start: currentBlock.start,
             end: currentBlock.end,
             score: task.priorityScore * 0.5,
+            estimatedDuration: task.estimatedDuration,
             unplaced: true,
           });
         }

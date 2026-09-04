@@ -9,7 +9,7 @@ router.get('/available', authenticateToken, getAvailable);
 router.get('/conflicts', authenticateToken, getConflicts);
 router.get('/:id', authenticateToken, getBlock);
 router.post('/', authenticateToken, validateBlock, createBlock);
-router.put('/:id', authenticateToken, updateBlock);
+router.put('/:id', authenticateToken, validateBlock, updateBlock);
 router.delete('/:id', authenticateToken, deleteBlock);
 
 module.exports = router;

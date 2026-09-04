@@ -5,7 +5,7 @@ const trainScheduleRepo = require('../repositories/trainSchedule.repository');
 const assetRepo = require('../repositories/asset.repository');
 const conflictRepo = require('../repositories/conflict.repository');
 const { NotFoundError } = require('../utils/errors');
-const { successResponse, generateId, timeToMinutes, minutesToTime, timesOverlap, clamp } = require('../utils/helpers');
+const { successResponse, nextSequentialId, timeToMinutes, minutesToTime, timesOverlap, clamp } = require('../utils/helpers');
 
 let io = null;
 function setSocketIO(socketInstance) {
@@ -14,8 +14,7 @@ function setSocketIO(socketInstance) {
 
 class SimulationService {
   async createScenario({ corridorId, block, maintenanceTaskIds, trainScheduleDate }) {
-    const count = await this._countScenarios();
-    const id = generateId('SIM', count + 1);
+    const id = await nextSequentialId('SIM', () => this._countScenarios());
 
     const scenario = await simRepo.createScenario({
       id,
@@ -141,9 +140,9 @@ class SimulationService {
 
     if (io) io.emit('simulation:progress', { scenarioId: id, progress: 100, message: 'Simulation completed' });
 
-    const resultCount = await this._countResults();
+    const resultId = await nextSequentialId('SIMR', () => this._countResults());
     const result = await simRepo.createResult({
-      id: generateId('SIMR', resultCount + 1),
+      id: resultId,
       simulationId: id,
       affectedTrains,
       expectedDelay,

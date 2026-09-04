@@ -6,12 +6,18 @@ const trainRepo = require('../repositories/train.repository');
 const trainScheduleRepo = require('../repositories/trainSchedule.repository');
 const { successResponse } = require('../utils/helpers');
 
+const ACTIVE_BLOCK_STATUSES = ['pending', 'approved', 'active'];
+
 class NetworkService {
   async getNetwork(corridorId) {
     const corridors = await corridorRepo.findAll();
     let stations = await stationRepo.findAll();
     let assets = await assetRepo.findWithFilters(corridorId ? { corridorId } : {});
-    let activeBlocks = await blockRepo.findWithFilters({ status: 'active' });
+    // Matches the "active" definition used elsewhere (e.g. dashboard.service.js):
+    // pending/approved/active blocks all still occupy a corridor window.
+    let activeBlocks = (await blockRepo.findWithFilters({})).filter((b) =>
+      ACTIVE_BLOCK_STATUSES.includes(b.status)
+    );
     let trains = await trainRepo.findWithFilters(corridorId ? { corridorId } : {});
 
     if (corridorId) {

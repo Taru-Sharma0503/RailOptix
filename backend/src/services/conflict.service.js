@@ -3,7 +3,7 @@ const blockRepo = require('../repositories/block.repository');
 const departmentRepo = require('../repositories/department.repository');
 const trainScheduleRepo = require('../repositories/trainSchedule.repository');
 const { NotFoundError, ValidationError } = require('../utils/errors');
-const { successResponse, timeToMinutes, minutesToTime, timesOverlap, generateId } = require('../utils/helpers');
+const { successResponse, timeToMinutes, minutesToTime, timesOverlap, nextSequentialId } = require('../utils/helpers');
 
 class ConflictService {
   async getConflicts(filters) {
@@ -130,11 +130,11 @@ class ConflictService {
   async detectConflictsForDate(corridorId, date) {
     const blocks = await blockRepo.findByCorridorAndDate(corridorId, date);
     const detected = [];
+    const existingOpen = await conflictRepo.findWithFilters({ corridorId });
 
     for (let i = 0; i < blocks.length; i++) {
       for (let j = i + 1; j < blocks.length; j++) {
         if (timesOverlap(blocks[i].start, blocks[i].end, blocks[j].start, blocks[j].end)) {
-          const existingOpen = await conflictRepo.findWithFilters({ corridorId });
           const alreadyRecorded = existingOpen.find(
             (d) => (d.blockIds || []).includes(blocks[i].id) && (d.blockIds || []).includes(blocks[j].id)
           );
@@ -142,9 +142,9 @@ class ConflictService {
             (d) => d.blockIds.includes(blocks[i].id) && d.blockIds.includes(blocks[j].id)
           );
           if (!alreadyRecorded && !existingInBatch) {
-            const count = await conflictRepo.count();
+            const id = await nextSequentialId('CON', () => conflictRepo.count());
             const conflict = await conflictRepo.create({
-              id: generateId('CON', count + detected.length + 1),
+              id,
               corridorId,
               date,
               type: 'block_overlap',
