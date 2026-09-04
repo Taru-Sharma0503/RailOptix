@@ -2,7 +2,7 @@ const conflictRepo = require('../repositories/conflict.repository');
 const blockRepo = require('../repositories/block.repository');
 const departmentRepo = require('../repositories/department.repository');
 const trainScheduleRepo = require('../repositories/trainSchedule.repository');
-const { NotFoundError } = require('../utils/errors');
+const { NotFoundError, ValidationError } = require('../utils/errors');
 const { successResponse, timeToMinutes, minutesToTime, timesOverlap, generateId } = require('../utils/helpers');
 
 class ConflictService {
@@ -15,6 +15,15 @@ class ConflictService {
     const conflict = await conflictRepo.findById(id);
     if (!conflict) throw NotFoundError.resource('Conflict');
     return successResponse({ conflict });
+  }
+
+  // Public endpoint wrapper — validates input and runs detection on demand.
+  async detectConflicts({ corridorId, date }) {
+    if (!corridorId) throw new ValidationError('corridorId is required');
+    if (!date) throw new ValidationError('date is required');
+
+    const detected = await this.detectConflictsForDate(corridorId, date);
+    return successResponse({ corridorId, date, detected: detected.length, conflicts: detected });
   }
 
   async negotiate({ conflictId }) {
@@ -108,7 +117,7 @@ class ConflictService {
 
     if (resolutionType === 'combined_block' && start && end && conflict.blockIds) {
       for (const bid of conflict.blockIds) {
-        await blockRepo.update(bid, { status: 'approved', start_time: start, end_time: end });
+        await blockRepo.update(bid, { status: 'approved', start, end });
       }
     }
 
@@ -125,10 +134,14 @@ class ConflictService {
     for (let i = 0; i < blocks.length; i++) {
       for (let j = i + 1; j < blocks.length; j++) {
         if (timesOverlap(blocks[i].start, blocks[i].end, blocks[j].start, blocks[j].end)) {
-          const existing = detected.find(
+          const existingOpen = await conflictRepo.findWithFilters({ corridorId });
+          const alreadyRecorded = existingOpen.find(
+            (d) => (d.blockIds || []).includes(blocks[i].id) && (d.blockIds || []).includes(blocks[j].id)
+          );
+          const existingInBatch = detected.find(
             (d) => d.blockIds.includes(blocks[i].id) && d.blockIds.includes(blocks[j].id)
           );
-          if (!existing) {
+          if (!alreadyRecorded && !existingInBatch) {
             const count = await conflictRepo.count();
             const conflict = await conflictRepo.create({
               id: generateId('CON', count + detected.length + 1),

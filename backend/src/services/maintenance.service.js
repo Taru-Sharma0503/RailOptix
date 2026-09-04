@@ -1,6 +1,7 @@
 const maintenanceRepo = require('../repositories/maintenance.repository');
 const assetRepo = require('../repositories/asset.repository');
 const historicalFailureRepo = require('../repositories/historicalFailure.repository');
+const maintenanceHistoryRepo = require('../repositories/maintenanceHistory.repository');
 const { NotFoundError, ValidationError } = require('../utils/errors');
 const { successResponse, generateId, daysBetween, clamp } = require('../utils/helpers');
 const { query } = require('../config/db');
@@ -70,6 +71,27 @@ class MaintenanceService {
     }
 
     const task = await maintenanceRepo.update(id, data);
+
+    // Auto-log a maintenance_history entry when a task transitions to completed.
+    if (data.status === 'completed' && existing.status !== 'completed') {
+      try {
+        const historyCount = await this._countHistory();
+        await maintenanceHistoryRepo.create({
+          id: generateId('MH', historyCount + 1),
+          assetId: task.assetId,
+          taskId: task.id,
+          departmentId: task.departmentId,
+          description: task.description,
+          type: 'maintenance',
+          status: 'completed',
+          performedAt: new Date().toISOString(),
+          durationMinutes: task.estimatedDuration,
+        });
+      } catch (err) {
+        console.error(`Failed to log maintenance history for task ${id}:`, err.message);
+      }
+    }
+
     return { success: true, task };
   }
 
@@ -199,6 +221,11 @@ class MaintenanceService {
     }
 
     return parseFloat((severityScore + criticalityScore + riskScore + safetyScore + overdueScore).toFixed(2));
+  }
+
+  async _countHistory() {
+    const result = await query('SELECT COUNT(*) as count FROM maintenance_history');
+    return parseInt(result.rows[0].count);
   }
 }
 

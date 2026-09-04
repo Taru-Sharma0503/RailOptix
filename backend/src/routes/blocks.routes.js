@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getBlocks, getBlock, createBlock, deleteBlock, getAvailable, getConflicts } = require('../controllers/block.controller');
+const { getBlocks, getBlock, createBlock, updateBlock, deleteBlock, getAvailable, getConflicts } = require('../controllers/block.controller');
 const { authenticateToken } = require('../middleware/auth');
 const { validateBlock } = require('../validators');
 
@@ -9,6 +9,7 @@ router.get('/available', authenticateToken, getAvailable);
 router.get('/conflicts', authenticateToken, getConflicts);
 router.get('/:id', authenticateToken, getBlock);
 router.post('/', authenticateToken, validateBlock, createBlock);
+router.put('/:id', authenticateToken, updateBlock);
 router.delete('/:id', authenticateToken, deleteBlock);
 
 module.exports = router;

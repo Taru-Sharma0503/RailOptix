@@ -1,8 +1,9 @@
 const assetRepo = require('../repositories/asset.repository');
 const historicalFailureRepo = require('../repositories/historicalFailure.repository');
 const maintenanceHistoryRepo = require('../repositories/maintenanceHistory.repository');
-const { NotFoundError } = require('../utils/errors');
+const { NotFoundError, ValidationError } = require('../utils/errors');
 const { successResponse, generateId, daysBetween } = require('../utils/helpers');
+const { query } = require('../config/db');
 
 class AssetService {
   async getAssets(filters) {
@@ -102,6 +103,34 @@ class AssetService {
       riskLevel,
       factors,
     };
+  }
+
+  async addAssetFailure(id, data) {
+    const asset = await assetRepo.findById(id);
+    if (!asset) throw NotFoundError.resource('Asset');
+
+    if (!data.failureType) throw new ValidationError('failureType is required');
+    if (!data.failureDate) throw new ValidationError('failureDate is required');
+
+    const totalCount = await this._countAllFailures();
+    const failureId = generateId('HF', totalCount + 1);
+
+    const failure = await historicalFailureRepo.create({
+      id: failureId,
+      assetId: id,
+      failureType: data.failureType,
+      failureDate: data.failureDate,
+      downtimeHours: data.downtimeHours || 0,
+      rootCause: data.rootCause || null,
+      resolution: data.resolution || null,
+    });
+
+    return { success: true, failure };
+  }
+
+  async _countAllFailures() {
+    const result = await query('SELECT COUNT(*) as count FROM historical_failures');
+    return parseInt(result.rows[0].count);
   }
 }
 

@@ -68,6 +68,48 @@ class BlockRepository extends BaseRepository {
     return this.mapRow(result.rows[0]);
   }
 
+  // Overrides BaseRepository.update — maps camelCase API fields to snake_case
+  // columns and recomputes duration_minutes when start/end change.
+  async update(id, data) {
+    const fieldMap = {
+      status: 'status',
+      reason: 'reason',
+      start: 'start_time',
+      end: 'end_time',
+      departmentId: 'department_id',
+      maintenanceTaskIds: 'maintenance_task_ids',
+    };
+
+    const setParts = [];
+    const params = [];
+    let idx = 1;
+
+    for (const [jsKey, dbKey] of Object.entries(fieldMap)) {
+      if (data[jsKey] !== undefined) {
+        setParts.push(`${dbKey} = $${idx++}`);
+        params.push(data[jsKey]);
+      }
+    }
+
+    if (data.start !== undefined || data.end !== undefined) {
+      const current = await this.findById(id);
+      if (!current) return null;
+      const startTime = data.start !== undefined ? data.start : current.start;
+      const endTime = data.end !== undefined ? data.end : current.end;
+      const duration = timeToMinutes(endTime) - timeToMinutes(startTime);
+      setParts.push(`duration_minutes = $${idx++}`);
+      params.push(duration);
+    }
+
+    if (setParts.length === 0) return this.findById(id);
+
+    params.push(id);
+    const sql = `UPDATE blocks SET ${setParts.join(', ')} WHERE id = $${idx}
+                 RETURNING id, corridor_id, department_id, date, start_time, end_time, reason, status, maintenance_task_ids, duration_minutes, created_at`;
+    const result = await query(sql, params);
+    return result.rows[0] ? this.mapRow(result.rows[0]) : null;
+  }
+
   async countActive() {
     const result = await query(`SELECT COUNT(*) as count FROM blocks WHERE status IN ('pending', 'approved', 'active')`);
     return parseInt(result.rows[0].count);

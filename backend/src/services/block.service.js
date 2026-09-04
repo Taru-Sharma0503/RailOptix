@@ -1,6 +1,7 @@
 const blockRepo = require('../repositories/block.repository');
 const trainScheduleRepo = require('../repositories/trainSchedule.repository');
 const conflictRepo = require('../repositories/conflict.repository');
+const conflictService = require('./conflict.service');
 const { NotFoundError, ValidationError } = require('../utils/errors');
 const { successResponse, generateId, timeToMinutes, minutesToTime, timesOverlap, isValidTime } = require('../utils/helpers');
 
@@ -20,13 +21,34 @@ class BlockService {
     const count = await blockRepo.count();
     const id = generateId('BLK', count + 1);
     const block = await blockRepo.create({ id, ...data });
+
+    // Auto-detect conflicts against other blocks on the same corridor/date.
+    try {
+      await conflictService.detectConflictsForDate(block.corridorId, block.date);
+    } catch (err) {
+      console.error(`Conflict detection failed after creating block ${block.id}:`, err.message);
+    }
+
     return { success: true, block };
   }
 
   async updateBlock(id, data) {
     const existing = await blockRepo.findById(id);
     if (!existing) throw NotFoundError.resource('Block');
-    const { update } = require('../config/db');
+
+    if (data.status !== undefined) {
+      const validStatuses = ['pending', 'approved', 'rejected', 'active', 'completed'];
+      if (!validStatuses.includes(data.status)) {
+        throw new ValidationError(`Status must be one of: ${validStatuses.join(', ')}`);
+      }
+    }
+    if (data.start !== undefined && !isValidTime(data.start)) {
+      throw new ValidationError('Invalid start time format (use HH:MM)');
+    }
+    if (data.end !== undefined && !isValidTime(data.end)) {
+      throw new ValidationError('Invalid end time format (use HH:MM)');
+    }
+
     const block = await blockRepo.update(id, data);
     return { success: true, block };
   }
