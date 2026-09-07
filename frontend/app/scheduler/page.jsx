@@ -1,25 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { CalendarClock, CheckCircle2, Clock3, Navigation, Play, TrainFront, TriangleAlert } from 'lucide-react'
-import { apiFetch } from '@/lib/api'
-
-const mockSchedules = [
-  { id:'SCH-26091', task:'Track renewal', asset:'TRK-DLI-042', location:'Narela', date:'03 Sep 2026', start:'22:00', end:'02:30', duration:'4h 30m', trains:4, impact:'High', state:'high' },
-  { id:'SCH-26092', task:'Signal inspection', asset:'SIG-GZB-118', location:'Ghaziabad', date:'03 Sep 2026', start:'23:30', end:'01:30', duration:'2h', trains:2, impact:'Medium', state:'warning' },
-  { id:'SCH-26093', task:'OHE maintenance', asset:'OHE-PNP-031', location:'Panipat', date:'04 Sep 2026', start:'00:30', end:'04:00', duration:'3h 30m', trains:5, impact:'High', state:'high' },
-  { id:'SCH-26094', task:'Bridge inspection', asset:'BRG-MTH-017', location:'Mathura', date:'04 Sep 2026', start:'01:00', end:'03:00', duration:'2h', trains:1, impact:'Low', state:'healthy' },
-  { id:'SCH-26095', task:'Point machine service', asset:'PNT-FBD-088', location:'Faridabad', date:'03 Sep 2026', start:'21:00', end:'23:00', duration:'2h', trains:3, impact:'Medium', state:'warning' },
-  { id:'SCH-26096', task:'Track maintenance', asset:'TRK-RHT-056', location:'Rohtak', date:'05 Sep 2026', start:'02:00', end:'05:00', duration:'3h', trains:2, impact:'Medium', state:'warning' },
-]
-
-const metrics = [
-  ['Pending Tasks','24','Awaiting scheduling',Clock3,'warn'],
-  ['Scheduled','38','Maintenance windows',CalendarClock,'info'],
-  ['Conflicts','4','Require resolution',TriangleAlert,'critical'],
-  ['Ready to Run','17','Eligible schedules',CheckCircle2,'up'],
-]
+import { maintenanceApi, blocksApi, optimizeApi, requireAuth } from '../../lib/api'
 
 function StateTag({ children, state }) {
   const colors = { healthy:'var(--green)', info:'var(--cyan)', warning:'var(--yellow)', critical:'var(--red)', high:'var(--orange)' }
@@ -27,94 +11,82 @@ function StateTag({ children, state }) {
 }
 
 export default function SchedulerPage() {
-  const [schedules, setSchedules] = useState(mockSchedules)
-  const [selectedId, setSelectedId] = useState(mockSchedules[0].id)
+  const router = useRouter()
+  const [tasks, setTasks] = useState([])
+  const [blocks, setBlocks] = useState([])
+  const [selectedTaskIds, setSelectedTaskIds] = useState([])
+  const [selectedBlockIds, setSelectedBlockIds] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [running, setRunning] = useState(false)
 
-  const selected = schedules.find(item => item.id === selectedId) || schedules[0]
+  useEffect(() => {
+    if (!requireAuth(router)) return
+
+    let cancelled = false
+    Promise.all([maintenanceApi.list(), blocksApi.list()])
+      .then(([taskData, blockData]) => {
+        if (cancelled) return
+        const openTasks = (taskData.tasks || []).filter((t) => t.status !== 'completed')
+        const openBlocks = (blockData.blocks || []).filter((b) => b.status === 'pending' || b.status === 'approved')
+        setTasks(openTasks)
+        setBlocks(openBlocks)
+        setSelectedTaskIds(openTasks.map((t) => t.id))
+        setSelectedBlockIds(openBlocks.map((b) => b.id))
+      })
+      .catch((err) => { if (!cancelled) setError(err.message || 'Could not load scheduler data.') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    return () => { cancelled = true }
+  }, [router])
+
+  function toggleTask(id) {
+    setSelectedTaskIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))
+  }
+  function toggleBlock(id) {
+    setSelectedBlockIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))
+  }
 
   async function runScheduler() {
+    setError('')
+    if (!selectedTaskIds.length || !selectedBlockIds.length) {
+      setError('Select at least one maintenance task and one block to run the optimizer.')
+      return
+    }
+
     setRunning(true)
-
     try {
-      const [maintenance, blocks] = await Promise.all([
-        apiFetch('/api/maintenance'),
-        apiFetch('/api/blocks'),
-      ])
-
-      const tasks =
-        maintenance?.tasks ||
-        maintenance?.maintenance ||
-        maintenance ||
-        []
-
-      const availableBlocks =
-        blocks?.blocks ||
-        blocks ||
-        []
-
-      const taskIds = tasks.map(t => t.id).filter(Boolean)
-      const blockIds = availableBlocks.map(b => b.id).filter(Boolean)
-
-      const corridorId =
-        availableBlocks[0]?.corridorId ||
-        tasks[0]?.corridorId ||
-        'COR-001'
-
-      const planningDate =
-        new Date().toISOString().split('T')[0]
-
-      const result = await apiFetch('/api/optimize', {
-        method: 'POST',
-        body: JSON.stringify({
-          corridorId,
-          planningDate,
-          maintenanceTaskIds: taskIds,
-          blockIds,
-          objective: {
-            assetAvailability: 0.35,
-            trainDisruption: 0.30,
-            conflicts: 0.15,
-            blockWastage: 0.10,
-            safetyRisk: 0.10,
-          },
-        }),
+      const corridorId = blocks.find((b) => selectedBlockIds.includes(b.id))?.corridorId || 'COR-001'
+      const { runId } = await optimizeApi.start({
+        corridorId,
+        planningDate: new Date().toISOString().split('T')[0],
+        maintenanceTaskIds: selectedTaskIds,
+        blockIds: selectedBlockIds,
       })
-
-      if (!result?.runId) {
-        throw new Error('Optimization runId not returned')
-      }
-
-      const runId = result.runId
-
-      const checkStatus = async () => {
-        const status = await apiFetch(`/api/optimize/${runId}`)
-
-        if (status.status === 'completed') {
-          window.location.href = `/scheduler/results/${runId}`
-          return
-        }
-
-        if (status.status === 'failed') {
-          throw new Error(status.message || 'Optimization failed')
-        }
-
-        setTimeout(checkStatus, 1000)
-      }
-
-      checkStatus()
+      router.push(`/scheduler/results/${runId}`)
     } catch (err) {
-      console.error('Scheduler optimization failed:', err)
+      setError(err.message || 'Could not start optimization run.')
       setRunning(false)
     }
   }
 
+  const criticalCount = tasks.filter((t) => (t.priorityScore ?? 0) > 70).length
+
+  const metrics = [
+    ['Open Tasks', String(tasks.length), 'Eligible for scheduling', Clock3, 'warn'],
+    ['Available Blocks', String(blocks.length), 'Pending or approved', CalendarClock, 'info'],
+    ['Critical Priority', String(criticalCount), 'Score above 70', TriangleAlert, 'critical'],
+    ['Selected', `${selectedTaskIds.length} / ${selectedBlockIds.length}`, 'Tasks / blocks chosen', CheckCircle2, 'up'],
+  ]
+
   return (
     <main className="dashboard">
       <div className="page-intro">
-        <div><div className="breadcrumb">OPERATIONS <span>/</span> SCHEDULER</div><h1>Maintenance Scheduler</h1><p>Build and evaluate maintenance schedules against train operations and available block windows.</p></div>
-        <button className="primary-btn" onClick={runScheduler} disabled={running}><Play size={15}/>{running ? 'RUNNING...' : 'RUN SCHEDULER'}</button>
+        <div><div className="breadcrumb">OPERATIONS <span>/</span> SCHEDULER</div><h1>Maintenance Scheduler</h1><p>Select maintenance tasks and block windows, then run the OR-Tools CP-SAT optimizer to generate a schedule.</p></div>
+        <button className="primary-btn" onClick={runScheduler} disabled={running || loading}><Play size={15}/>{running ? 'STARTING…' : 'RUN SCHEDULER'}</button>
       </div>
+
+      {error && <div style={{ margin: '0 0 16px', padding: '12px 14px', border: '1px solid rgba(217,74,74,.35)', color: 'var(--red)', fontSize: '12px' }}>{error}</div>}
 
       <div className="metric-grid" style={{ gridTemplateColumns:'repeat(auto-fit, minmax(165px, 1fr))' }}>
         {metrics.map(([label,value,detail,Icon,state]) => (
@@ -128,79 +100,39 @@ export default function SchedulerPage() {
       <div className="main-grid">
         <section className="panel" style={{ overflow:'hidden' }}>
           <div className="panel-head compact">
-            <div><div className="section-kicker"><CalendarClock/> SCHEDULING REGISTER</div><h2>Maintenance Schedule Candidates</h2><p>Candidate maintenance windows available for scheduling.</p></div>
+            <div><div className="section-kicker"><CalendarClock/> MAINTENANCE TASKS</div><h2>Select Tasks to Schedule</h2><p>{loading ? 'Loading…' : `${tasks.length} open tasks`}</p></div>
           </div>
-
-          <div style={{ overflowX:'auto' }}>
-            <div className="table-head" style={{ minWidth:'900px', display:'grid', gridTemplateColumns:'0.9fr 1.25fr 1fr 1fr .8fr .8fr .7fr .7fr', gap:'12px' }}>
-              <span>SCHEDULE ID</span><span>TASK</span><span>ASSET</span><span>LOCATION</span><span>DATE</span><span>WINDOW</span><span>TRAINS</span><span>IMPACT</span>
-            </div>
-
-            <div style={{ minWidth:'900px' }}>
-              {schedules.map(schedule => {
-                const isSelected = schedule.id === selectedId
-                return (
-                  <button key={schedule.id} onClick={() => setSelectedId(schedule.id)} aria-pressed={isSelected} style={{ width:'100%', display:'grid', gridTemplateColumns:'0.9fr 1.25fr 1fr 1fr .8fr .8fr .7fr .7fr', gap:'12px', alignItems:'center', padding:'13px 16px', border:0, borderBottom:'1px solid var(--line)', borderLeft:isSelected ? '3px solid var(--teal)' : '3px solid transparent', background:isSelected ? '#E7F4F1' : 'var(--panel)', textAlign:'left', minHeight:'62px', cursor:'pointer' }}>
-                    <span><strong style={{ display:'block', fontFamily:'var(--font-mono)', fontSize:'12px', color:'var(--cyan)' }}>{schedule.id}</strong></span>
-                    <span style={{ color:'var(--muted)', fontSize:'12px' }}>{schedule.task}</span>
-                    <span style={{ color:'var(--muted)', fontSize:'12px', fontFamily:'var(--font-mono)' }}>{schedule.asset}</span>
-                    <span style={{ color:'var(--muted)', fontSize:'12px' }}>{schedule.location}</span>
-                    <span style={{ color:'var(--muted)', fontSize:'12px' }}>{schedule.date}</span>
-                    <span style={{ fontFamily:'var(--font-mono)', fontSize:'12px' }}>{schedule.start} → {schedule.end}</span>
-                    <span style={{ fontFamily:'var(--font-mono)', fontSize:'12px' }}>{schedule.trains}</span>
-                    <StateTag state={schedule.state}>{schedule.impact}</StateTag>
-                  </button>
-                )
-              })}
-            </div>
+          <div style={{ maxHeight: '420px', overflowY: 'auto' }}>
+            {!loading && tasks.length === 0 && <div style={{ padding: '20px 16px', fontSize: '12px', color: 'var(--muted)' }}>No open maintenance tasks.</div>}
+            {tasks.map((t) => (
+              <label key={t.id} style={{ display:'grid', gridTemplateColumns:'auto 1fr auto', gap:'12px', alignItems:'center', padding:'12px 16px', borderBottom:'1px solid var(--line)', cursor:'pointer' }}>
+                <input type="checkbox" checked={selectedTaskIds.includes(t.id)} onChange={() => toggleTask(t.id)} />
+                <span><strong style={{ display:'block', fontFamily:'var(--font-mono)', fontSize:'12px', color:'var(--cyan)' }}>{t.id}</strong><small style={{ color:'var(--muted)', fontSize:'11px' }}>{t.description} · {t.assetId}</small></span>
+                <StateTag state={(t.priorityScore ?? 0) > 70 ? 'critical' : (t.priorityScore ?? 0) > 50 ? 'high' : 'warning'}>{t.priorityScore ?? 0}</StateTag>
+              </label>
+            ))}
           </div>
         </section>
 
         <aside className="panel">
           <div className="panel-head compact">
-            <div><div className="section-kicker"><Navigation/> SELECTED SCHEDULE</div><h2>Schedule Candidate</h2></div>
-            <StateTag state={selected.state}>{selected.impact}</StateTag>
+            <div><div className="section-kicker"><Navigation/> AVAILABLE BLOCKS</div><h2>Select Block Windows</h2></div>
           </div>
-
-          <div style={{ padding:'2px 18px 18px' }}>
-            <h3 style={{ margin:'12px 0 5px', fontSize:'17px', fontWeight:600 }}>{selected.task}</h3>
-            <p style={{ marginBottom:'17px', color:'var(--cyan)', fontFamily:'var(--font-mono)', fontSize:'12px' }}>{selected.id}</p>
-
-            <div style={{ padding:'14px 4px 18px', borderTop:'1px solid var(--line)', borderBottom:'1px solid var(--line)', marginBottom:'14px' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', color:'var(--muted)', fontFamily:'var(--font-mono)', fontSize:'9px' }}><span>START</span><span>MAINTENANCE WINDOW</span><span>END</span></div>
-              <div style={{ height:'3px', background:'var(--line)', margin:'11px 5px', position:'relative' }}>
-                <i style={{ position:'absolute', left:0, top:'-4px', width:'10px', height:'10px', borderRadius:'50%', background:'var(--cyan)' }}/>
-                <i style={{ position:'absolute', left:'50%', top:'-4px', width:'10px', height:'10px', borderRadius:'50%', background:selected.state === 'high' ? 'var(--orange)' : 'var(--yellow)' }}/>
-                <i style={{ position:'absolute', right:0, top:'-4px', width:'10px', height:'10px', borderRadius:'50%', background:'var(--green)' }}/>
-              </div>
-              <div style={{ color:'var(--teal)', fontFamily:'var(--font-mono)', fontSize:'10px', letterSpacing:'.08em' }}>{selected.start} → {selected.duration} → {selected.end}</div>
-            </div>
-
-            {[
-              ['TASK',selected.task],
-              ['ASSET',selected.asset],
-              ['LOCATION',selected.location],
-              ['DATE',selected.date],
-              ['START TIME',selected.start],
-              ['END TIME',selected.end],
-              ['DURATION',selected.duration],
-              ['AFFECTED TRAINS',selected.trains],
-              ['OPERATIONAL IMPACT',selected.impact],
-            ].map(([label,value]) => (
-              <div key={label} className="table-head" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', padding:'9px 0', borderBottom:'1px solid var(--line)' }}>
-                <span>{label}</span>
-                <span style={{ textAlign:'right', fontSize:'12px', color:label === 'OPERATIONAL IMPACT' ? { High:'var(--orange)', Medium:'var(--yellow)', Low:'var(--green)' }[value] : undefined }}>{value}</span>
-              </div>
+          <div style={{ maxHeight: '420px', overflowY: 'auto' }}>
+            {!loading && blocks.length === 0 && <div style={{ padding: '20px 16px', fontSize: '12px', color: 'var(--muted)' }}>No pending or approved blocks.</div>}
+            {blocks.map((b) => (
+              <label key={b.id} style={{ display:'grid', gridTemplateColumns:'auto 1fr', gap:'12px', alignItems:'center', padding:'12px 16px', borderBottom:'1px solid var(--line)', cursor:'pointer' }}>
+                <input type="checkbox" checked={selectedBlockIds.includes(b.id)} onChange={() => toggleBlock(b.id)} />
+                <span><strong style={{ display:'block', fontFamily:'var(--font-mono)', fontSize:'12px', color:'var(--cyan)' }}>{b.id}</strong><small style={{ color:'var(--muted)', fontSize:'11px' }}>{b.corridorName || b.corridorId} · {b.start}–{b.end}</small></span>
+              </label>
             ))}
-
-            <Link href={`/scheduler/results/${selected.id}`} className="primary-btn" style={{width:'100%',justifyContent:'center',marginTop:'18px'}}><CalendarClock/> VIEW SCHEDULE DETAILS</Link>
           </div>
         </aside>
       </div>
 
       <section className="panel" style={{ marginTop:'18px' }}>
         <div className="panel-head compact">
-          <div><div className="section-kicker"><TrainFront/> SCHEDULING LOGIC</div><h2>Operational Constraints</h2><p>The scheduler evaluates maintenance windows against train movement and operational availability.</p></div>
+          <div><div className="section-kicker"><TrainFront/> SCHEDULING LOGIC</div><h2>How the Optimizer Works</h2><p>The AI engine's OR-Tools CP-SAT solver evaluates maintenance windows against train movement, asset criticality, and safety constraints.</p></div>
         </div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(190px, 1fr))', gap:'1px', background:'var(--line)', borderTop:'1px solid var(--line)' }}>

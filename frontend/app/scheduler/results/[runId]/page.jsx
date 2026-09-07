@@ -1,690 +1,156 @@
 'use client'
 
-import { use } from 'react'
+import { use, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
   CalendarClock,
   CheckCircle2,
   Clock3,
-  Navigation,
   TrainFront,
   TriangleAlert,
 } from 'lucide-react'
+import { optimizeApi, requireAuth } from '../../../../lib/api'
 
-const results = {
-  'SCH-26091': {
-    id: 'SCH-26091',
-    task: 'Track renewal',
-    asset: 'TRK-DLI-042',
-    location: 'Narela',
-    date: '03 Sep 2026',
-    start: '22:00',
-    end: '02:30',
-    duration: '4h 30m',
-    status: 'Approved',
-    statusState: 'healthy',
-    impact: 'High',
-    impactState: 'high',
-    affectedTrains: 4,
-    department: 'Track Maintenance',
-    reason:
-      'Night maintenance window selected to minimize disruption to scheduled passenger services.',
-  },
-
-  'SCH-26092': {
-    id: 'SCH-26092',
-    task: 'Signal inspection',
-    asset: 'SIG-GZB-118',
-    location: 'Ghaziabad',
-    date: '03 Sep 2026',
-    start: '23:30',
-    end: '01:30',
-    duration: '2h',
-    status: 'Approved',
-    statusState: 'healthy',
-    impact: 'Medium',
-    impactState: 'warning',
-    affectedTrains: 2,
-    department: 'Signal & Telecom',
-    reason:
-      'Scheduled within a low-density operating window with limited train conflicts.',
-  },
-
-  'SCH-26093': {
-    id: 'SCH-26093',
-    task: 'OHE maintenance',
-    asset: 'OHE-PNP-031',
-    location: 'Panipat',
-    date: '04 Sep 2026',
-    start: '00:30',
-    end: '04:00',
-    duration: '3h 30m',
-    status: 'Approved',
-    statusState: 'healthy',
-    impact: 'High',
-    impactState: 'high',
-    affectedTrains: 5,
-    department: 'Electrical / OHE',
-    reason:
-      'Block aligned with the available engineering window and optimized against train movements.',
-  },
-
-  'SCH-26094': {
-    id: 'SCH-26094',
-    task: 'Bridge inspection',
-    asset: 'BRG-MTH-017',
-    location: 'Mathura',
-    date: '04 Sep 2026',
-    start: '01:00',
-    end: '03:00',
-    duration: '2h',
-    status: 'Approved',
-    statusState: 'healthy',
-    impact: 'Low',
-    impactState: 'healthy',
-    affectedTrains: 1,
-    department: 'Engineering',
-    reason:
-      'Low-impact inspection window identified with minimal service disruption.',
-  },
-
-  'SCH-26095': {
-    id: 'SCH-26095',
-    task: 'Point machine service',
-    asset: 'PNT-FBD-088',
-    location: 'Faridabad',
-    date: '03 Sep 2026',
-    start: '21:00',
-    end: '23:00',
-    duration: '2h',
-    status: 'Review Required',
-    statusState: 'warning',
-    impact: 'Medium',
-    impactState: 'warning',
-    affectedTrains: 3,
-    department: 'Signal & Telecom',
-    reason:
-      'Schedule is feasible but requires operational review because of overlapping train movements.',
-  },
-
-  'SCH-26096': {
-    id: 'SCH-26096',
-    task: 'Track maintenance',
-    asset: 'TRK-RHT-056',
-    location: 'Rohtak',
-    date: '05 Sep 2026',
-    start: '02:00',
-    end: '05:00',
-    duration: '3h',
-    status: 'Approved',
-    statusState: 'healthy',
-    impact: 'Medium',
-    impactState: 'warning',
-    affectedTrains: 2,
-    department: 'Track Maintenance',
-    reason:
-      'Maintenance window fits within the available block period without critical service conflicts.',
-  },
-}
-
-function StateTag({ children, state }) {
-  const colors = {
-    healthy: 'var(--green)',
-    info: 'var(--cyan)',
-    warning: 'var(--yellow)',
-    critical: 'var(--red)',
-    high: 'var(--orange)',
-  }
-
-  return (
-    <span
-      className="block-state"
-      style={{
-        color: colors[state] || 'var(--muted)',
-        borderColor: colors[state] || 'var(--line)',
-      }}
-    >
-      {children}
-    </span>
-  )
-}
-
-export default function SchedulerResultPage({ params }) {
+export default function ScheduleResultPage({ params }) {
   const { runId } = use(params)
+  const router = useRouter()
 
-  const result = results[runId] || results['SCH-26091']
+  const [status, setStatus] = useState('queued')
+  const [progress, setProgress] = useState(0)
+  const [message, setMessage] = useState('Submitting optimization request…')
+  const [result, setResult] = useState(null)
+  const [explanation, setExplanation] = useState([])
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!requireAuth(router)) return
+
+    let cancelled = false
+
+    optimizeApi
+      .poll(runId, {
+        onProgress: (s) => {
+          if (cancelled) return
+          setStatus(s.status)
+          setProgress(s.progress ?? 0)
+          setMessage(s.message || '')
+        },
+      })
+      .then((res) => {
+        if (cancelled) return
+        setResult(res)
+        setStatus('completed')
+        setProgress(100)
+        return optimizeApi.explanation(runId)
+      })
+      .then((exp) => {
+        if (cancelled || !exp) return
+        setExplanation(exp.explanation?.topFeatures || exp.topFeatures || exp.whyOptimal || [])
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setStatus('failed')
+        setError(err.message || 'Optimization run failed.')
+      })
+
+    return () => { cancelled = true }
+  }, [runId, router])
+
+  const metrics = result?.metrics || {}
 
   return (
     <main className="dashboard">
-
       <div className="page-intro">
         <div>
-          <div className="breadcrumb">
-            OPERATIONS <span>/</span> SCHEDULER <span>/</span> RESULT
-          </div>
-
-          <h1>Scheduler Result</h1>
-
-          <p>
-            Review the generated maintenance schedule and its operational impact.
-          </p>
+          <div className="breadcrumb">OPERATIONS <span>/</span> SCHEDULER <span>/</span> RESULTS</div>
+          <h1>Optimization Run {runId}</h1>
+          <p>Live status and results from the OR-Tools CP-SAT optimizer.</p>
         </div>
-
-        <Link href="/scheduler" className="secondary-btn">
-          <ArrowLeft size={15} />
-          BACK TO SCHEDULER
-        </Link>
+        <Link href="/scheduler" className="secondary-btn"><ArrowLeft size={15}/> BACK TO SCHEDULER</Link>
       </div>
 
-      <div
-        className="metric-grid"
-        style={{
-          gridTemplateColumns: 'repeat(auto-fit, minmax(165px, 1fr))',
-        }}
-      >
-        <div className="metric">
-          <div className="metric-top">
-            <span>SCHEDULE STATUS</span>
-            <CheckCircle2 />
+      {status !== 'completed' && status !== 'failed' && (
+        <section className="panel" style={{ padding: '24px' }}>
+          <div className="section-kicker"><Clock3/> {status.toUpperCase()}</div>
+          <h2 style={{ margin: '10px 0' }}>{message || 'Running optimization…'}</h2>
+          <div style={{ height: '8px', background: 'var(--line)', borderRadius: '4px', overflow: 'hidden', marginTop: '14px' }}>
+            <div style={{ height: '100%', width: `${progress}%`, background: 'var(--teal)', transition: 'width .3s ease' }} />
           </div>
-
-          <div className="metric-bottom">
-            <strong style={{ fontSize: '18px' }}>
-              {result.status}
-            </strong>
-
-            <small className="up">
-              Scheduler decision
-            </small>
-          </div>
-        </div>
-
-        <div className="metric">
-          <div className="metric-top">
-            <span>MAINTENANCE WINDOW</span>
-            <Clock3 />
-          </div>
-
-          <div className="metric-bottom">
-            <strong>{result.duration}</strong>
-            <small className="info">
-              {result.start} → {result.end}
-            </small>
-          </div>
-        </div>
-
-        <div className="metric">
-          <div className="metric-top">
-            <span>AFFECTED TRAINS</span>
-            <TrainFront />
-          </div>
-
-          <div className="metric-bottom">
-            <strong>{result.affectedTrains}</strong>
-            <small className="warn">
-              Services evaluated
-            </small>
-          </div>
-        </div>
-
-        <div className="metric">
-          <div className="metric-top">
-            <span>OPERATIONAL IMPACT</span>
-            <TriangleAlert />
-          </div>
-
-          <div className="metric-bottom">
-            <strong>{result.impact}</strong>
-            <small
-              className={
-                result.impact === 'High'
-                  ? 'critical'
-                  : result.impact === 'Medium'
-                    ? 'warn'
-                    : 'up'
-              }
-            >
-              Schedule impact
-            </small>
-          </div>
-        </div>
-      </div>
-
-      <div className="main-grid">
-
-        <section
-          className="panel"
-          style={{ overflow: 'hidden' }}
-        >
-          <div className="panel-head compact">
-            <div>
-              <div className="section-kicker">
-                <Navigation />
-                SELECTED SCHEDULE
-              </div>
-
-              <h2>{result.task}</h2>
-
-              <p>
-                {result.asset} · {result.location}
-              </p>
-            </div>
-
-            <StateTag state={result.statusState}>
-              {result.status}
-            </StateTag>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '1px',
-              background: 'var(--line)',
-              borderTop: '1px solid var(--line)',
-            }}
-          >
-            {[
-              ['SCHEDULE ID', result.id],
-              ['DEPARTMENT', result.department],
-              ['ASSET', result.asset],
-              ['LOCATION', result.location],
-              ['DATE', result.date],
-              ['DURATION', result.duration],
-              ['START TIME', result.start],
-              ['END TIME', result.end],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                style={{
-                  padding: '15px 16px',
-                  background: 'var(--panel)',
-                }}
-              >
-                <div
-                  className="table-head"
-                  style={{
-                    marginBottom: '6px',
-                  }}
-                >
-                  {label}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    fontFamily:
-                      label === 'SCHEDULE ID' || label === 'ASSET'
-                        ? 'var(--font-mono)'
-                        : undefined,
-                  }}
-                >
-                  {value}
-                </div>
-              </div>
-            ))}
-          </div>
+          <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--muted)' }}>{progress}% complete</div>
         </section>
+      )}
 
-        <aside className="panel">
+      {status === 'failed' && (
+        <section className="panel" style={{ padding: '24px' }}>
+          <div className="section-kicker" style={{ color: 'var(--red)' }}><TriangleAlert/> FAILED</div>
+          <h2 style={{ margin: '10px 0' }}>Optimization run failed</h2>
+          <p style={{ color: 'var(--red)', fontSize: '13px' }}>{error}</p>
+        </section>
+      )}
 
-          <div className="panel-head compact">
-            <div>
-              <div className="section-kicker">
-                <CheckCircle2 />
-                SCHEDULER DECISION
-              </div>
-
-              <h2>Decision Summary</h2>
-            </div>
-          </div>
-
-          <div
-            style={{
-              padding: '16px',
-              margin: '0 18px 18px',
-              background: 'var(--elevated)',
-              borderLeft: '3px solid var(--teal)',
-            }}
-          >
-            <StateTag state={result.statusState}>
-              {result.status}
-            </StateTag>
-
-            <p
-              style={{
-                margin: '12px 0 0',
-                color: 'var(--muted)',
-                fontSize: '12px',
-                lineHeight: 1.6,
-              }}
-            >
-              {result.reason}
-            </p>
-          </div>
-
-          <div style={{ padding: '0 18px 18px' }}>
-
-            <div className="section-kicker">
-              <TriangleAlert />
-              OPERATIONAL IMPACT
-            </div>
-
+      {status === 'completed' && result && (
+        <>
+          <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(165px, 1fr))' }}>
             {[
-              ['Affected trains', `${result.affectedTrains} services`],
-              ['Impact level', result.impact],
-              ['Block required', 'Yes'],
-              ['Schedule date', result.date],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  padding: '10px 0',
-                  borderBottom: '1px solid var(--line)',
-                }}
-              >
-                <span
-                  style={{
-                    color: 'var(--muted)',
-                    fontSize: '11px',
-                  }}
-                >
-                  {label}
-                </span>
-
-                <strong
-                  style={{
-                    textAlign: 'right',
-                    fontSize: '12px',
-                    color:
-                      label === 'Impact level'
-                        ? result.impactState === 'high'
-                          ? 'var(--orange)'
-                          : result.impactState === 'warning'
-                            ? 'var(--yellow)'
-                            : 'var(--green)'
-                        : undefined,
-                  }}
-                >
-                  {value}
-                </strong>
+              ['Asset Availability', `${metrics.assetAvailability ?? '—'}%`, CheckCircle2, 'up'],
+              ['Expected Train Delay', `${metrics.expectedTrainDelay ?? '—'} min`, Clock3, 'warn'],
+              ['Conflicts', String(metrics.conflicts ?? result.conflictsResolved ?? 0), TriangleAlert, 'critical'],
+              ['Block Utilization', `${metrics.blockUtilization ?? '—'}%`, CalendarClock, 'info'],
+            ].map(([label, value, Icon, state]) => (
+              <div className="metric" key={label}>
+                <div className="metric-top"><span>{label}</span><Icon /></div>
+                <div className="metric-bottom"><strong>{value}</strong></div>
               </div>
             ))}
-
           </div>
-        </aside>
 
-      </div>
-
-      <section
-        className="panel"
-        style={{ marginTop: '18px' }}
-      >
-        <div className="panel-head compact">
-          <div>
-            <div className="section-kicker">
-              <Clock3 />
-              SCHEDULE TIMELINE
+          <section className="panel" style={{ overflow: 'hidden' }}>
+            <div className="panel-head compact">
+              <div><div className="section-kicker"><CalendarClock /> OPTIMIZED SCHEDULE</div><h2>Generated Maintenance Schedule</h2><p>{(result.schedule || []).length} task(s) scheduled</p></div>
             </div>
-
-            <h2>Maintenance Window</h2>
-
-            <p>
-              Operational window selected by the scheduler.
-            </p>
-          </div>
-        </div>
-
-        <div
-          style={{
-            padding: '8px 18px 22px',
-          }}
-        >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '100px 1fr 100px',
-              alignItems: 'center',
-              gap: '12px',
-            }}
-          >
-            <div>
-              <div className="table-head">START</div>
-
-              <strong
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '14px',
-                }}
-              >
-                {result.start}
-              </strong>
-            </div>
-
-            <div>
-              <div
-                style={{
-                  height: '4px',
-                  background: 'var(--line)',
-                  position: 'relative',
-                }}
-              >
-                <span
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: '-4px',
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    background: 'var(--cyan)',
-                  }}
-                />
-
-                <span
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    top: '-4px',
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    background:
-                      result.impactState === 'high'
-                        ? 'var(--orange)'
-                        : 'var(--yellow)',
-                  }}
-                />
-
-                <span
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: '-4px',
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    background: 'var(--green)',
-                  }}
-                />
+            <div style={{ overflowX: 'auto' }}>
+              <div className="table-head" style={{ minWidth: '700px', display: 'grid', gridTemplateColumns: '1.2fr 1fr .8fr .8fr .8fr .8fr', gap: '12px' }}>
+                <span>TASK</span><span>BLOCK</span><span>START</span><span>END</span><span>DURATION</span><span>SCORE</span>
               </div>
-
-              <div
-                style={{
-                  textAlign: 'center',
-                  marginTop: '10px',
-                  color: 'var(--muted)',
-                  fontSize: '10px',
-                  fontFamily: 'var(--font-mono)',
-                  letterSpacing: '.06em',
-                }}
-              >
-                MAINTENANCE WINDOW · {result.duration}
+              <div style={{ minWidth: '700px' }}>
+                {(result.schedule || []).length === 0 && <div style={{ padding: '20px 16px', fontSize: '12px', color: 'var(--muted)' }}>No tasks could be placed into the available blocks.</div>}
+                {(result.schedule || []).map((s, i) => (
+                  <div key={`${s.maintenanceTaskId}-${i}`} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr .8fr .8fr .8fr .8fr', gap: '12px', alignItems: 'center', padding: '13px 16px', borderBottom: '1px solid var(--line)' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--cyan)' }}>{s.maintenanceTaskId}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--muted)' }}>{s.blockId}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>{s.start}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>{s.end}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--muted)' }}>{s.estimatedDuration ? `${s.estimatedDuration} min` : '—'}</span>
+                    <span style={{ fontSize: '12px', color: s.unplaced ? 'var(--red)' : 'var(--green)' }}>{s.unplaced ? 'Unplaced' : Math.round(s.score ?? 0)}</span>
+                  </div>
+                ))}
               </div>
             </div>
+          </section>
 
-            <div style={{ textAlign: 'right' }}>
-              <div className="table-head">END</div>
+          {explanation.length > 0 && (
+            <section className="panel" style={{ marginTop: '18px' }}>
+              <div className="panel-head compact">
+                <div><div className="section-kicker"><TrainFront /> WHY THIS SCHEDULE</div><h2>Explanation</h2></div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '1px', background: 'var(--line)', borderTop: '1px solid var(--line)' }}>
+                {explanation.map((f, i) => (
+                  <div key={f.factor || i} style={{ padding: '18px', background: 'var(--panel)' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, color: f.impact === 'positive' ? 'var(--green)' : f.impact === 'negative' ? 'var(--red)' : 'var(--teal)', letterSpacing: '.05em', marginBottom: '7px' }}>{(f.factor || f.feature || 'FACTOR').toUpperCase()}</div>
+                    <div style={{ color: 'var(--muted)', fontSize: '12px', lineHeight: 1.5 }}>Impact score: {f.score ?? f.value ?? '—'}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
-              <strong
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '14px',
-                }}
-              >
-                {result.end}
-              </strong>
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '18px' }}>
+            <Link href="/scheduler" className="text-btn"><CalendarClock size={15} /> RETURN TO SCHEDULER <span>→</span></Link>
           </div>
-        </div>
-      </section>
-
-      <section
-        className="panel"
-        style={{ marginTop: '18px' }}
-      >
-        <div className="panel-head compact">
-          <div>
-            <div className="section-kicker">
-              <TrainFront />
-              AFFECTED TRAIN OPERATIONS
-            </div>
-
-            <h2>Service Impact</h2>
-
-            <p>
-              Train paths evaluated against the selected maintenance window.
-            </p>
-          </div>
-
-          <StateTag state={result.impactState}>
-            {result.impact} IMPACT
-          </StateTag>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '1px',
-            background: 'var(--line)',
-            borderTop: '1px solid var(--line)',
-          }}
-        >
-          <div
-            style={{
-              padding: '18px',
-              background: 'var(--panel)',
-            }}
-          >
-            <div className="table-head">
-              AFFECTED SERVICES
-            </div>
-
-            <strong
-              style={{
-                display: 'block',
-                fontSize: '20px',
-                marginTop: '7px',
-              }}
-            >
-              {result.affectedTrains}
-            </strong>
-          </div>
-
-          <div
-            style={{
-              padding: '18px',
-              background: 'var(--panel)',
-            }}
-          >
-            <div className="table-head">
-              IMPACT LEVEL
-            </div>
-
-            <strong
-              style={{
-                display: 'block',
-                fontSize: '14px',
-                marginTop: '9px',
-                color:
-                  result.impactState === 'high'
-                    ? 'var(--orange)'
-                    : result.impactState === 'warning'
-                      ? 'var(--yellow)'
-                      : 'var(--green)',
-              }}
-            >
-              {result.impact}
-            </strong>
-          </div>
-
-          <div
-            style={{
-              padding: '18px',
-              background: 'var(--panel)',
-            }}
-          >
-            <div className="table-head">
-              BLOCK REQUIREMENT
-            </div>
-
-            <strong
-              style={{
-                display: 'block',
-                fontSize: '14px',
-                marginTop: '9px',
-              }}
-            >
-              Required
-            </strong>
-          </div>
-
-          <div
-            style={{
-              padding: '18px',
-              background: 'var(--panel)',
-            }}
-          >
-            <div className="table-head">
-              SCHEDULE DATE
-            </div>
-
-            <strong
-              style={{
-                display: 'block',
-                fontSize: '13px',
-                marginTop: '9px',
-              }}
-            >
-              {result.date}
-            </strong>
-          </div>
-        </div>
-      </section>
-
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          marginTop: '18px',
-        }}
-      >
-        <Link
-          href="/scheduler"
-          className="text-btn"
-        >
-          <CalendarClock size={15} />
-          RETURN TO SCHEDULER
-          <span>→</span>
-        </Link>
-      </div>
-
+        </>
+      )}
     </main>
   )
 }

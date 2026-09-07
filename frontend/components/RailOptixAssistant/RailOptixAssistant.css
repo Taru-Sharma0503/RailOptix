@@ -1,0 +1,1319 @@
+/* =========================================================
+   RAILOPTIX ONBOARDING ASSISTANT
+   Completely isolated from the dashboard
+   ========================================================= */
+
+.rail-assistant-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
+
+.rail-assistant-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(245, 244, 239, 0.90),
+      rgba(239, 239, 234, 0.94)
+    );
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.rail-assistant {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* =========================================================
+   SKIP
+   ========================================================= */
+
+.assistant-skip {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  z-index: 30;
+  height: 40px;
+  padding: 0 13px 0 16px;
+  border: 1px solid rgba(35, 42, 48, 0.13);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #4d555b;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.assistant-skip:hover {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(35, 42, 48, 0.22);
+  transform: translateY(-1px);
+}
+
+.skip-x {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #eef0ed;
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* =========================================================
+   SCENE
+   ========================================================= */
+
+.assistant-scene {
+  position: relative;
+  width: min(1180px, 94vw);
+  height: min(48vh, 470px);
+  margin-top: 4vh;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    linear-gradient(
+      180deg,
+      #f9f9f6 0%,
+      #f3f3ef 55%,
+      #e9e9e4 100%
+    );
+  border: 1px solid rgba(41, 48, 52, 0.09);
+  box-shadow:
+    0 35px 90px rgba(36, 42, 46, 0.13),
+    0 8px 24px rgba(36, 42, 46, 0.07);
+}
+
+.scene-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 42%;
+  height: 1px;
+  background: rgba(50, 57, 61, 0.07);
+}
+
+/* =========================================================
+   RAILWAY TRACK
+   ========================================================= */
+
+/* =========================================================
+   RAILWAY TRACK
+   ========================================================= */
+
+.railway-track {
+  position: absolute;
+  left: 3%;
+  right: 3%;
+  bottom: 38px;
+  height: 105px;
+  perspective: 700px;
+  z-index: 2;
+}
+
+.track-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #d2d5d3 0%,
+      #8a9192 25%,
+      #4f5759 50%,
+      #aeb3b2 75%,
+      #666d6f 100%
+    );
+
+  box-shadow:
+    0 2px 4px rgba(25, 30, 32, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+.rail-one {
+  bottom: 34px;
+}
+
+.rail-two {
+  bottom: 8px;
+}
+
+.sleepers {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 70px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  overflow: hidden;
+}
+
+.sleepers span {
+  width: 43px;
+  height: 13px;
+  flex-shrink: 0;
+
+  border-radius: 2px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #777d7c 0%,
+      #555b5a 48%,
+      #3d4241 100%
+    );
+
+  transform:
+    perspective(120px)
+    rotateX(8deg);
+
+  box-shadow:
+    0 4px 7px rgba(0, 0, 0, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.railway-track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(50, 55, 56, 0.08),
+      rgba(30, 35, 36, 0.02)
+    );
+
+  filter: blur(3px);
+}
+/* =========================================================
+   METALLIC TRAIN
+   ENTERS FROM LEFT
+   EXITS FROM RIGHT
+   ========================================================= */
+/* =========================================================
+   TRAIN MOVEMENT
+   ========================================================= */
+
+.technical-train {
+  position: absolute;
+  left: 50%;
+  bottom: 91px;
+  width: min(950px, 86%);
+  height: 172px;
+  display: flex;
+  align-items: flex-end;
+
+  /* Start completely outside the LEFT side */
+  transform: translateX(calc(-50% - 120vw));
+
+  opacity: 0;
+
+  transition:
+    transform 2400ms cubic-bezier(0.45, 0.05, 0.25, 1),
+    opacity 500ms ease;
+
+  z-index: 6;
+}
+
+/* Waiting outside the scene */
+.technical-train.train-waiting {
+  transform: translateX(calc(-50% - 120vw));
+  opacity: 0;
+}
+
+/* Entered and centered */
+.technical-train.train-entered {
+  transform: translateX(-50%);
+  opacity: 1;
+
+  transition:
+    transform 2400ms cubic-bezier(0.45, 0.05, 0.25, 1),
+    opacity 500ms ease;
+}
+
+/* Leaving completely through the RIGHT */
+.technical-train.train-departing {
+  transform: translateX(120vw);
+  opacity: 1;
+
+  transition:
+    transform 2500ms cubic-bezier(0.45, 0.05, 0.25, 1),
+    opacity 700ms ease;
+}
+/* =========================================================
+   TRAIN FRONT
+   ========================================================= */
+
+.train-front {
+  position: relative;
+  width: 165px;
+  height: 142px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 18px 7px 5px 18px;
+  background:
+    linear-gradient(
+      145deg,
+      #e3e5e3 0%,
+      #aeb4b5 25%,
+      #747d80 50%,
+      #c9ccca 76%,
+      #8a9193 100%
+    );
+  border: 1px solid rgba(36, 42, 44, 0.35);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    inset -12px 0 25px rgba(32, 37, 40, 0.14),
+    0 15px 25px rgba(30, 35, 38, 0.20);
+}
+
+.train-windshield {
+  position: absolute;
+  left: 23px;
+  right: 23px;
+  top: 17px;
+  height: 55px;
+  overflow: hidden;
+  border-radius: 12px 12px 7px 7px;
+  background:
+    linear-gradient(
+      145deg,
+      #27363d 0%,
+      #101b21 50%,
+      #3b4b51 100%
+    );
+  border: 2px solid rgba(240, 243, 242, 0.35);
+  box-shadow:
+    inset 0 2px 5px rgba(255, 255, 255, 0.16);
+}
+
+.windshield-reflection {
+  position: absolute;
+  width: 100px;
+  height: 18px;
+  top: -5px;
+  left: -15px;
+  transform: rotate(-18deg);
+  background: rgba(255, 255, 255, 0.14);
+  filter: blur(1px);
+}
+
+.front-light {
+  position: absolute;
+  bottom: 31px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      #ffffff 0%,
+      #f5f2d8 32%,
+      #a7a8a0 70%,
+      transparent 72%
+    );
+  box-shadow:
+    0 0 15px rgba(255, 255, 255, 0.72);
+}
+
+.light-one {
+  left: 28px;
+}
+
+.light-two {
+  right: 28px;
+}
+
+.front-lower {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 0;
+  height: 28px;
+  background:
+    linear-gradient(
+      180deg,
+      #50585a,
+      #303638
+    );
+  border-radius: 6px 6px 0 0;
+}
+
+.front-grille {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  top: 8px;
+  height: 5px;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #1d2224 0 4px,
+      transparent 4px 8px
+    );
+}
+
+.front-shadow {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 0, 0, 0.12)
+    );
+}
+
+/* =========================================================
+   TRAIN CARS
+   ========================================================= */
+
+.train-car {
+  position: relative;
+  height: 137px;
+  flex: 1;
+  min-width: 0;
+  margin-left: 3px;
+  border-radius: 5px;
+  background:
+    linear-gradient(
+      180deg,
+      #e1e3e1 0%,
+      #b7bcbb 15%,
+      #858d8f 50%,
+      #c3c6c4 78%,
+      #6d7578 100%
+    );
+  border: 1px solid rgba(41, 47, 49, 0.30);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.72),
+    inset 0 -12px 20px rgba(35, 40, 42, 0.10),
+    0 11px 22px rgba(31, 36, 38, 0.17);
+  overflow: visible;
+  transition:
+    filter 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.train-car::after {
+  content: "";
+  position: absolute;
+  top: 58px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background:
+    linear-gradient(
+      90deg,
+      #333a3c,
+      #697174,
+      #333a3c
+    );
+  opacity: 0.65;
+}
+
+.car-roof {
+  position: absolute;
+  top: -7px;
+  left: 7px;
+  right: 7px;
+  height: 9px;
+  border-radius: 7px 7px 1px 1px;
+  background:
+    linear-gradient(
+      180deg,
+      #dfe1df,
+      #8d9597
+    );
+  border: 1px solid rgba(50, 55, 57, 0.24);
+}
+
+.car-window-row {
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  top: 18px;
+  height: 35px;
+  display: flex;
+  gap: 5px;
+}
+
+.car-window-row span {
+  flex: 1;
+  min-width: 0;
+  border-radius: 4px;
+  background:
+    linear-gradient(
+      145deg,
+      #45565e,
+      #1b2930 48%,
+      #596970
+    );
+  border: 1px solid rgba(220, 225, 223, 0.28);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.10);
+}
+
+.car-window-row span::after {
+  content: "";
+  display: block;
+  width: 45%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  transform: skewX(-20deg);
+}
+
+.car-door {
+  position: absolute;
+  width: 19px;
+  height: 54px;
+  right: 11px;
+  bottom: 16px;
+  border-radius: 2px;
+  border: 1px solid rgba(60, 67, 69, 0.40);
+  background:
+    linear-gradient(
+      90deg,
+      #7c8586,
+      #b8bcba,
+      #6f7779
+    );
+}
+
+.point-marker {
+  position: absolute;
+  left: 50%;
+  top: 73px;
+  width: 37px;
+  height: 37px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(249, 250, 247, 0.94);
+  border: 1px solid rgba(40, 48, 52, 0.20);
+  box-shadow:
+    0 5px 13px rgba(25, 31, 34, 0.16);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease,
+    background 250ms ease;
+}
+
+.point-marker span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #30383c;
+}
+
+.car-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15px;
+  background:
+    linear-gradient(
+      180deg,
+      #555e60,
+      #303638
+    );
+}
+
+/* =========================================================
+   ACTIVE TRAIN BLOCK GLOW
+   ========================================================= */
+
+.active-car {
+  filter: brightness(1.08);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    0 0 0 2px rgba(64, 75, 79, 0.16),
+    0 0 22px rgba(80, 91, 95, 0.20),
+    0 15px 27px rgba(30, 36, 39, 0.20);
+}
+
+.active-car .point-marker {
+  background: #ffffff;
+  box-shadow:
+    0 0 0 5px rgba(72, 84, 88, 0.10),
+    0 0 20px rgba(80, 91, 95, 0.25),
+    0 8px 22px rgba(35, 43, 46, 0.22);
+  transform:
+    translateX(-50%)
+    scale(1.12);
+}
+
+/* =========================================================
+   POINT LABELS
+   IMPORTANT:
+   Labels are attached to their train cars.
+   They stay fixed vertically when highlighted.
+   ========================================================= */
+
+.car-point-label {
+  position: absolute;
+  left: 50%;
+  bottom: -64px;
+  width: max-content;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  z-index: 30;
+
+  color: rgba(48, 56, 60, 0.34);
+
+  transition:
+    color 250ms ease;
+}
+
+.car-point-label .label-title {
+  display: block;
+  white-space: nowrap;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: rgba(48, 56, 60, 0.38);
+
+  transition:
+    color 250ms ease,
+    text-shadow 250ms ease,
+    transform 250ms ease;
+}
+
+.car-point-label .label-line {
+  display: block;
+  width: 1px;
+  height: 15px;
+  margin-top: 5px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(70, 78, 81, 0.30),
+      rgba(70, 78, 81, 0.08)
+    );
+
+  transition:
+    background 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.car-point-label .label-number {
+  display: block;
+  margin-top: 4px;
+  white-space: nowrap;
+
+  font-size: 6.5px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+
+  color: rgba(48, 56, 60, 0.28);
+
+  transition: color 250ms ease;
+}
+
+/* =========================================================
+   ACTIVE LABEL
+   NO VERTICAL MOVEMENT
+   ========================================================= */
+
+.car-point-label.active-point {
+  transform: translateX(-50%);
+}
+
+.car-point-label.active-point .label-title {
+  color: #252e32;
+  transform: scale(1.04);
+  text-shadow:
+    0 0 12px rgba(70, 80, 84, 0.25);
+}
+
+.car-point-label.active-point .label-line {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(50, 59, 63, 0.60),
+      rgba(50, 59, 63, 0.16)
+    );
+
+  box-shadow:
+    0 0 8px rgba(75, 87, 91, 0.25);
+}
+
+.car-point-label.active-point .label-number {
+  color: rgba(48, 56, 60, 0.62);
+}
+
+/* =========================================================
+   GIRL / ASSISTANT
+   ORIGINAL MASCOT DESIGN
+   ========================================================= */
+
+.assistant-mascot {
+  position: absolute;
+  left: 50%;
+  bottom: 42px;
+  z-index: 15;
+  width: 150px;
+  height: 230px;
+  transform: translateX(-50%);
+
+  transition:
+    opacity 0.55s ease,
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mascot-intro {
+  opacity: 1;
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+.mascot-hidden {
+  opacity: 0;
+  transform:
+    translateX(-50%)
+    translateY(80px);
+  pointer-events: none;
+}
+
+.mascot-final {
+  opacity: 1;
+  transform:
+    translateX(-50%)
+    translateY(-4px);
+}
+
+.mascot-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 130px;
+  height: 130px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(120, 125, 118, 0.10);
+  filter: blur(18px);
+}
+
+.mascot-character {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 120px;
+  height: 220px;
+  transform: translateX(-50%);
+}
+
+/* =========================================================
+   MASCOT HAIR
+   ========================================================= */
+
+.mascot-hair {
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  width: 82px;
+  height: 96px;
+  transform: translateX(-50%);
+  border-radius: 46% 46% 42% 42%;
+  background: #2f3535;
+  z-index: 3;
+}
+
+.mascot-hair .hair-side {
+  position: absolute;
+  top: 42px;
+  width: 25px;
+  height: 70px;
+  background: #2f3535;
+  border-radius: 50%;
+}
+
+.mascot-hair .hair-side.left {
+  left: -5px;
+  transform: rotate(8deg);
+}
+
+.mascot-hair .hair-side.right {
+  right: -5px;
+  transform: rotate(-8deg);
+}
+
+/* =========================================================
+   MASCOT HEAD
+   ========================================================= */
+
+.mascot-head {
+  position: absolute;
+  left: 50%;
+  top: 15px;
+  width: 67px;
+  height: 78px;
+  transform: translateX(-50%);
+  background: #d9aa86;
+  border-radius: 48% 48% 45% 45%;
+  z-index: 5;
+  box-shadow:
+    inset -5px -5px 0
+      rgba(120, 70, 45, 0.07);
+}
+
+.mascot-ear {
+  position: absolute;
+  top: 31px;
+  width: 12px;
+  height: 20px;
+  background: #d9aa86;
+  border-radius: 50%;
+}
+
+.mascot-ear.left {
+  left: -7px;
+}
+
+.mascot-ear.right {
+  right: -7px;
+}
+
+.mascot-eye {
+  position: absolute;
+  top: 34px;
+  width: 5px;
+  height: 7px;
+  border-radius: 50%;
+  background: #29302f;
+}
+
+.mascot-eye.left {
+  left: 21px;
+}
+
+.mascot-eye.right {
+  right: 21px;
+}
+
+.mascot-nose {
+  position: absolute;
+  left: 50%;
+  top: 42px;
+  width: 5px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-right:
+    1px solid
+    rgba(90, 55, 40, 0.4);
+  border-bottom:
+    1px solid
+    rgba(90, 55, 40, 0.4);
+  border-radius: 0 0 5px 0;
+}
+
+.mascot-smile {
+  position: absolute;
+  left: 50%;
+  top: 55px;
+  width: 17px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-bottom:
+    2px solid
+    #743f3d;
+  border-radius: 0 0 50% 50%;
+}
+
+/* =========================================================
+   MASCOT NECK
+   ========================================================= */
+
+.mascot-neck {
+  position: absolute;
+  left: 50%;
+  top: 87px;
+  width: 24px;
+  height: 22px;
+  transform: translateX(-50%);
+  background: #d9aa86;
+  z-index: 2;
+}
+
+/* =========================================================
+   MASCOT BODY
+   ========================================================= */
+
+.mascot-body {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 98px;
+  height: 128px;
+  transform: translateX(-50%);
+  background: #5c6767;
+  border-radius: 42px 42px 12px 12px;
+  z-index: 1;
+}
+
+.mascot-collar {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 40px;
+  height: 32px;
+  transform: translateX(-50%);
+  background: #f5f2e9;
+  clip-path:
+    polygon(
+      0 0,
+      50% 100%,
+      100% 0
+    );
+}
+
+.mascot-badge {
+  position: absolute;
+  top: 47px;
+  left: 50%;
+  width: 25px;
+  height: 25px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f5f2e9;
+  color: #4d5757;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   MASCOT ARM
+   ========================================================= */
+
+.mascot-arm {
+  position: absolute;
+  right: -5px;
+  top: 112px;
+  width: 25px;
+  height: 72px;
+  background: #5c6767;
+  border-radius: 18px;
+  transform: rotate(-18deg);
+  z-index: 0;
+}
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+.assistant-message {
+  position: relative;
+  z-index: 20;
+  width: min(860px, 90vw);
+  margin-top: 25px;
+  text-align: center;
+}
+
+.message-progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 17px;
+}
+
+.message-progress span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background:
+    rgba(53, 61, 64, 0.18);
+
+  transition:
+    width 220ms ease,
+    background 220ms ease;
+}
+
+.message-progress .progress-active {
+  width: 18px;
+  border-radius: 99px;
+  background: #3f494d;
+}
+
+.message-kicker {
+  margin-bottom: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #747c7f;
+}
+
+.assistant-message h1 {
+  margin: 0;
+  color: #242b2e;
+  font-size:
+    clamp(
+      25px,
+      2.5vw,
+      34px
+    );
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+  font-weight: 650;
+}
+
+.assistant-message p {
+  width: min(690px, 90vw);
+  margin: 13px auto 0;
+  color: #697174;
+  font-size: 15px;
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.message-action {
+  margin-top: 17px;
+  display: flex;
+  justify-content: center;
+}
+
+.assistant-next,
+.assistant-enter {
+  height: 43px;
+  padding:
+    0 19px
+    0 21px;
+  border-radius: 999px;
+  border:
+    1px solid
+    rgba(37, 44, 47, 0.18);
+  background: #30393d;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow:
+    0 8px 18px
+    rgba(35, 42, 45, 0.17);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.assistant-next span,
+.assistant-enter span {
+  font-size: 17px;
+
+  transition:
+    transform 180ms ease;
+}
+
+.assistant-next:hover,
+.assistant-enter:hover {
+  transform: translateY(-2px);
+  background: #252e32;
+
+  box-shadow:
+    0 11px 24px
+    rgba(35, 42, 45, 0.22);
+}
+
+.assistant-next:hover span,
+.assistant-enter:hover span {
+  transform: translateX(3px);
+}
+
+.assistant-next:disabled {
+  cursor: default;
+}
+
+/* =========================================================
+   FINAL STATE
+   ========================================================= */
+
+.final-state .assistant-scene {
+  background:
+    radial-gradient(
+      circle at 50% 38%,
+      #ffffff 0%,
+      #f4f4f0 45%,
+      #e9e9e4 100%
+    );
+}
+
+.final-state .assistant-message {
+  animation:
+    finalMessage
+    600ms
+    ease
+    both;
+}
+
+@keyframes finalMessage {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .assistant-scene {
+    height: 43vh;
+  }
+
+  .technical-train {
+    width: 91%;
+  }
+
+  .train-front {
+    width: 125px;
+  }
+
+  .point-marker {
+    width: 31px;
+    height: 31px;
+  }
+
+  .train-wheel {
+    width: 24px;
+    height: 24px;
+  }
+
+  .assistant-message h1 {
+    font-size: 25px;
+  }
+
+  .assistant-message p {
+    font-size: 14px;
+  }
+
+  .car-point-label .label-title {
+    font-size: 8px;
+    letter-spacing: 0.06em;
+  }
+
+  .car-point-label .label-number {
+    font-size: 6px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .assistant-skip {
+    top: 15px;
+    right: 15px;
+  }
+
+  .assistant-scene {
+    width: 96vw;
+    height: 38vh;
+    margin-top: 2vh;
+    border-radius: 20px;
+  }
+
+  .technical-train {
+    width: 96%;
+    height: 125px;
+    bottom: 76px;
+  }
+
+  .train-front {
+    width: 95px;
+    height: 105px;
+  }
+
+  .train-windshield {
+    left: 13px;
+    right: 13px;
+    top: 12px;
+    height: 39px;
+  }
+
+  .train-car {
+    height: 105px;
+  }
+
+  .car-window-row {
+    top: 13px;
+    height: 27px;
+  }
+
+  .car-door {
+    display: none;
+  }
+
+  .point-marker {
+    top: 57px;
+    width: 27px;
+    height: 27px;
+  }
+
+  .point-marker span {
+    font-size: 8px;
+  }
+
+  .train-wheel {
+    display: none;
+  }
+
+  /* =======================================================
+     MOBILE POINT LABELS
+     ======================================================= */
+
+  .car-point-label {
+    bottom: -48px;
+  }
+
+  .car-point-label .label-title {
+    font-size: 6px;
+    letter-spacing: 0.045em;
+  }
+
+  .car-point-label .label-line {
+    height: 10px;
+    margin-top: 3px;
+  }
+
+  .car-point-label .label-number {
+    margin-top: 3px;
+    font-size: 5px;
+    letter-spacing: 0.08em;
+  }
+
+  /*
+   * IMPORTANT:
+   * Active label remains fixed.
+   */
+  .car-point-label.active-point {
+    transform: translateX(-50%);
+  }
+
+  .car-point-label.active-point .label-title {
+    transform: scale(1.02);
+  }
+
+  /* =======================================================
+     GIRL
+     ======================================================= */
+
+  .assistant-mascot {
+    width: 150px;
+    height: 230px;
+    bottom: 25px;
+  }
+
+  .mascot-character {
+    width: 120px;
+    height: 220px;
+  }
+
+  /* =======================================================
+     MESSAGE
+     ======================================================= */
+
+  .assistant-message {
+    width: 92vw;
+    margin-top: 17px;
+  }
+
+  .message-progress {
+    margin-bottom: 12px;
+  }
+
+  .message-kicker {
+    font-size: 8px;
+    letter-spacing: 0.13em;
+  }
+
+  .assistant-message h1 {
+    font-size: 21px;
+  }
+
+  .assistant-message p {
+    width: 88vw;
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .message-action {
+    margin-top: 13px;
+  }
+
+  .assistant-next,
+  .assistant-enter {
+    height: 39px;
+    font-size: 12px;
+  }
+}

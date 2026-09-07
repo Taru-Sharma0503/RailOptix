@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { CheckCircle2, ClipboardPlus, Plus, X } from 'lucide-react'
-import { apiFetch } from '@/lib/api'
+import { assetsApi, departmentsApi, maintenanceApi } from '@/lib/api'
 
 const initialForm = {
 asset: '', type: '', location: '', priority: '', date: '', time: '',
@@ -32,8 +32,8 @@ useEffect(() => {
 async function loadFormData() {
 try {
 const [assetsData, departmentsData] = await Promise.all([
-apiFetch('/api/assets'),
-apiFetch('/api/departments')
+  assetsApi.list(),
+  departmentsApi.list()
 ])
 
 
@@ -104,10 +104,7 @@ try {
 
   console.log('Maintenance payload:', payload)
 
-  const data = await apiFetch('/api/maintenance', {
-    method: 'POST',
-    body: JSON.stringify(payload)
-  })
+  const data = await maintenanceApi.create(payload)
 
   const created = data?.task || data?.maintenance || data
 

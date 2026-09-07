@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Navigation, TrainFront } from 'lucide-react'
-import { apiFetch } from '@/lib/api'
+import { trainsApi } from '@/lib/api'
 
 const mockTrain = {
   id: 'TR-003',
@@ -45,7 +45,7 @@ export default function TrainPage({ params }) {
   useEffect(() => {
     async function loadTrain() {
       try {
-        const data = await apiFetch(`/api/trains/${trainId}`)
+        const data = await trainsApi.get(trainId)
         const t = data?.train
 
         if (!t) throw new Error('Invalid train response')

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Activity,
@@ -10,137 +11,37 @@ import {
   Plus,
   Wrench,
 } from 'lucide-react'
-import { apiFetch } from '@/lib/api'
+import { assetsApi, requireAuth } from '../../lib/api'
 
-const mockAssets = [
-  {
-    id: 'TRK-102',
-    name: 'Main Line Track Section',
-    type: 'Track Section',
-    location: 'New Delhi – Ghaziabad',
-    health: '72%',
-    healthState: 'warning',
-    inspection: '28 Aug 2026',
-    maintenance: '04 Sep 2026',
-    status: 'At Risk',
-    priority: 'High',
-  },
-  {
-    id: 'SIG-044',
-    name: 'Automatic Block Signal',
-    type: 'Signal',
-    location: 'New Delhi Yard',
-    health: '91%',
-    healthState: 'healthy',
-    inspection: '30 Aug 2026',
-    maintenance: '18 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-  },
-  {
-    id: 'PTM-018',
-    name: 'Point Machine No. 18',
-    type: 'Point Machine',
-    location: 'Ghaziabad Junction',
-    health: '58%',
-    healthState: 'critical',
-    inspection: '26 Aug 2026',
-    maintenance: '02 Sep 2026',
-    status: 'Critical',
-    priority: 'Critical',
-  },
-  {
-    id: 'OHE-221',
-    name: 'Overhead Contact System',
-    type: 'Overhead Equipment',
-    location: 'Panipat – Karnal',
-    health: '76%',
-    healthState: 'warning',
-    inspection: '27 Aug 2026',
-    maintenance: '08 Sep 2026',
-    status: 'At Risk',
-    priority: 'Medium',
-  },
-  {
-    id: 'LC-014',
-    name: 'Manned Level Crossing',
-    type: 'Level Crossing',
-    location: 'Sonepat Outer',
-    health: '96%',
-    healthState: 'healthy',
-    inspection: '29 Aug 2026',
-    maintenance: '22 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-  },
-  {
-    id: 'BRG-007',
-    name: 'Yamuna River Bridge',
-    type: 'Bridge',
-    location: 'Delhi – Shahdara',
-    health: '84%',
-    healthState: 'warning',
-    inspection: '25 Aug 2026',
-    maintenance: '12 Sep 2026',
-    status: 'At Risk',
-    priority: 'High',
-  },
-  {
-    id: 'TRK-187',
-    name: 'Loop Line Track Section',
-    type: 'Track Section',
-    location: 'Meerut City',
-    health: '93%',
-    healthState: 'healthy',
-    inspection: '31 Aug 2026',
-    maintenance: '26 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-  },
-  {
-    id: 'SIG-091',
-    name: 'Electronic Interlocking Signal',
-    type: 'Signal',
-    location: 'Panipat Junction',
-    health: '65%',
-    healthState: 'critical',
-    inspection: '24 Aug 2026',
-    maintenance: '03 Sep 2026',
-    status: 'Critical',
-    priority: 'Critical',
-  },
-  {
-    id: 'OHE-106',
-    name: 'Traction Mast Assembly',
-    type: 'Overhead Equipment',
-    location: 'Gurugram – Rewari',
-    health: '88%',
-    healthState: 'healthy',
-    inspection: '30 Aug 2026',
-    maintenance: '19 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-  },
-  {
-    id: 'PTM-031',
-    name: 'Point Machine No. 31',
-    type: 'Point Machine',
-    location: 'New Delhi Yard',
-    health: '79%',
-    healthState: 'warning',
-    inspection: '28 Aug 2026',
-    maintenance: '09 Sep 2026',
-    status: 'At Risk',
-    priority: 'Medium',
-  },
-]
+const CONDITION_LABEL = { healthy: 'Healthy', warning: 'At Risk', critical: 'Critical' }
+const CRITICALITY_LABEL = (c) => (c >= 9 ? 'Critical' : c >= 7 ? 'High' : c >= 4 ? 'Medium' : 'Low')
 
-const kpis = [
-  ['Total Assets', '1,284', 'Across Delhi Division', Database, 'info'],
-  ['Healthy', '1,137', '88.6% of monitored', CircleCheck, 'up'],
-  ['At Risk', '96', 'Review required', AlertTriangle, 'warn'],
-  ['Critical', '51', 'Immediate attention', Activity, 'critical'],
-]
+function toViewModel(a) {
+  return {
+    id: a.id,
+    name: a.name,
+    type: a.type,
+    location: a.corridorId || '—',
+    health: `${Math.round((1 - (a.failureRisk ?? 0)) * 100)}%`,
+    healthState: a.condition || 'healthy',
+    failureRisk: a.failureRisk,
+    status: CONDITION_LABEL[a.condition] || a.condition,
+    priority: CRITICALITY_LABEL(a.criticality ?? 1),
+  }
+}
+
+function buildKpis(assets) {
+  const total = assets.length
+  const healthy = assets.filter((a) => a.healthState === 'healthy').length
+  const warning = assets.filter((a) => a.healthState === 'warning').length
+  const critical = assets.filter((a) => a.healthState === 'critical').length
+  return [
+    ['Total Assets', String(total), 'Across Delhi Division', Database, 'info'],
+    ['Healthy', String(healthy), total ? `${((healthy / total) * 100).toFixed(1)}% of monitored` : '', CircleCheck, 'up'],
+    ['At Risk', String(warning), 'Review required', AlertTriangle, 'warn'],
+    ['Critical', String(critical), 'Immediate attention', Activity, 'critical'],
+  ]
+}
 
 function StatusPill({ children, state }) {
   return (
@@ -167,157 +68,32 @@ function StatusPill({ children, state }) {
 }
 
 export default function AssetsPage() {
-  const [assets, setAssets] = useState(mockAssets)
-const [selectedId, setSelectedId] = useState(null)
-const [selectedMaintenance, setSelectedMaintenance] = useState('—')
-const [selectedInspection, setSelectedInspection] = useState('—')
+  const router = useRouter()
+  const [assets, setAssets] = useState([])
+  const [selectedId, setSelectedId] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const selected =
-    assets.find((asset) => asset.id === selectedId) || assets[0]
-    useEffect(() => {
-  async function loadAssets() {
-    try {
-      const data = await apiFetch('/api/assets')
+  useEffect(() => {
+    if (!requireAuth(router)) return
 
-      const realAssets =
-        Array.isArray(data?.assets)
-          ? data.assets
-          : Array.isArray(data)
-            ? data
-            : null
-
-      if (!realAssets) {
-        console.warn('Unexpected assets API response:', data)
-        return
-      }
-
-      const safeAssets = realAssets.map((asset) => {
-        const health = Math.round(
-          (1 - (asset.failureRisk ?? 0)) * 100
-        )
-
-        const healthState =
-          asset.condition === 'critical'
-            ? 'critical'
-            : asset.condition === 'warning'
-              ? 'warning'
-              : 'healthy'
-
-        const priority =
-          asset.criticality >= 9
-            ? 'Critical'
-            : asset.criticality >= 7
-              ? 'High'
-              : asset.criticality >= 4
-                ? 'Medium'
-                : 'Low'
-
-        return {
-          ...asset,
-
-          type: asset.type
-            ? asset.type.charAt(0).toUpperCase() +
-              asset.type.slice(1)
-            : '—',
-
-          location:
-            asset.location &&
-            typeof asset.location === 'object'
-              ? `${asset.location.latitude}, ${asset.location.longitude}`
-              : asset.location || '—',
-
-          health: `${health}%`,
-          healthState,
-
-          inspection: '—',
-          maintenance: '—',
-
-          status:
-            asset.condition === 'critical'
-              ? 'Critical'
-              : asset.condition === 'warning'
-                ? 'At Risk'
-                : 'Healthy',
-
-          priority,
-        }
+    let cancelled = false
+    assetsApi.list()
+      .then((data) => {
+        if (cancelled) return
+        const mapped = (data.assets || []).map(toViewModel)
+        setAssets(mapped)
+        if (mapped.length) setSelectedId(mapped[0].id)
       })
+      .catch((err) => { if (!cancelled) setError(err.message || 'Could not load assets.') })
+      .finally(() => { if (!cancelled) setLoading(false) })
 
-      if (safeAssets.length > 0) {
-        setAssets(safeAssets)
-        setSelectedId(safeAssets[0].id)
-      }
-    } catch (err) {
-      console.error(
-        'Failed to load assets from backend:',
-        err
-      )
-    }
-  }
+    return () => { cancelled = true }
+  }, [router])
 
-  loadAssets()
-}, [])
-useEffect(() => {
-  async function loadSelectedAssetDetails() {
-    if (!selectedId) return
+  const kpis = buildKpis(assets)
+  const selected = assets.find((asset) => asset.id === selectedId) || assets[0]
 
-    try {
-      const [assetData, maintenanceData] = await Promise.all([
-        apiFetch(`/api/assets/${selectedId}`),
-        apiFetch(`/api/maintenance?assetId=${selectedId}`),
-      ])
-
-      const backendAsset = assetData?.asset || assetData
-      const maintenanceTasks = maintenanceData?.tasks || []
-
-      const upcomingMaintenance = maintenanceTasks
-        .filter((task) => task.status !== 'completed' && task.deadline)
-        .sort(
-          (a, b) =>
-            new Date(a.deadline) -
-            new Date(b.deadline)
-        )[0]
-
-      const maintenanceHistory =
-        backendAsset?.maintenanceHistory || []
-
-      const latestInspection =
-        maintenanceHistory
-          .filter((item) => item.performedAt)
-          .sort(
-            (a, b) =>
-              new Date(b.performedAt) -
-              new Date(a.performedAt)
-          )[0]
-
-      setSelectedMaintenance(
-        upcomingMaintenance
-          ? new Date(
-              upcomingMaintenance.deadline
-            ).toLocaleDateString('en-IN')
-          : '—'
-      )
-
-      setSelectedInspection(
-        latestInspection
-          ? new Date(
-              latestInspection.performedAt
-            ).toLocaleDateString('en-IN')
-          : '—'
-      )
-    } catch (err) {
-      console.error(
-        'Failed to load selected asset details:',
-        err
-      )
-
-      setSelectedMaintenance('—')
-      setSelectedInspection('—')
-    }
-  }
-
-  loadSelectedAssetDetails()
-}, [selectedId])
   return (
     <main className="dashboard">
       <div className="page-intro">
@@ -329,8 +105,7 @@ useEffect(() => {
           <h1>Asset Management</h1>
 
           <p>
-            Monitor railway infrastructure assets, health, and
-            maintenance status.
+            Monitor railway infrastructure assets, health, and maintenance status.
           </p>
         </div>
 
@@ -339,12 +114,10 @@ useEffect(() => {
         </Link>
       </div>
 
-      <div
-        className="metric-grid"
-        style={{
-          gridTemplateColumns: 'repeat(4,1fr)',
-        }}
-      >
+      {error && <div style={{margin:'0 0 16px',padding:'12px 14px',border:'1px solid rgba(217,74,74,.35)',color:'var(--red)',fontSize:'12px'}}>Couldn't reach the backend: {error}</div>}
+      {loading && <div style={{padding:'16px',fontSize:'12px',color:'var(--muted)'}}>Loading assets…</div>}
+
+      <div className="metric-grid" style={{gridTemplateColumns:'repeat(4,1fr)'}}>
         {kpis.map(([label, value, sub, Icon, type]) => (
           <div className="metric" key={label}>
             <div className="metric-top">
@@ -354,10 +127,7 @@ useEffect(() => {
 
             <div className="metric-bottom">
               <strong>{value}</strong>
-
-              <small className={type}>
-                {sub}
-              </small>
+              <small className={type}>{sub}</small>
             </div>
           </div>
         ))}
@@ -370,7 +140,6 @@ useEffect(() => {
               <div className="section-kicker">
                 <Database /> ASSET REGISTER
               </div>
-
               <h2>Monitored Assets</h2>
             </div>
           </div>
@@ -381,6 +150,12 @@ useEffect(() => {
             <span>STATUS</span>
             <span>PRIORITY</span>
           </div>
+
+          {!loading && assets.length === 0 && (
+            <div style={{ padding: '20px 16px', fontSize: '12px', color: 'var(--muted)' }}>
+              No assets found.
+            </div>
+          )}
 
           {assets.map((asset) => (
             <button
@@ -404,7 +179,6 @@ useEffect(() => {
 
                 <div>
                   <strong>{asset.name}</strong>
-
                   <small>
                     {asset.type} · {asset.location}
                   </small>
@@ -419,22 +193,16 @@ useEffect(() => {
                 <div className="risk-bar">
                   <i
                     className={asset.healthState}
-                    style={{
-                      width: asset.health,
-                    }}
+                    style={{ width: asset.health }}
                   />
                 </div>
               </div>
 
-              <StatusPill
-                state={asset.healthState}
-              >
+              <StatusPill state={asset.healthState}>
                 {asset.status}
               </StatusPill>
 
-              <span
-                className={`impact ${asset.healthState}`}
-              >
+              <span className={`impact ${asset.healthState}`}>
                 {asset.priority}
               </span>
             </button>
@@ -447,29 +215,23 @@ useEffect(() => {
               <div className="section-kicker">
                 <Activity /> SELECTED ASSET
               </div>
-
-              <h2>{selected.id}</h2>
+              <h2>{selected ? selected.id : '—'}</h2>
             </div>
 
-            <StatusPill
-              state={selected.healthState}
-            >
-              {selected.status}
-            </StatusPill>
+            {selected && (
+              <StatusPill state={selected.healthState}>
+                {selected.status}
+              </StatusPill>
+            )}
           </div>
 
-          <div
-            style={{
-              padding: '4px 18px 20px',
-            }}
-          >
-            <h2
-              style={{
-                marginBottom: '5px',
-              }}
-            >
-              {selected.name}
-            </h2>
+          {!selected ? (
+            <div style={{ padding: '20px 18px', fontSize: '12px', color: 'var(--muted)' }}>
+              {loading ? 'Loading…' : 'Select an asset to view details.'}
+            </div>
+          ) : (
+          <div style={{ padding: '4px 18px 20px' }}>
+            <h2 style={{ marginBottom: '5px' }}>{selected.name}</h2>
 
             <div
               style={{
@@ -482,13 +244,12 @@ useEffect(() => {
             </div>
 
             {[
-  ['LOCATION', selected.location],
-  ['HEALTH', selected.health],
-  ['LAST INSPECTION', selectedInspection],
-  ['NEXT MAINTENANCE', selectedMaintenance],
-  ['STATUS', selected.status],
-  ['PRIORITY', selected.priority],
-].map(([label, value]) => (
+              ['CORRIDOR', selected.location],
+              ['HEALTH', selected.health],
+              ['FAILURE RISK', `${Math.round((selected.failureRisk ?? 0) * 100)}%`],
+              ['STATUS', selected.status],
+              ['PRIORITY', selected.priority],
+            ].map(([label, value]) => (
               <div
                 key={label}
                 className="table-head"
@@ -496,8 +257,7 @@ useEffect(() => {
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
                   padding: '12px 0',
-                  borderBottom:
-                    '1px solid var(--line)',
+                  borderBottom: '1px solid var(--line)',
                 }}
               >
                 <span>{label}</span>
@@ -537,6 +297,7 @@ useEffect(() => {
               <Wrench /> CREATE MAINTENANCE TASK
             </Link>
           </div>
+          )}
         </section>
       </div>
     </main>

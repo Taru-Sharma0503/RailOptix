@@ -56,13 +56,70 @@ class OptimizationService {
 
     emit(10, 'Submitting optimization request to AI Engine (OR-Tools CP-SAT)');
 
-    const payload = {
-      corridorId: params.corridorId || 'COR-001',
-      planningDate: params.planningDate || new Date().toISOString().split('T')[0],
-      maintenanceTaskIds: params.maintenanceTaskIds || [],
-      blockIds: params.blockIds || [],
-      objective: params.objective || undefined,
-    };
+    const selectedTaskIds = params.maintenanceTaskIds || [];
+
+const allTasks = await maintenanceRepo.findWithFilters({});
+const selectedTasks = allTasks.filter((task) =>
+  selectedTaskIds.includes(task.id)
+);
+
+const missingTaskIds = selectedTaskIds.filter(
+  (taskId) => !selectedTasks.some((task) => task.id === taskId)
+);
+
+if (missingTaskIds.length > 0) {
+  throw new Error(
+    `Maintenance task(s) not found: ${missingTaskIds.join(', ')}`
+  );
+}
+
+const maintenanceTasks = selectedTasks.map((task) => ({
+  taskId: task.id,
+  assetId: task.assetId,
+  department: task.departmentName || 'Engineering',
+  corridorId: task.corridorId || params.corridorId || 'COR-001',
+  severity: Number(task.severity ?? 5),
+  safetyRisk: Number(task.safetyRisk ?? 5),
+  priorityScore: Number(task.priorityScore ?? 50),
+  failureRisk: Number(task.failureRisk ?? 0),
+  estimatedDurationMinutes: Number(task.estimatedDuration ?? 60),
+  trainTraffic: 50,
+}));
+const selectedBlockIds = params.blockIds || [];
+
+const allBlocks = await blockRepo.findWithFilters({});
+const selectedBlocks = allBlocks.filter((block) =>
+  selectedBlockIds.includes(block.id)
+);
+
+const missingBlockIds = selectedBlockIds.filter(
+  (blockId) => !selectedBlocks.some((block) => block.id === blockId)
+);
+
+if (missingBlockIds.length > 0) {
+  throw new Error(
+    `Block(s) not found: ${missingBlockIds.join(', ')}`
+  );
+}
+
+const blocks = selectedBlocks.map((block) => ({
+  id: block.id,
+  corridorId: block.corridorId || params.corridorId || 'COR-001',
+  start: block.start,
+  end: block.end,
+  durationMinutes: Number(block.durationMinutes ?? 0),
+}));
+
+const payload = {
+  corridorId: params.corridorId || 'COR-001',
+  planningDate:
+    params.planningDate || new Date().toISOString().split('T')[0],
+  maintenanceTaskIds: selectedTaskIds,
+  maintenanceTasks,
+  blockIds: selectedBlockIds,
+  blocks,
+  objective: params.objective || undefined,
+};
 
     // Delegate to FastAPI AI Engine synchronous solver
     const aiResponse = await aiClient.post('/api/optimize', payload);

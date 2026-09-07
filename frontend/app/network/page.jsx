@@ -1,106 +1,91 @@
 'use client'
 
-import { useState,useEffect } from 'react'
-import { Activity, CircleDot, GitBranch, RefreshCw, ShieldCheck, TrainFront, TriangleAlert } from 'lucide-react'
-import { apiFetch } from '@/lib/api'
-const sections = {
-  newDelhi: { name: 'New Delhi Central', status: 'Operational', availability: '99.2%', assets: '186 active assets', tasks: '3 scheduled tasks', block: 'No active block', delay: '3.1 min', state: 'healthy' },
-  gurugram: { name: 'Gurugram Section', status: 'Operational', availability: '98.6%', assets: '94 active assets', tasks: '2 scheduled tasks', block: 'Block at 18:30', delay: '5.4 min', state: 'warning' },
-  panipat: { name: 'Panipat Section', status: 'Attention required', availability: '94.1%', assets: '71 active assets', tasks: '6 scheduled tasks', block: 'Engineering block active', delay: '12.8 min', state: 'critical' },
-  ghaziabad: { name: 'Ghaziabad Section', status: 'Operational', availability: '97.8%', assets: '118 active assets', tasks: '4 scheduled tasks', block: 'No active block', delay: '6.2 min', state: 'healthy' },
-  meerut: { name: 'Meerut Section', status: 'Operational', availability: '98.1%', assets: '83 active assets', tasks: '1 scheduled task', block: 'Block planned 22:15', delay: '4.7 min', state: 'warning' },
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Activity, GitBranch, RefreshCw, ShieldCheck, TriangleAlert } from 'lucide-react'
+import { networkApi, requireAuth } from '../../lib/api'
+
+function buildCorridorSummary(corridorId, data) {
+  const stations = (data.stations || []).filter((s) => s.corridorId === corridorId)
+  const assets = (data.assets || []).filter((a) => a.corridorId === corridorId)
+  const blocks = (data.activeBlocks || []).filter((b) => b.corridorId === corridorId)
+  const trains = (data.trains || []).filter((t) => t.corridorId === corridorId)
+  const criticalAssets = assets.filter((a) => a.condition === 'critical').length
+  const state = criticalAssets > 0 ? 'critical' : blocks.length > 0 ? 'warning' : 'healthy'
+
+  return {
+    stations,
+    assetCount: assets.length,
+    criticalAssets,
+    blockCount: blocks.length,
+    nextBlock: blocks[0] ? `${blocks[0].start} – ${blocks[0].end}` : 'No active block',
+    trainCount: trains.length,
+    state,
+  }
 }
 
-const mockMetrics = [
-  ['Network Availability', '97.8%', 'Across 248.6 route km', Activity, 'up'],
-  ['Active Sections', '42', 'All monitored', GitBranch, 'info'],
-  ['Assets at Risk', '27', '6 need attention', TriangleAlert, 'critical'],
-  ['Active Blocks', '18', '4 in progress', ShieldCheck, 'warn'],
-]
-
-function Node({ id, x, y, label, selected, onSelect }) {
+function Node({ x, y, label, selected, onSelect, id }) {
   return (
     <g className={`station network-node ${selected ? 'selected' : ''}`} transform={`translate(${x} ${y})`} onClick={() => onSelect(id)} role="button" tabIndex="0" aria-label={`Select ${label}`} onKeyDown={(event) => event.key === 'Enter' && onSelect(id)}>
       {selected && <circle r="16" fill="none" stroke="var(--teal)" strokeWidth="2" opacity=".45" />}
       <circle r={selected ? '12' : '9'} style={selected ? { stroke: 'var(--teal)', strokeWidth: 3, fill: '#E7F4F1' } : undefined} />
       <circle r="4" />
-      <text y="-19" x={label === 'NEW DELHI' ? '-29' : '-22'}>{label}</text>
+      <text y="-19" x="-24">{label}</text>
     </g>
   )
 }
 
 export default function NetworkPage() {
-  const [selected, setSelected] = useState('newDelhi')
+  const router = useRouter()
+  const [data, setData] = useState(null)
+  const [selectedCorridorId, setSelectedCorridorId] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [refreshed, setRefreshed] = useState(false)
-  const [network, setNetwork] = useState(null)
+  const [error, setError] = useState('')
 
-  const section = sections[selected]
-
-  async function loadNetwork() {
-    try {
-      const data = await apiFetch('/api/network?corridorId=COR-001')
-      setNetwork(data)
-      setRefreshed(true)
-    } catch (err) {
-      console.error('Failed to load network from backend:', err)
-    }
+  function load() {
+    return networkApi.get().then((res) => {
+      setData(res)
+      if (!selectedCorridorId && res.corridors?.length) setSelectedCorridorId(res.corridors[0].id)
+    })
   }
 
   useEffect(() => {
-    loadNetwork()
-  }, [])
+    if (!requireAuth(router)) return
+    let cancelled = false
+    load()
+      .catch((err) => { if (!cancelled) setError(err.message || 'Could not load network data.') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router])
 
-  async function refreshStatus() {
+  function refreshStatus() {
     if (refreshing) return
-
     setRefreshing(true)
-
-    await loadNetwork()
-
-    setRefreshing(false)
+    load().catch((err) => setError(err.message || 'Could not refresh.')).finally(() => setRefreshing(false))
   }
 
-  const networkData = network || {}
+  const corridors = data?.corridors || []
+  const selected = selectedCorridorId ? buildCorridorSummary(selectedCorridorId, data || {}) : null
+  const selectedCorridor = corridors.find((c) => c.id === selectedCorridorId)
+
+  const totalAssets = (data?.assets || []).length
+  const criticalAssets = (data?.assets || []).filter((a) => a.condition === 'critical').length
+  const activeBlocks = (data?.activeBlocks || []).length
 
   const metrics = [
-    [
-      'Network Availability',
-      '97.8%',
-      networkData.corridors
-        ? `${networkData.corridors.length} corridors monitored`
-        : 'Across 248.6 route km',
-      Activity,
-      'up',
-    ],
-    [
-      'Active Sections',
-      networkData.stations?.length ?? '42',
-      'All monitored',
-      GitBranch,
-      'info',
-    ],
-    [
-      'Assets at Risk',
-      networkData.assets
-        ? networkData.assets.filter((asset) =>
-            ['high', 'critical'].includes(
-              String(asset.risk || asset.riskLevel || '').toLowerCase()
-            )
-          ).length
-        : '27',
-      '6 need attention',
-      TriangleAlert,
-      'critical',
-    ],
-    [
-      'Active Blocks',
-      networkData.activeBlocks?.length ?? '18',
-      '4 in progress',
-      ShieldCheck,
-      'warn',
-    ],
+    ['Corridors', String(corridors.length), 'Monitored corridors', GitBranch, 'info'],
+    ['Total Assets', String(totalAssets), 'Across the network', Activity, 'up'],
+    ['Assets at Risk', String(criticalAssets), 'Need attention', TriangleAlert, 'critical'],
+    ['Active Blocks', String(activeBlocks), 'Currently occupying corridors', ShieldCheck, 'warn'],
   ]
+
+  // Lay out stations for the selected corridor along a simple curve for the schematic view.
+  const positions = (selected?.stations || []).map((s, i, arr) => {
+    const t = arr.length > 1 ? i / (arr.length - 1) : 0
+    return { ...s, x: 60 + t * 640, y: 200 - Math.sin(t * Math.PI) * 90 }
+  })
 
   return (
     <main className="dashboard">
@@ -108,85 +93,76 @@ export default function NetworkPage() {
         <div>
           <div className="breadcrumb">OPERATIONS <span>/</span> NETWORK</div>
           <h1>Railway Network</h1>
-          <p>Live infrastructure and asset status across the operational network.</p>
+          <p>Live corridor status, assets, and active blocks across the network.</p>
         </div>
-        <button className="secondary-btn hover:!bg-[#E7F4F1] hover:!text-[#172126]" onClick={refreshStatus} disabled={refreshing} aria-live="polite"><RefreshCw /> {refreshing ? 'REFRESHING...' : 'REFRESH STATUS'}</button>
+        <button className="secondary-btn" onClick={refreshStatus} disabled={refreshing}>
+          <RefreshCw size={15} className={refreshing ? 'spin' : ''} /> {refreshing ? 'REFRESHING…' : 'REFRESH STATUS'}
+        </button>
       </div>
 
-      <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
-        {metrics.map(([label, value, detail, Icon, type]) => (
+      {error && <div style={{ margin: '0 0 16px', padding: '12px 14px', border: '1px solid rgba(217,74,74,.35)', color: 'var(--red)', fontSize: '12px' }}>Couldn't reach the backend: {error}</div>}
+
+      <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(165px, 1fr))' }}>
+        {metrics.map(([label, value, detail, Icon, state]) => (
           <div className="metric" key={label}>
-            <div className="metric-top">
-              <span>{label}</span>
-              <Icon />
-            </div>
-            <div className="metric-bottom">
-              <strong>{value}</strong>
-              <small className={type}>{detail}</small>
-           </div>
-      </div>
-    ))}
+            <div className="metric-top"><span>{label}</span><Icon /></div>
+            <div className="metric-bottom"><strong>{value}</strong><small className={state}>{detail}</small></div>
+          </div>
+        ))}
       </div>
 
-      <div className="main-grid" style={{ gridTemplateColumns: 'minmax(0, 1.65fr) minmax(290px, .75fr)' }}>
+      <div className="main-grid">
         <section className="panel twin">
           <div className="panel-head">
-            <div>
-              <div className="section-kicker"><GitBranch /> LIVE NETWORK VIEW</div>
-              <h2>Railway Digital Twin</h2>
-              <p>Infrastructure schematic · Delhi Division {refreshed && <span style={{ color: 'var(--teal)', marginLeft: '8px', fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '.1em' }}>UPDATED JUST NOW</span>}</p>
+            <div><div className="section-kicker"><GitBranch /> LIVE NETWORK VIEW</div><h2>{selectedCorridor?.name || 'Select a corridor'}</h2><p>{selectedCorridor ? `${selectedCorridor.lengthKm ?? '—'} route km` : ''}</p></div>
+            <div className="panel-tools">
+              {corridors.map((c) => (
+                <button key={c.id} className={`tool-btn ${c.id === selectedCorridorId ? 'active' : ''}`} onClick={() => setSelectedCorridorId(c.id)}>{c.name || c.id}</button>
+              ))}
             </div>
-            <span className="status"><span className="pulse-dot" /> LIVE</span>
           </div>
-          <div className="twin-map" style={{ height: '440px' }}>
-            <div className="map-grid" />
-            <svg viewBox="0 0 820 440" role="img" aria-label="Interactive schematic railway network for Delhi Division" preserveAspectRatio="xMidYMid meet">
-              <path className="route-secondary" d="M70 338 C150 290 210 230 310 250 S425 340 510 270 S640 150 750 125" />
-              <path className="route" d="M70 338 C150 290 210 230 310 250 S425 340 510 270 S640 150 750 125" />
-              <path className="route" d="M70 338 C155 365 250 360 310 250 S390 115 490 100 S640 110 750 125" />
-              <path className="route-secondary" d="M310 250 C375 205 405 145 490 100" />
-              <path className="route-secondary" d="M510 270 C565 330 660 342 755 310" />
-              <path className="route" d="M510 270 C565 330 660 342 755 310" />
 
-              <g className="asset healthy" transform="translate(178 284)"><circle r="6" /><path d="M0-11v22M-11 0h22" /></g>
-              <g className="asset risk" transform="translate(393 302)"><circle r="7" /><path d="M-4-4l8 8m0-8l-8 8" /></g>
-              <g className="asset warn" transform="translate(617 198)"><circle r="6" /><path d="M0-11v22M-11 0h22" /></g>
-              <g className="signal" transform="translate(444 130)"><rect width="9" height="18" rx="2" /><circle cx="4.5" cy="4" r="2" /><circle cx="4.5" cy="13" r="2" /></g>
-              <g className="signal" transform="translate(662 326)"><rect width="9" height="18" rx="2" /><circle cx="4.5" cy="4" r="2" /><circle cx="4.5" cy="13" r="2" /></g>
-              <g className="block" transform="translate(535 259)"><rect x="-10" y="-10" width="20" height="20" rx="2" /><path d="M-5-5l10 10m0-10l-10 10" /></g>
-              <g className="block" transform="translate(274 258)"><rect x="-10" y="-10" width="20" height="20" rx="2" /><path d="M-5-5l10 10m0-10l-10 10" /></g>
-              <g className="train" transform="translate(218 270)"><circle r="10" /><path d="M-5 0h10M0-5v10" /></g>
-              <g className="train train-two" transform="translate(588 215)"><circle r="10" /><path d="M-5 0h10M0-5v10" /></g>
-
-              <Node id="gurugram" x="70" y="338" label="GURUGRAM" selected={selected === 'gurugram'} onSelect={setSelected} />
-              <Node id="newDelhi" x="310" y="250" label="NEW DELHI" selected={selected === 'newDelhi'} onSelect={setSelected} />
-              <Node id="panipat" x="490" y="100" label="PANIPAT" selected={selected === 'panipat'} onSelect={setSelected} />
-              <Node id="ghaziabad" x="510" y="270" label="GHAZIABAD" selected={selected === 'ghaziabad'} onSelect={setSelected} />
-              <Node id="meerut" x="750" y="125" label="MEERUT" selected={selected === 'meerut'} onSelect={setSelected} />
-            </svg>
-            <div className="map-readout"><span><i className="green-dot" /> 1,221 HEALTHY</span><span><i className="yellow-dot" /> 18 BLOCKS</span><span><i className="red-dot" /> 27 AT RISK</span></div>
-            <div className="legend" style={{ padding: '6px 8px' }}><span><i className="legend-line" /> ROUTE</span><span><i className="legend-train" /> TRAIN</span><span><i className="legend-ohe" /> HEALTHY</span><span><i className="legend-signal" /> WARNING</span><span><i className="red-dot" /> CRITICAL</span><span><i className="legend-block" /> BLOCK</span></div>
+          <div className="twin-map">
+            <div className="map-grid"></div>
+            {!loading && positions.length > 0 && (
+              <svg viewBox="0 0 760 380" role="img" aria-label="Schematic railway corridor" preserveAspectRatio="xMidYMid meet">
+                <path className="route" d={`M${positions.map((p) => `${p.x} ${p.y}`).join(' L ')}`} fill="none" />
+                {positions.map((p) => (
+                  <Node key={p.id} id={p.id} x={p.x} y={p.y} label={(p.name || p.id).toUpperCase()} selected={false} onSelect={() => {}} />
+                ))}
+              </svg>
+            )}
+            {!loading && positions.length === 0 && (
+              <div style={{ padding: '40px 16px', fontSize: '12px', color: 'var(--muted)' }}>No stations found for this corridor.</div>
+            )}
           </div>
         </section>
 
         <aside className="panel">
           <div className="panel-head compact">
-            <div>
-              <div className="section-kicker"><CircleDot /> SELECTED SECTION</div>
-              <h2>Selected Section</h2>
+            <div><div className="section-kicker"><Activity /> CORRIDOR STATUS</div><h2>Section Detail</h2></div>
+          </div>
+
+          {!selected ? (
+            <div style={{ padding: '20px 18px', fontSize: '12px', color: 'var(--muted)' }}>{loading ? 'Loading…' : 'Select a corridor.'}</div>
+          ) : (
+            <div style={{ padding: '4px 18px 18px' }}>
+              {[
+                ['STATUS', selectedCorridor?.status || '—'],
+                ['STATIONS', selected.stations.length],
+                ['ACTIVE ASSETS', selected.assetCount],
+                ['ASSETS AT RISK', selected.criticalAssets],
+                ['ACTIVE BLOCKS', selected.blockCount],
+                ['NEXT BLOCK', selected.nextBlock],
+                ['TRAINS ON CORRIDOR', selected.trainCount],
+              ].map(([label, value]) => (
+                <div key={label} className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
+                  <span>{label}</span>
+                  <span style={{ textAlign: 'right', fontSize: '12px', color: label === 'ASSETS AT RISK' && value > 0 ? 'var(--red)' : undefined }}>{value}</span>
+                </div>
+              ))}
             </div>
-            <span className={`block-state ${section.state === 'warning' ? 'soon' : ''}`} style={{ color: section.state === 'critical' ? 'var(--red)' : undefined }}>{section.status}</span>
-          </div>
-          <div style={{ padding: '2px 18px 18px' }}>
-            <h3 style={{ margin: '12px 0 18px', fontSize: '17px', fontWeight: 600 }}>{section.name}</h3>
-            <div className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0' }}><span>OPERATIONAL STATUS</span><span style={{ textAlign: 'right', fontSize: '12px' }}>{section.status}</span></div>
-            <div className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0' }}><span>AVAILABILITY</span><span style={{ textAlign: 'right', fontSize: '12px', color: 'var(--teal)' }}>{section.availability}</span></div>
-            <div className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0' }}><span>ACTIVE ASSETS</span><span style={{ textAlign: 'right', fontSize: '12px' }}>{section.assets}</span></div>
-            <div className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0' }}><span>MAINTENANCE</span><span style={{ textAlign: 'right', fontSize: '12px' }}>{section.tasks}</span></div>
-            <div className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0' }}><span>BLOCK STATUS</span><span style={{ textAlign: 'right', fontSize: '12px' }}>{section.block}</span></div>
-            <div className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0', borderBottom: '1px solid var(--line)' }}><span>DELAY RISK</span><span style={{ textAlign: 'right', fontSize: '12px', color: section.state === 'critical' ? 'var(--red)' : 'var(--yellow)' }}>{section.delay}</span></div>
-            <div style={{ marginTop: '16px', color: 'var(--teal)', fontSize: '9px', fontFamily: 'var(--font-mono)', letterSpacing: '.12em' }}><span className="pulse-dot" style={{ marginRight: '7px' }} /> SELECTED ON SCHEMATIC</div>
-          </div>
+          )}
         </aside>
       </div>
     </main>

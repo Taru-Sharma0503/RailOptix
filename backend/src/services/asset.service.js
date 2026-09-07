@@ -25,22 +25,23 @@ class AssetService {
   async getAssets(filters) {
     const assets = await assetRepo.findWithFilters(filters);
 
-    const enriched = await Promise.all(
-      assets.map(async (a) => {
-        const failures = await historicalFailureRepo.findByAssetId(a.id);
-        const { failureRisk } = this._computeFailureRisk(a, failures.length);
-        return {
-          id: a.id,
-          name: a.name,
-          type: a.type,
-          corridorId: a.corridorId,
-          condition: a.condition,
-          criticality: a.criticality,
-          failureRisk,
-          location: { latitude: a.latitude, longitude: a.longitude },
-        };
-      })
-    );
+    const enriched = [];
+
+for (const a of assets) {
+  const failures = await historicalFailureRepo.findByAssetId(a.id);
+  const { failureRisk } = this._computeFailureRisk(a, failures.length);
+
+  enriched.push({
+    id: a.id,
+    name: a.name,
+    type: a.type,
+    corridorId: a.corridorId,
+    condition: a.condition,
+    criticality: a.criticality,
+    failureRisk,
+    location: { latitude: a.latitude, longitude: a.longitude },
+  });
+}
 
     return successResponse({ assets: enriched });
   }

@@ -1,761 +1,164 @@
 'use client'
 
-import { use } from 'react'
+import { use, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Activity,
   ArrowLeft,
-  CalendarClock,
-  CheckCircle2,
   Clock3,
+  Gauge,
   Navigation,
   TrainFront,
   TriangleAlert,
 } from 'lucide-react'
+import { simulationApi, requireAuth } from '../../../lib/api'
 
-const scenarios = [
-  {
-    id: 'SIM-26041',
-    name: 'Night Maintenance Plan',
-    date: '03 Sep 2026',
-    blocks: 4,
-    trains: 18,
-    duration: '22:00 → 06:00',
-    delay: '6 min',
-    impact: 'Low',
-    state: 'healthy',
-    status: 'Ready',
-    score: '92%',
-    conflicts: 1,
-    recommendation:
-      'Preferred scenario. The maintenance windows fit within low-density operating periods with limited train disruption.',
-  },
-  {
-    id: 'SIM-26042',
-    name: 'High Priority Track Works',
-    date: '04 Sep 2026',
-    blocks: 5,
-    trains: 24,
-    duration: '00:30 → 07:30',
-    delay: '14 min',
-    impact: 'Medium',
-    state: 'warning',
-    status: 'Ready',
-    score: '78%',
-    conflicts: 3,
-    recommendation:
-      'Acceptable scenario, but two train paths require adjustment during the peak maintenance period.',
-  },
-  {
-    id: 'SIM-26043',
-    name: 'Express Protection Plan',
-    date: '05 Sep 2026',
-    blocks: 3,
-    trains: 16,
-    duration: '21:00 → 05:00',
-    delay: '3 min',
-    impact: 'Low',
-    state: 'healthy',
-    status: 'Ready',
-    score: '96%',
-    conflicts: 0,
-    recommendation:
-      'Strong operational candidate. Priority services remain protected while maintenance is completed overnight.',
-  },
-  {
-    id: 'SIM-26044',
-    name: 'Maximum Maintenance Window',
-    date: '06 Sep 2026',
-    blocks: 7,
-    trains: 31,
-    duration: '22:00 → 08:00',
-    delay: '27 min',
-    impact: 'High',
-    state: 'high',
-    status: 'Needs Review',
-    score: '61%',
-    conflicts: 6,
-    recommendation:
-      'Not recommended without modification. The number of simultaneous blocks creates significant operational disruption.',
-  },
-  {
-    id: 'SIM-26045',
-    name: 'Weekend Engineering Plan',
-    date: '07 Sep 2026',
-    blocks: 6,
-    trains: 21,
-    duration: '23:00 → 07:00',
-    delay: '9 min',
-    impact: 'Medium',
-    state: 'warning',
-    status: 'Ready',
-    score: '84%',
-    conflicts: 2,
-    recommendation:
-      'Viable weekend scenario with moderate operational impact and sufficient engineering capacity.',
-  },
-  {
-    id: 'SIM-26046',
-    name: 'Minimal Disruption Plan',
-    date: '08 Sep 2026',
-    blocks: 3,
-    trains: 14,
-    duration: '01:00 → 05:30',
-    delay: '2 min',
-    impact: 'Low',
-    state: 'healthy',
-    status: 'Ready',
-    score: '98%',
-    conflicts: 0,
-    recommendation:
-      'Best disruption profile. Maintenance scope is smaller but can be executed with minimal impact on train movement.',
-  },
-]
+const RISK_COLOR = { low: 'var(--green)', medium: 'var(--yellow)', high: 'var(--red)' }
 
-function StateTag({ children, state }) {
-  const colors = {
-    healthy: 'var(--green)',
-    info: 'var(--cyan)',
-    warning: 'var(--yellow)',
-    critical: 'var(--red)',
-    high: 'var(--orange)',
-  }
-
-  return (
-    <span
-      className="block-state"
-      style={{
-        color: colors[state] || 'var(--muted)',
-        borderColor: colors[state] || 'var(--line)',
-      }}
-    >
-      {children}
-    </span>
-  )
-}
-
-export default function SimulationDetailPage({ params }) {
+export default function SimulationResultPage({ params }) {
   const { scenarioId } = use(params)
+  const router = useRouter()
 
-  const selected =
-    scenarios.find((item) => item.id === scenarioId) || scenarios[0]
+  const [status, setStatus] = useState('queued')
+  const [progress, setProgress] = useState(0)
+  const [message, setMessage] = useState('Setting up scenario…')
+  const [data, setData] = useState(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!requireAuth(router)) return
+
+    let cancelled = false
+
+    simulationApi
+      .poll(scenarioId, {
+        onProgress: (s) => {
+          if (cancelled) return
+          setStatus(s?.scenario?.status || 'running')
+        },
+      })
+      .then((res) => {
+        if (cancelled) return
+        setData(res)
+        setStatus('completed')
+        setProgress(100)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setStatus('failed')
+        setError(err.message || 'Simulation failed.')
+      })
+
+    // Since the backend doesn't emit incremental progress over the polling
+    // endpoint (only via Socket.IO), animate a lightweight progress bar
+    // while we wait for completion.
+    const tick = setInterval(() => {
+      setProgress((p) => (p < 90 ? p + 5 : p))
+    }, 400)
+
+    return () => { cancelled = true; clearInterval(tick) }
+  }, [scenarioId, router])
+
+  const results = data?.results
+  const risk = results?.risk
 
   return (
     <main className="dashboard">
       <div className="page-intro">
         <div>
-          <div className="breadcrumb">
-            OPERATIONS <span>/</span> SIMULATION <span>/</span>{' '}
-            {selected.id}
-          </div>
-
-          <h1>{selected.name}</h1>
-
-          <p>
-            Detailed operational evaluation of the selected maintenance
-            scenario.
-          </p>
+          <div className="breadcrumb">OPERATIONS <span>/</span> SIMULATION <span>/</span> RESULTS</div>
+          <h1>Simulation {scenarioId}</h1>
+          <p>Impact analysis for the proposed maintenance window.</p>
         </div>
-
-        <Link href="/simulation" className="primary-btn">
-          <ArrowLeft size={15} />
-          BACK TO SIMULATION
-        </Link>
+        <Link href="/simulation" className="secondary-btn"><ArrowLeft size={15}/> BACK TO SIMULATION</Link>
       </div>
 
-      <div
-        className="metric-grid"
-        style={{
-          gridTemplateColumns: 'repeat(auto-fit, minmax(165px, 1fr))',
-        }}
-      >
-        {[
-          [
-            'SIMULATION SCORE',
-            selected.score,
-            'Overall scenario rating',
-            Activity,
-            selected.state,
-          ],
-          [
-            'AFFECTED TRAINS',
-            selected.trains,
-            'Services evaluated',
-            TrainFront,
-            'info',
-          ],
-          [
-            'ESTIMATED DELAY',
-            selected.delay,
-            'Network impact',
-            Clock3,
-            selected.state,
-          ],
-          [
-            'CONFLICTS',
-            selected.conflicts,
-            'Detected overlaps',
-            TriangleAlert,
-            selected.conflicts > 2 ? 'warning' : 'healthy',
-          ],
-        ].map(([label, value, detail, Icon, state]) => (
-          <div className="metric" key={label}>
-            <div className="metric-top">
-              <span>{label}</span>
-              <Icon />
-            </div>
-
-            <div className="metric-bottom">
-              <strong>{value}</strong>
-              <small className={state}>{detail}</small>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <section className="panel">
-        <div className="panel-head compact">
-          <div>
-            <div className="section-kicker">
-              <CheckCircle2 />
-              SIMULATION RESULT
-            </div>
-
-            <h2>Operational Evaluation</h2>
-
-            <p>
-              The selected scenario has been evaluated against the current
-              maintenance and train movement plan.
-            </p>
-          </div>
-
-          <StateTag state={selected.state}>
-            {selected.status}
-          </StateTag>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '1px',
-            background: 'var(--line)',
-            borderTop: '1px solid var(--line)',
-          }}
-        >
-          {[
-            ['SCENARIO', selected.id],
-            ['DATE', selected.date],
-            ['MAINTENANCE BLOCKS', selected.blocks],
-            ['AFFECTED TRAINS', selected.trains],
-            ['SIMULATION WINDOW', selected.duration],
-            ['ESTIMATED DELAY', selected.delay],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              style={{
-                padding: '18px',
-                background: 'var(--panel)',
-              }}
-            >
-              <div
-                className="table-head"
-                style={{
-                  marginBottom: '8px',
-                }}
-              >
-                {label}
-              </div>
-
-              <div
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '13px',
-                  color: 'var(--foreground)',
-                }}
-              >
-                {value}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="main-grid">
-        <section className="panel">
-          <div className="panel-head compact">
-            <div>
-              <div className="section-kicker">
-                <CalendarClock />
-                SIMULATION TIMELINE
-              </div>
-
-              <h2>Maintenance Window</h2>
-
-              <p>
-                Timeline of the simulated maintenance operating period.
-              </p>
-            </div>
-          </div>
-
-          <div style={{ padding: '8px 20px 22px' }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                color: 'var(--muted)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '10px',
-              }}
-            >
-              <span>START</span>
-              <span>MAINTENANCE</span>
-              <span>END</span>
-            </div>
-
-            <div
-              style={{
-                height: '4px',
-                background: 'var(--line)',
-                margin: '15px 7px',
-                position: 'relative',
-              }}
-            >
-              <i
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: '-4px',
-                  width: '12px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  background: 'var(--cyan)',
-                }}
-              />
-
-              <i
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  top: '-4px',
-                  width: '12px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  background:
-                    selected.state === 'high'
-                      ? 'var(--orange)'
-                      : selected.state === 'warning'
-                      ? 'var(--yellow)'
-                      : 'var(--teal)',
-                }}
-              />
-
-              <i
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                  top: '-4px',
-                  width: '12px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  background: 'var(--green)',
-                }}
-              />
-            </div>
-
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr',
-                gap: '15px',
-                marginTop: '18px',
-              }}
-            >
-              <div>
-                <div className="table-head">START</div>
-
-                <div
-                  style={{
-                    marginTop: '6px',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '13px',
-                  }}
-                >
-                  {selected.duration.split(' → ')[0]}
-                </div>
-              </div>
-
-              <div style={{ textAlign: 'center' }}>
-                <div className="table-head">WINDOW</div>
-
-                <div
-                  style={{
-                    marginTop: '6px',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '13px',
-                    color: 'var(--teal)',
-                  }}
-                >
-                  {selected.duration}
-                </div>
-              </div>
-
-              <div style={{ textAlign: 'right' }}>
-                <div className="table-head">END</div>
-
-                <div
-                  style={{
-                    marginTop: '6px',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '13px',
-                  }}
-                >
-                  {selected.duration.split(' → ')[1]}
-                </div>
-              </div>
-            </div>
+      {status !== 'completed' && status !== 'failed' && (
+        <section className="panel" style={{ padding: '24px' }}>
+          <div className="section-kicker"><Clock3/> {status.toUpperCase()}</div>
+          <h2 style={{ margin: '10px 0' }}>{message || 'Running simulation…'}</h2>
+          <div style={{ height: '8px', background: 'var(--line)', borderRadius: '4px', overflow: 'hidden', marginTop: '14px' }}>
+            <div style={{ height: '100%', width: `${progress}%`, background: 'var(--teal)', transition: 'width .3s ease' }} />
           </div>
         </section>
+      )}
 
-        <aside className="panel">
-          <div className="panel-head compact">
-            <div>
-              <div className="section-kicker">
-                <Navigation />
-                AI EVALUATION
-              </div>
+      {status === 'failed' && (
+        <section className="panel" style={{ padding: '24px' }}>
+          <div className="section-kicker" style={{ color: 'var(--red)' }}><TriangleAlert/> FAILED</div>
+          <h2 style={{ margin: '10px 0' }}>Simulation failed</h2>
+          <p style={{ color: 'var(--red)', fontSize: '13px' }}>{error}</p>
+        </section>
+      )}
 
-              <h2>Recommended Decision</h2>
-            </div>
-          </div>
-
-          <div style={{ padding: '4px 18px 20px' }}>
-            <div
-              style={{
-                padding: '15px',
-                background: 'var(--elevated)',
-                border: '1px solid var(--line)',
-                marginBottom: '15px',
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  color: 'var(--teal)',
-                  letterSpacing: '.06em',
-                  marginBottom: '8px',
-                }}
-              >
-                SCENARIO ASSESSMENT
-              </div>
-
-              <p
-                style={{
-                  margin: 0,
-                  color: 'var(--muted)',
-                  fontSize: '12px',
-                  lineHeight: 1.6,
-                }}
-              >
-                {selected.recommendation}
-              </p>
-            </div>
-
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '1px',
-                background: 'var(--line)',
-              }}
-            >
-              <div
-                style={{
-                  padding: '15px',
-                  background: 'var(--panel)',
-                }}
-              >
-                <div className="table-head">SCORE</div>
-
-                <strong
-                  style={{
-                    display: 'block',
-                    marginTop: '6px',
-                    fontSize: '21px',
-                    color: 'var(--teal)',
-                  }}
-                >
-                  {selected.score}
-                </strong>
-              </div>
-
-              <div
-                style={{
-                  padding: '15px',
-                  background: 'var(--panel)',
-                }}
-              >
-                <div className="table-head">CONFLICTS</div>
-
-                <strong
-                  style={{
-                    display: 'block',
-                    marginTop: '6px',
-                    fontSize: '21px',
-                    color:
-                      selected.conflicts > 2
-                        ? 'var(--red)'
-                        : selected.conflicts > 0
-                        ? 'var(--yellow)'
-                        : 'var(--green)',
-                  }}
-                >
-                  {selected.conflicts}
-                </strong>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-
-      <section
-        className="panel"
-        style={{ marginTop: '18px' }}
-      >
-        <div className="panel-head compact">
-          <div>
-            <div className="section-kicker">
-              <TrainFront />
-              TRAIN IMPACT
-            </div>
-
-            <h2>Affected Train Operations</h2>
-
-            <p>
-              Estimated effect of the selected maintenance scenario on train
-              movement.
-            </p>
-          </div>
-        </div>
-
-        <div style={{ overflowX: 'auto' }}>
-          <div
-            className="table-head"
-            style={{
-              minWidth: '700px',
-              display: 'grid',
-              gridTemplateColumns:
-                '1.2fr 1.4fr 1fr 1fr 1fr',
-              gap: '12px',
-              padding: '12px 16px',
-              borderBottom: '1px solid var(--line)',
-            }}
-          >
-            <span>TRAIN SERVICE</span>
-            <span>ROUTE</span>
-            <span>EXPECTED DELAY</span>
-            <span>OPERATIONAL EFFECT</span>
-            <span>STATUS</span>
-          </div>
-
-          <div style={{ minWidth: '700px' }}>
+      {status === 'completed' && results && (
+        <>
+          <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(165px, 1fr))' }}>
             {[
-              [
-                'NDLS-12034',
-                'New Delhi → Chandigarh',
-                '0 min',
-                'No impact',
-                'Protected',
-                'healthy',
-              ],
-              [
-                'NDLS-12482',
-                'New Delhi → Meerut City',
-                '3 min',
-                'Minor path adjustment',
-                'Monitored',
-                'warning',
-              ],
-              [
-                'NZM-12952',
-                'Hazrat Nizamuddin → Mumbai',
-                '6 min',
-                'Pathing adjustment',
-                'Monitored',
-                'warning',
-              ],
-              [
-                'NDLS-12056',
-                'New Delhi → Dehradun',
-                '8 min',
-                'Connection risk',
-                'At Risk',
-                'critical',
-              ],
-            ].map(
-              ([
-                train,
-                route,
-                delay,
-                effect,
-                status,
-                state,
-              ]) => (
-                <div
-                  key={train}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns:
-                      '1.2fr 1.4fr 1fr 1fr 1fr',
-                    gap: '12px',
-                    alignItems: 'center',
-                    padding: '13px 16px',
-                    borderBottom: '1px solid var(--line)',
-                    minHeight: '58px',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '12px',
-                      color: 'var(--cyan)',
-                    }}
-                  >
-                    {train}
-                  </span>
-
-                  <span
-                    style={{
-                      color: 'var(--muted)',
-                      fontSize: '12px',
-                    }}
-                  >
-                    {route}
-                  </span>
-
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '12px',
-                    }}
-                  >
-                    {delay}
-                  </span>
-
-                  <span
-                    style={{
-                      color: 'var(--muted)',
-                      fontSize: '12px',
-                    }}
-                  >
-                    {effect}
-                  </span>
-
-                  <span>
-                    <StateTag state={state}>{status}</StateTag>
-                  </span>
-                </div>
-              )
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="panel"
-        style={{ marginTop: '18px' }}
-      >
-        <div className="panel-head compact">
-          <div>
-            <div className="section-kicker">
-              <TriangleAlert />
-              DECISION SUMMARY
-            </div>
-
-            <h2>Simulation Conclusion</h2>
-
-            <p>
-              Summary of the simulated operational outcome for this scenario.
-            </p>
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fit, minmax(190px, 1fr))',
-            gap: '1px',
-            background: 'var(--line)',
-            borderTop: '1px solid var(--line)',
-          }}
-        >
-          {[
-            [
-              'MAINTENANCE FEASIBILITY',
-              selected.state === 'high'
-                ? 'Requires modification'
-                : 'Operationally feasible',
-            ],
-            [
-              'TRAIN DISRUPTION',
-              selected.impact === 'Low'
-                ? 'Limited'
-                : selected.impact === 'Medium'
-                ? 'Moderate'
-                : 'High',
-            ],
-            [
-              'CONFLICT LEVEL',
-              selected.conflicts === 0
-                ? 'None detected'
-                : `${selected.conflicts} conflict${
-                    selected.conflicts > 1 ? 's' : ''
-                  } detected`,
-            ],
-            [
-              'RECOMMENDATION',
-              selected.state === 'high'
-                ? 'Review before execution'
-                : 'Suitable for planning',
-            ],
-          ].map(([title, value]) => (
-            <div
-              key={title}
-              style={{
-                padding: '18px',
-                background: 'var(--panel)',
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: 'var(--teal)',
-                  letterSpacing: '.05em',
-                  marginBottom: '7px',
-                }}
-              >
-                {title}
+              ['Affected Trains', String(results.affectedTrains ?? 0), TrainFront, 'warn'],
+              ['Expected Delay', `${results.expectedDelayMinutes ?? 0} min`, Clock3, 'warn'],
+              ['Affected Assets', String(results.affectedAssets ?? 0), Gauge, 'info'],
+              ['Conflicts', String(results.conflicts ?? 0), TriangleAlert, 'critical'],
+            ].map(([label, value, Icon, state]) => (
+              <div className="metric" key={label}>
+                <div className="metric-top"><span>{label}</span><Icon /></div>
+                <div className="metric-bottom"><strong>{value}</strong></div>
               </div>
+            ))}
+          </div>
 
-              <div
-                style={{
-                  color: 'var(--muted)',
-                  fontSize: '12px',
-                  lineHeight: 1.5,
-                }}
-              >
-                {value}
+          <div className="main-grid">
+            <section className="panel">
+              <div className="panel-head compact">
+                <div><div className="section-kicker"><Gauge /> NETWORK IMPACT</div><h2>Simulation Metrics</h2></div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+              <div style={{ padding: '4px 18px 18px' }}>
+                {[
+                  ['INFRASTRUCTURE AVAILABILITY', `${results.infrastructureAvailability ?? '—'}%`],
+                  ['BLOCK UTILIZATION', `${results.blockUtilization ?? '—'}%`],
+                  ['OVERALL RISK', (risk || '—').toUpperCase()],
+                ].map(([label, value]) => (
+                  <div key={label} className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
+                    <span>{label}</span>
+                    <span style={{ textAlign: 'right', fontSize: '12px', color: label === 'OVERALL RISK' ? RISK_COLOR[risk] : undefined }}>{value}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <aside className="panel">
+              <div className="panel-head compact">
+                <div><div className="section-kicker"><Navigation /> RECOMMENDATION</div><h2>Suggested Alternative</h2></div>
+              </div>
+              <div style={{ padding: '16px 18px' }}>
+                {data.recommendation ? (
+                  <div style={{ padding: '14px', background: 'var(--elevated)', border: '1px solid var(--line)' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--orange)', fontWeight: 700, letterSpacing: '.06em', marginBottom: '8px' }}>ALTERNATIVE BLOCK</div>
+                    <p style={{ margin: 0, color: 'var(--muted)', fontSize: '12px', lineHeight: 1.55 }}>Try {data.recommendation.start} – {data.recommendation.end} instead, which avoids the current conflicts.</p>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: '12px', color: 'var(--muted)' }}>No lower-impact alternative window was found — this appears to be a good time slot.</p>
+                )}
+
+                {(data.alternativeBlocks || []).length > 1 && (
+                  <div style={{ marginTop: '14px' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--muted)', letterSpacing: '.06em', marginBottom: '6px' }}>OTHER OPTIONS</div>
+                    {data.alternativeBlocks.slice(1).map((alt, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '6px 0', borderBottom: '1px solid var(--line)' }}>
+                        <span>{alt.start} – {alt.end}</span><span style={{ color: 'var(--muted)' }}>{alt.risk} risk</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </aside>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '18px' }}>
+            <Link href="/simulation" className="text-btn">TRY ANOTHER SCENARIO <span>→</span></Link>
+          </div>
+        </>
+      )}
     </main>
   )
 }

@@ -1,16 +1,19 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight, LockKeyhole, UserRound } from 'lucide-react'
-import { apiFetch } from '@/lib/api'
+import { authApi, setSession, ApiError } from '../../lib/api'
 
 export default function SignupPage() {
+  const router = useRouter()
   const [name,setName] = useState('')
   const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
   const [confirmPassword,setConfirmPassword] = useState('')
   const [error,setError] = useState('')
+  const [loading,setLoading] = useState(false)
 
   async function handleSignup(e) {
     e.preventDefault()
@@ -26,23 +29,16 @@ export default function SignupPage() {
       return
     }
 
+    setLoading(true)
     try {
-      const data = await apiFetch('/api/auth/register', {
-        method:'POST',
-        body:JSON.stringify({
-          name:name.trim(),
-          email:email.trim(),
-          password,
-          role:'operator'
-        })
-      })
-
-      localStorage.setItem('railoptix-token',data.token)
-      localStorage.setItem('railoptix-user',JSON.stringify(data.user))
-
-      window.location.href='/dashboard'
+      await authApi.register({ name: name.trim(), email: email.trim(), password, role: 'operator' })
+      const result = await authApi.login({ email: email.trim(), password })
+      setSession(result.token, result.user)
+      router.push('/dashboard')
     } catch (err) {
-      setError(err.message || 'Unable to create account.')
+      setError(err instanceof ApiError ? err.message : 'Could not create account. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -109,7 +105,7 @@ export default function SignupPage() {
                 type="email"
                 value={email}
                 onChange={e=>setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder="Enter email"
                 style={{width:'100%',boxSizing:'border-box',height:'46px',padding:'0 14px 0 40px',border:'1px solid var(--line)',background:'var(--panel)',color:'var(--text)',outline:'none',fontSize:'12px'}}
               />
             </div>
@@ -150,8 +146,8 @@ export default function SignupPage() {
               </div>
             )}
 
-            <button type="submit" className="primary-btn" style={{width:'100%',height:'46px',justifyContent:'center'}}>
-              CREATE ACCOUNT <ArrowRight size={15}/>
+            <button type="submit" disabled={loading} className="primary-btn" style={{width:'100%',height:'46px',justifyContent:'center',opacity:loading?0.7:1}}>
+              {loading ? 'CREATING ACCOUNT…' : <>CREATE ACCOUNT <ArrowRight size={15}/></>}
             </button>
           </form>
 

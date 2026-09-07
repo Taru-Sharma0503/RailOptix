@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { apiFetch } from '@/lib/api'
+import { assetsApi, maintenanceApi } from '@/lib/api'
 import {
   ArrowLeft,
   Activity,
@@ -56,11 +56,11 @@ export default function AssetPage() {
     async function loadAsset() {
       try {
         const [assetData, riskData, maintenanceData] =
-          await Promise.all([
-            apiFetch(`/api/assets/${id}`),
-            apiFetch(`/api/assets/${id}/risk`),
-             apiFetch(`/api/maintenance?assetId=${id}`),
-          ])
+  await Promise.all([
+    assetsApi.get(id),
+    assetsApi.risk(id),
+    maintenanceApi.list({ assetId: id }),
+  ])
 
         const backendAsset = assetData?.asset || assetData
         const backendRisk = riskData?.risk || riskData
@@ -230,7 +230,7 @@ maintenance:
         </Link>
       </div>
 
-      <div className="metric-grid">
+      <div className="metric-grid asset-metric-grid">
         <div className="metric">
           <div className="metric-top">
             <span>ASSET HEALTH</span>

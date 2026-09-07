@@ -50,12 +50,14 @@ class TrafficImpactPayload(BaseModel):
     maintenanceDuration: Optional[float] = 240.0
     planningDate: Optional[str] = "2026-09-12"
 
-class OptimizationPayload(BaseModel):
-    corridorId: Optional[str] = "COR-001"
-    planningDate: Optional[str] = "2026-09-12"
-    maintenanceTaskIds: Optional[List[str]] = None
-    blockIds: Optional[List[str]] = None
-    objective: Optional[Dict[str, float]] = None
+class OptimizationPayload(BaseModel): 
+    corridorId: Optional[str] = "COR-001" 
+    planningDate: Optional[str] = "2026-09-12" 
+    maintenanceTaskIds: Optional[List[str]] = None 
+    blockIds: Optional[List[str]] = None 
+    maintenanceTasks: Optional[List[Dict[str, Any]]] = None
+    blocks: Optional[List[Dict[str, Any]]] = None
+    objective: Optional[Dict[str, float]] = None 
 
 class ConflictNegotiatePayload(BaseModel):
     conflictId: Optional[str] = "CON-001"

@@ -4,7 +4,7 @@ const { ServiceUnavailableError, ValidationError, AppError } = require('./errors
 class AIClient {
   constructor() {
     this.baseUrl = (config.aiServiceUrl || process.env.AI_SERVICE_URL || 'http://localhost:8000').replace(/\/+$/, '');
-    this.defaultTimeoutMs = 15000;
+    this.defaultTimeoutMs = 120000;
   }
 
   async request(path, options = {}) {

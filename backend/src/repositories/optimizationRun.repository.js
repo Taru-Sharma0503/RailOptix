@@ -38,16 +38,16 @@ class OptimizationRunRepository extends BaseRepository {
     let idx = 1;
 
     for (const [jsKey, dbKey] of Object.entries(fieldMap)) {
-      if (data[jsKey] !== undefined) {
-        if (typeof data[jsKey] === 'object' && data[jsKey] !== null) {
-          setParts.push(`${dbKey} = $${idx++}::jsonb`);
-          params.push(JSON.stringify(data[jsKey]));
-        } else {
-          setParts.push(`${dbKey} = $${idx++}`);
-          params.push(data[jsKey]);
-        }
-      }
+  if (data[jsKey] !== undefined) {
+    if (jsKey === 'result') {
+      setParts.push(`${dbKey} = $${idx++}::jsonb`);
+      params.push(JSON.stringify(data[jsKey]));
+    } else {
+      setParts.push(`${dbKey} = $${idx++}`);
+      params.push(data[jsKey]);
     }
+  }
+}
 
     if (setParts.length === 0) return this.findById(id);
 
