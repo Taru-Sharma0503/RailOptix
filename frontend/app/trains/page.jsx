@@ -1,21 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { apiFetch } from '@/lib/api'
 import Link from 'next/link'
 import { AlertTriangle, CircleCheck, Clock3, Navigation, TrainFront, TriangleAlert } from 'lucide-react'
-
-const trains = [
-  { id: 'NDLS-12034', train: 'Delhi Shatabdi', service: 'Intercity Express', route: 'New Delhi → Chandigarh', origin: 'New Delhi', destination: 'Chandigarh', current: 'Panipat Junction', next: 'Karnal', status: 'On Time', statusState: 'healthy', delay: '0 min', priority: 'High', priorityState: 'high', scheduledArrival: '17:45', estimatedArrival: '17:45', impact: 'No operational impact' },
-  { id: 'NDLS-12482', train: 'Intercity Link', service: 'Passenger Express', route: 'New Delhi → Meerut City', origin: 'New Delhi', destination: 'Meerut City', current: 'Ghaziabad Junction', next: 'Modinagar', status: 'Approaching', statusState: 'info', delay: '3 min', priority: 'Medium', priorityState: 'warning', scheduledArrival: '15:20', estimatedArrival: '15:23', impact: 'Minor platform adjustment' },
-  { id: 'NZM-12952', train: 'Capital Express', service: 'Superfast Express', route: 'Hazrat Nizamuddin → Mumbai Central', origin: 'Hazrat Nizamuddin', destination: 'Mumbai Central', current: 'Faridabad', next: 'Mathura Junction', status: 'Delayed', statusState: 'warning', delay: '18 min', priority: 'High', priorityState: 'high', scheduledArrival: '06:30', estimatedArrival: '06:48', impact: 'Pathing adjustment required' },
-  { id: 'DLI-64002', train: 'Delhi MEMU', service: 'Suburban Service', route: 'Delhi Junction → Panipat', origin: 'Delhi Junction', destination: 'Panipat', current: 'Narela', next: 'Sonepat', status: 'On Time', statusState: 'healthy', delay: '0 min', priority: 'Medium', priorityState: 'warning', scheduledArrival: '16:10', estimatedArrival: '16:10', impact: 'No operational impact' },
-  { id: 'NDLS-12056', train: 'Jan Shatabdi', service: 'Intercity Express', route: 'New Delhi → Dehradun', origin: 'New Delhi', destination: 'Dehradun', current: 'Ghaziabad Junction', next: 'Meerut City', status: 'At Risk', statusState: 'critical', delay: '24 min', priority: 'Critical', priorityState: 'critical', scheduledArrival: '20:15', estimatedArrival: '20:39', impact: 'Connection risk at Meerut' },
-  { id: 'DLI-54011', train: 'Delhi Passenger', service: 'Passenger Service', route: 'Delhi Junction → Rewari', origin: 'Delhi Junction', destination: 'Rewari', current: 'Gurugram', next: 'Pataudi Road', status: 'Stopped', statusState: 'neutral', delay: '11 min', priority: 'Low', priorityState: 'healthy', scheduledArrival: '18:05', estimatedArrival: '18:16', impact: 'Awaiting line clearance' },
-  { id: 'NDLS-12310', train: 'Rajendra Express', service: 'Superfast Express', route: 'New Delhi → Patna Junction', origin: 'New Delhi', destination: 'Patna Junction', current: 'New Delhi Yard', next: 'Ghaziabad Junction', status: 'Approaching', statusState: 'info', delay: '2 min', priority: 'High', priorityState: 'high', scheduledArrival: '07:10', estimatedArrival: '07:12', impact: 'No operational impact' },
-  { id: 'NZM-12138', train: 'Punjab Mail', service: 'Mail Express', route: 'Hazrat Nizamuddin → Firozpur', origin: 'Hazrat Nizamuddin', destination: 'Firozpur', current: 'Delhi Cantt', next: 'Gurugram', status: 'On Time', statusState: 'healthy', delay: '0 min', priority: 'Medium', priorityState: 'warning', scheduledArrival: '19:40', estimatedArrival: '19:40', impact: 'No operational impact' },
-  { id: 'NDLS-14086', train: 'Haryana Express', service: 'Express Service', route: 'New Delhi → Hisar', origin: 'New Delhi', destination: 'Hisar', current: 'Rohtak Junction', next: 'Bhiwani', status: 'Delayed', statusState: 'warning', delay: '9 min', priority: 'Low', priorityState: 'healthy', scheduledArrival: '21:25', estimatedArrival: '21:34', impact: 'Minor crossing adjustment' },
-  { id: 'DLI-64468', train: 'Delhi EMU', service: 'Suburban Service', route: 'Delhi Junction → Ghaziabad', origin: 'Delhi Junction', destination: 'Ghaziabad', current: 'Shahdara', next: 'Ghaziabad Junction', status: 'On Time', statusState: 'healthy', delay: '0 min', priority: 'Low', priorityState: 'healthy', scheduledArrival: '14:55', estimatedArrival: '14:55', impact: 'No operational impact' },
-  { id: 'NDLS-12414', train: 'Rajdhani Express', service: 'Premium Express', route: 'New Delhi → Ranchi', origin: 'New Delhi', destination: 'Ranchi', current: 'Panipat Junction', next: 'Karnal', status: 'At Risk', statusState: 'critical', delay: '16 min', priority: 'Critical', priorityState: 'critical', scheduledArrival: '09:30', estimatedArrival: '09:46', impact: 'Priority path allocation needed' },
+const mockTrains = [
+  {
+    id: 'TR-003', train: 'Rajdhani Express', service: 'Superfast',
+    route: 'COR-001', origin: 'New Delhi', destination: 'ST-003',
+    current: 'ST-002', next: 'ST-003', status: 'On Time',
+    statusState: 'healthy', delay: '0 min', priority: 'High',
+    priorityState: 'high', scheduledArrival: '10:00',
+    estimatedArrival: '10:00', impact: 'No operational impact',
+  },
+  {
+    id: 'TR-001', train: 'Shatabdi Express', service: 'Superfast',
+    route: 'COR-001', origin: 'New Delhi', destination: 'ST-003',
+    current: 'ST-001', next: 'ST-002', status: 'On Time',
+    statusState: 'healthy', delay: '0 min', priority: 'High',
+    priorityState: 'high', scheduledArrival: '08:15',
+    estimatedArrival: '08:15', impact: 'No operational impact',
+  },
 ]
 
 const metrics = [
@@ -31,9 +36,89 @@ function StateTag({ children, state }) {
 }
 
 export default function TrainsPage() {
-  const [selectedId, setSelectedId] = useState(trains[0].id)
-  const selected = trains.find((train) => train.id === selectedId) || trains[0]
+  const [trains, setTrains] = useState(mockTrains)
+const [selectedId, setSelectedId] = useState(mockTrains[0]?.id || null)
 
+useEffect(() => {
+  async function loadTrains() {
+    try {
+      const data = await apiFetch('/api/trains')
+
+      const realTrains = Array.isArray(data?.trains)
+        ? data.trains
+        : Array.isArray(data)
+          ? data
+          : null
+
+      if (!realTrains) {
+        console.warn('Unexpected trains API response:', data)
+        return
+      }
+
+      const safeTrains = realTrains.map((t) => ({
+        ...t,
+
+        train: t.name || '—',
+
+        service:
+          t.type === 'superfast' ? 'Superfast' :
+          t.type === 'express' ? 'Express' :
+          t.type === 'passenger' ? 'Passenger' :
+          t.type === 'freight' ? 'Freight' : '—',
+
+        route: t.corridorId || '—',
+
+        statusState:
+          t.status === 'On Time' ? 'healthy' :
+          t.status === 'Approaching' ? 'info' :
+          t.status === 'Delayed' ? 'warning' :
+          t.status === 'At Risk' ? 'critical' : 'neutral',
+
+        priority:
+          t.priority >= 9 ? 'High' :
+          t.priority >= 7 ? 'Medium' : 'Low',
+
+        priorityState:
+          t.priority >= 9 ? 'high' :
+          t.priority >= 7 ? 'warning' : 'healthy',
+
+        scheduledArrival: t.scheduledArrival || t.arrival || '—',
+        estimatedArrival: t.estimatedArrival || t.arrival || '—',
+        impact: t.operationalImpact || '—',
+      }))
+
+      if (safeTrains.length) {
+        setTrains(safeTrains)
+        setSelectedId(safeTrains[0].id)
+      }
+    } catch (err) {
+      console.error('Train API failed — using mock data:', err)
+      setTrains(mockTrains)
+      setSelectedId(mockTrains[0]?.id || null)
+    }
+  }
+
+  loadTrains()
+}, [])
+
+const selected = trains.find((train) => train.id === selectedId) || {
+  id: '—',
+  train: '—',
+  service: '—',
+  route: '—',
+  origin: '—',
+  destination: '—',
+  current: '—',
+  next: '—',
+  status: '—',
+  statusState: 'neutral',
+  delay: '—',
+  priority: '—',
+  priorityState: 'neutral',
+  scheduledArrival: '—',
+  estimatedArrival: '—',
+  impact: '—',
+}
   return (
     <main className="dashboard">
       <div className="page-intro"><div><div className="breadcrumb">OPERATIONS <span>/</span> TRAINS</div><h1>Train Operations</h1><p>Monitor active train services, movement status, and operational impact across the network.</p></div></div>

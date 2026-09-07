@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { GitBranch } from 'lucide-react'
 import Link from 'next/link'
 import { AlertTriangle, CalendarClock, CheckCircle2, Clock3, Construction, Navigation } from 'lucide-react'
-
-const blocks = [
+import { apiFetch } from '@/lib/api'
+const mockBlocks = [
   { id:'BLK-26091', asset:'TRK-DLI-042', section:'Delhi Junction → Narela', location:'Narela', type:'Track Maintenance', start:'22:00', end:'02:30', duration:'4h 30m', status:'Active', statusState:'critical', impact:'High', impactState:'high', affectedTrains:'4', department:'Track Maintenance' },
   { id:'BLK-26092', asset:'SIG-GZB-118', section:'Ghaziabad Junction', location:'Ghaziabad', type:'Signal Maintenance', start:'23:30', end:'01:30', duration:'2h', status:'Scheduled', statusState:'warning', impact:'Medium', impactState:'warning', affectedTrains:'2', department:'Signal & Telecom' },
   { id:'BLK-26093', asset:'OHE-PNP-031', section:'Panipat Junction', location:'Panipat', type:'OHE Maintenance', start:'00:30', end:'04:00', duration:'3h 30m', status:'Scheduled', statusState:'warning', impact:'High', impactState:'high', affectedTrains:'5', department:'Electrical / OHE' },
@@ -18,7 +18,7 @@ const blocks = [
   { id:'BLK-26100', asset:'PNT-DLI-074', section:'Delhi Junction Yard', location:'Delhi Junction', type:'Point Machine Maintenance', start:'19:00', end:'21:00', duration:'2h', status:'Completed', statusState:'healthy', impact:'Low', impactState:'healthy', affectedTrains:'1', department:'Signal & Telecom' },
 ]
 
-const metrics = [
+const mockMetrics = [
   ['Active Blocks','18','Currently affecting operations',Construction,'info'],
   ['Scheduled','11','Upcoming maintenance blocks',CalendarClock,'warn'],
   ['Completed','27','Completed this week',CheckCircle2,'up'],
@@ -31,9 +31,58 @@ function StateTag({ children, state }) {
 }
 
 export default function BlocksPage() {
-  const [selectedId,setSelectedId] = useState(blocks[0].id)
-  const selected = blocks.find(block => block.id === selectedId) || blocks[0]
+  const [blocks, setBlocks] = useState(mockBlocks)
+  const [selectedId, setSelectedId] = useState(mockBlocks[0].id)
+  const [conflicts, setConflicts] = useState([])
 
+  async function loadBlocks() {
+    try {
+      const data = await apiFetch(
+        '/api/blocks?corridorId=COR-001&date=2026-09-12'
+      )
+
+      const realBlocks = Array.isArray(data?.blocks)
+        ? data.blocks
+        : Array.isArray(data)
+          ? data
+          : null
+
+      if (realBlocks && realBlocks.length > 0) {
+        const safeBlocks = realBlocks.map(block => ({
+          ...block,
+          location:
+            block.location &&
+            typeof block.location === 'object'
+              ? `${block.location.latitude}, ${block.location.longitude}`
+              : block.location,
+        }))
+
+        setBlocks(safeBlocks)
+        setSelectedId(safeBlocks[0].id)
+      }
+
+      try {
+        const conflictData = await apiFetch('/api/blocks/conflicts')
+
+        if (Array.isArray(conflictData?.conflicts)) {
+          setConflicts(conflictData.conflicts)
+        } else if (Array.isArray(conflictData)) {
+          setConflicts(conflictData)
+        }
+      } catch (err) {
+        console.error('Failed to load block conflicts:', err)
+      }
+    } catch (err) {
+      console.error('Failed to load blocks from backend:', err)
+    }
+  }
+
+  useEffect(() => {
+    loadBlocks()
+  }, [])
+
+  const selected =
+    blocks.find(block => block.id === selectedId) || blocks[0]
   return (
     <main className="dashboard">
       <div className="page-intro">
@@ -46,7 +95,7 @@ export default function BlocksPage() {
       </div>
 
       <div className="metric-grid" style={{ gridTemplateColumns:'repeat(auto-fit, minmax(165px, 1fr))' }}>
-        {metrics.map(([label,value,detail,Icon,state]) => (
+        {mockMetrics.map(([label,value,detail,Icon,state]) => (
           <div className="metric" key={label}>
             <div className="metric-top"><span>{label}</span><Icon/></div>
             <div className="metric-bottom"><strong>{value}</strong><small className={state}>{detail}</small></div>

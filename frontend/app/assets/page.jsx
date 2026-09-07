@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   Activity,
@@ -10,8 +10,9 @@ import {
   Plus,
   Wrench,
 } from 'lucide-react'
+import { apiFetch } from '@/lib/api'
 
-const assets = [
+const mockAssets = [
   {
     id: 'TRK-102',
     name: 'Main Line Track Section',
@@ -166,11 +167,157 @@ function StatusPill({ children, state }) {
 }
 
 export default function AssetsPage() {
-  const [selectedId, setSelectedId] = useState(assets[0].id)
+  const [assets, setAssets] = useState(mockAssets)
+const [selectedId, setSelectedId] = useState(null)
+const [selectedMaintenance, setSelectedMaintenance] = useState('—')
+const [selectedInspection, setSelectedInspection] = useState('—')
 
   const selected =
     assets.find((asset) => asset.id === selectedId) || assets[0]
+    useEffect(() => {
+  async function loadAssets() {
+    try {
+      const data = await apiFetch('/api/assets')
 
+      const realAssets =
+        Array.isArray(data?.assets)
+          ? data.assets
+          : Array.isArray(data)
+            ? data
+            : null
+
+      if (!realAssets) {
+        console.warn('Unexpected assets API response:', data)
+        return
+      }
+
+      const safeAssets = realAssets.map((asset) => {
+        const health = Math.round(
+          (1 - (asset.failureRisk ?? 0)) * 100
+        )
+
+        const healthState =
+          asset.condition === 'critical'
+            ? 'critical'
+            : asset.condition === 'warning'
+              ? 'warning'
+              : 'healthy'
+
+        const priority =
+          asset.criticality >= 9
+            ? 'Critical'
+            : asset.criticality >= 7
+              ? 'High'
+              : asset.criticality >= 4
+                ? 'Medium'
+                : 'Low'
+
+        return {
+          ...asset,
+
+          type: asset.type
+            ? asset.type.charAt(0).toUpperCase() +
+              asset.type.slice(1)
+            : '—',
+
+          location:
+            asset.location &&
+            typeof asset.location === 'object'
+              ? `${asset.location.latitude}, ${asset.location.longitude}`
+              : asset.location || '—',
+
+          health: `${health}%`,
+          healthState,
+
+          inspection: '—',
+          maintenance: '—',
+
+          status:
+            asset.condition === 'critical'
+              ? 'Critical'
+              : asset.condition === 'warning'
+                ? 'At Risk'
+                : 'Healthy',
+
+          priority,
+        }
+      })
+
+      if (safeAssets.length > 0) {
+        setAssets(safeAssets)
+        setSelectedId(safeAssets[0].id)
+      }
+    } catch (err) {
+      console.error(
+        'Failed to load assets from backend:',
+        err
+      )
+    }
+  }
+
+  loadAssets()
+}, [])
+useEffect(() => {
+  async function loadSelectedAssetDetails() {
+    if (!selectedId) return
+
+    try {
+      const [assetData, maintenanceData] = await Promise.all([
+        apiFetch(`/api/assets/${selectedId}`),
+        apiFetch(`/api/maintenance?assetId=${selectedId}`),
+      ])
+
+      const backendAsset = assetData?.asset || assetData
+      const maintenanceTasks = maintenanceData?.tasks || []
+
+      const upcomingMaintenance = maintenanceTasks
+        .filter((task) => task.status !== 'completed' && task.deadline)
+        .sort(
+          (a, b) =>
+            new Date(a.deadline) -
+            new Date(b.deadline)
+        )[0]
+
+      const maintenanceHistory =
+        backendAsset?.maintenanceHistory || []
+
+      const latestInspection =
+        maintenanceHistory
+          .filter((item) => item.performedAt)
+          .sort(
+            (a, b) =>
+              new Date(b.performedAt) -
+              new Date(a.performedAt)
+          )[0]
+
+      setSelectedMaintenance(
+        upcomingMaintenance
+          ? new Date(
+              upcomingMaintenance.deadline
+            ).toLocaleDateString('en-IN')
+          : '—'
+      )
+
+      setSelectedInspection(
+        latestInspection
+          ? new Date(
+              latestInspection.performedAt
+            ).toLocaleDateString('en-IN')
+          : '—'
+      )
+    } catch (err) {
+      console.error(
+        'Failed to load selected asset details:',
+        err
+      )
+
+      setSelectedMaintenance('—')
+      setSelectedInspection('—')
+    }
+  }
+
+  loadSelectedAssetDetails()
+}, [selectedId])
   return (
     <main className="dashboard">
       <div className="page-intro">
@@ -182,7 +329,8 @@ export default function AssetsPage() {
           <h1>Asset Management</h1>
 
           <p>
-            Monitor railway infrastructure assets, health, and maintenance status.
+            Monitor railway infrastructure assets, health, and
+            maintenance status.
           </p>
         </div>
 
@@ -191,7 +339,12 @@ export default function AssetsPage() {
         </Link>
       </div>
 
-      <div className="metric-grid" style={{gridTemplateColumns:'repeat(4,1fr)'}}>
+      <div
+        className="metric-grid"
+        style={{
+          gridTemplateColumns: 'repeat(4,1fr)',
+        }}
+      >
         {kpis.map(([label, value, sub, Icon, type]) => (
           <div className="metric" key={label}>
             <div className="metric-top">
@@ -201,7 +354,10 @@ export default function AssetsPage() {
 
             <div className="metric-bottom">
               <strong>{value}</strong>
-              <small className={type}>{sub}</small>
+
+              <small className={type}>
+                {sub}
+              </small>
             </div>
           </div>
         ))}
@@ -214,6 +370,7 @@ export default function AssetsPage() {
               <div className="section-kicker">
                 <Database /> ASSET REGISTER
               </div>
+
               <h2>Monitored Assets</h2>
             </div>
           </div>
@@ -247,6 +404,7 @@ export default function AssetsPage() {
 
                 <div>
                   <strong>{asset.name}</strong>
+
                   <small>
                     {asset.type} · {asset.location}
                   </small>
@@ -261,16 +419,22 @@ export default function AssetsPage() {
                 <div className="risk-bar">
                   <i
                     className={asset.healthState}
-                    style={{ width: asset.health }}
+                    style={{
+                      width: asset.health,
+                    }}
                   />
                 </div>
               </div>
 
-              <StatusPill state={asset.healthState}>
+              <StatusPill
+                state={asset.healthState}
+              >
                 {asset.status}
               </StatusPill>
 
-              <span className={`impact ${asset.healthState}`}>
+              <span
+                className={`impact ${asset.healthState}`}
+              >
                 {asset.priority}
               </span>
             </button>
@@ -283,16 +447,29 @@ export default function AssetsPage() {
               <div className="section-kicker">
                 <Activity /> SELECTED ASSET
               </div>
+
               <h2>{selected.id}</h2>
             </div>
 
-            <StatusPill state={selected.healthState}>
+            <StatusPill
+              state={selected.healthState}
+            >
               {selected.status}
             </StatusPill>
           </div>
 
-          <div style={{ padding: '4px 18px 20px' }}>
-            <h2 style={{ marginBottom: '5px' }}>{selected.name}</h2>
+          <div
+            style={{
+              padding: '4px 18px 20px',
+            }}
+          >
+            <h2
+              style={{
+                marginBottom: '5px',
+              }}
+            >
+              {selected.name}
+            </h2>
 
             <div
               style={{
@@ -305,13 +482,13 @@ export default function AssetsPage() {
             </div>
 
             {[
-              ['LOCATION', selected.location],
-              ['HEALTH', selected.health],
-              ['LAST INSPECTION', selected.inspection],
-              ['NEXT MAINTENANCE', selected.maintenance],
-              ['STATUS', selected.status],
-              ['PRIORITY', selected.priority],
-            ].map(([label, value]) => (
+  ['LOCATION', selected.location],
+  ['HEALTH', selected.health],
+  ['LAST INSPECTION', selectedInspection],
+  ['NEXT MAINTENANCE', selectedMaintenance],
+  ['STATUS', selected.status],
+  ['PRIORITY', selected.priority],
+].map(([label, value]) => (
               <div
                 key={label}
                 className="table-head"
@@ -319,7 +496,8 @@ export default function AssetsPage() {
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
                   padding: '12px 0',
-                  borderBottom: '1px solid var(--line)',
+                  borderBottom:
+                    '1px solid var(--line)',
                 }}
               >
                 <span>{label}</span>

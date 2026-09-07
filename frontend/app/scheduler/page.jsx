@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { CalendarClock, CheckCircle2, Clock3, Navigation, Play, TrainFront, TriangleAlert } from 'lucide-react'
+import { apiFetch } from '@/lib/api'
 
-const schedules = [
+const mockSchedules = [
   { id:'SCH-26091', task:'Track renewal', asset:'TRK-DLI-042', location:'Narela', date:'03 Sep 2026', start:'22:00', end:'02:30', duration:'4h 30m', trains:4, impact:'High', state:'high' },
   { id:'SCH-26092', task:'Signal inspection', asset:'SIG-GZB-118', location:'Ghaziabad', date:'03 Sep 2026', start:'23:30', end:'01:30', duration:'2h', trains:2, impact:'Medium', state:'warning' },
   { id:'SCH-26093', task:'OHE maintenance', asset:'OHE-PNP-031', location:'Panipat', date:'04 Sep 2026', start:'00:30', end:'04:00', duration:'3h 30m', trains:5, impact:'High', state:'high' },
@@ -26,13 +27,86 @@ function StateTag({ children, state }) {
 }
 
 export default function SchedulerPage() {
-  const [selectedId,setSelectedId] = useState(schedules[0].id)
-  const [running,setRunning] = useState(false)
+  const [schedules, setSchedules] = useState(mockSchedules)
+  const [selectedId, setSelectedId] = useState(mockSchedules[0].id)
+  const [running, setRunning] = useState(false)
+
   const selected = schedules.find(item => item.id === selectedId) || schedules[0]
 
-  function runScheduler() {
+  async function runScheduler() {
     setRunning(true)
-    setTimeout(() => setRunning(false),1200)
+
+    try {
+      const [maintenance, blocks] = await Promise.all([
+        apiFetch('/api/maintenance'),
+        apiFetch('/api/blocks'),
+      ])
+
+      const tasks =
+        maintenance?.tasks ||
+        maintenance?.maintenance ||
+        maintenance ||
+        []
+
+      const availableBlocks =
+        blocks?.blocks ||
+        blocks ||
+        []
+
+      const taskIds = tasks.map(t => t.id).filter(Boolean)
+      const blockIds = availableBlocks.map(b => b.id).filter(Boolean)
+
+      const corridorId =
+        availableBlocks[0]?.corridorId ||
+        tasks[0]?.corridorId ||
+        'COR-001'
+
+      const planningDate =
+        new Date().toISOString().split('T')[0]
+
+      const result = await apiFetch('/api/optimize', {
+        method: 'POST',
+        body: JSON.stringify({
+          corridorId,
+          planningDate,
+          maintenanceTaskIds: taskIds,
+          blockIds,
+          objective: {
+            assetAvailability: 0.35,
+            trainDisruption: 0.30,
+            conflicts: 0.15,
+            blockWastage: 0.10,
+            safetyRisk: 0.10,
+          },
+        }),
+      })
+
+      if (!result?.runId) {
+        throw new Error('Optimization runId not returned')
+      }
+
+      const runId = result.runId
+
+      const checkStatus = async () => {
+        const status = await apiFetch(`/api/optimize/${runId}`)
+
+        if (status.status === 'completed') {
+          window.location.href = `/scheduler/results/${runId}`
+          return
+        }
+
+        if (status.status === 'failed') {
+          throw new Error(status.message || 'Optimization failed')
+        }
+
+        setTimeout(checkStatus, 1000)
+      }
+
+      checkStatus()
+    } catch (err) {
+      console.error('Scheduler optimization failed:', err)
+      setRunning(false)
+    }
   }
 
   return (

@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { apiFetch } from '@/lib/api'
 import {
   ArrowLeft,
   Activity,
@@ -12,178 +14,6 @@ import {
   MapPin,
   ShieldCheck,
 } from 'lucide-react'
-
-const assetData = {
-  'TRK-102': {
-    id: 'TRK-102',
-    name: 'Main Line Track Section',
-    type: 'Track Section',
-    location: 'New Delhi – Ghaziabad',
-    health: '72%',
-    healthState: 'warning',
-    inspection: '28 Aug 2026',
-    maintenance: '04 Sep 2026',
-    status: 'At Risk',
-    priority: 'High',
-    risk: '92%',
-    due: 'Due in 2 days',
-    impact: 'High',
-    issue: 'Track degradation detected',
-  },
-
-  'SIG-044': {
-    id: 'SIG-044',
-    name: 'Automatic Block Signal',
-    type: 'Signal',
-    location: 'New Delhi Yard',
-    health: '91%',
-    healthState: 'healthy',
-    inspection: '30 Aug 2026',
-    maintenance: '18 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-    risk: '24%',
-    due: 'Due in 14 days',
-    impact: 'Low',
-    issue: 'No significant issue detected',
-  },
-
-  'PTM-018': {
-    id: 'PTM-018',
-    name: 'Point Machine No. 18',
-    type: 'Point Machine',
-    location: 'Ghaziabad Junction',
-    health: '58%',
-    healthState: 'critical',
-    inspection: '26 Aug 2026',
-    maintenance: '02 Sep 2026',
-    status: 'Critical',
-    priority: 'Critical',
-    risk: '96%',
-    due: 'Due today',
-    impact: 'High',
-    issue: 'Point machine degradation detected',
-  },
-
-  'OHE-221': {
-    id: 'OHE-221',
-    name: 'Overhead Contact System',
-    type: 'Overhead Equipment',
-    location: 'Panipat – Karnal',
-    health: '76%',
-    healthState: 'warning',
-    inspection: '27 Aug 2026',
-    maintenance: '08 Sep 2026',
-    status: 'At Risk',
-    priority: 'Medium',
-    risk: '71%',
-    due: 'Due in 6 days',
-    impact: 'Medium',
-    issue: 'OHE inspection recommended',
-  },
-
-  'LC-014': {
-    id: 'LC-014',
-    name: 'Manned Level Crossing',
-    type: 'Level Crossing',
-    location: 'Sonepat Outer',
-    health: '96%',
-    healthState: 'healthy',
-    inspection: '29 Aug 2026',
-    maintenance: '22 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-    risk: '18%',
-    due: 'Due in 18 days',
-    impact: 'Low',
-    issue: 'No significant issue detected',
-  },
-
-  'BRG-007': {
-    id: 'BRG-007',
-    name: 'Yamuna River Bridge',
-    type: 'Bridge',
-    location: 'Delhi – Shahdara',
-    health: '84%',
-    healthState: 'warning',
-    inspection: '25 Aug 2026',
-    maintenance: '12 Sep 2026',
-    status: 'At Risk',
-    priority: 'High',
-    risk: '68%',
-    due: 'Due in 8 days',
-    impact: 'High',
-    issue: 'Bridge inspection recommended',
-  },
-
-  'TRK-187': {
-    id: 'TRK-187',
-    name: 'Loop Line Track Section',
-    type: 'Track Section',
-    location: 'Meerut City',
-    health: '93%',
-    healthState: 'healthy',
-    inspection: '31 Aug 2026',
-    maintenance: '26 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-    risk: '21%',
-    due: 'Due in 22 days',
-    impact: 'Low',
-    issue: 'No significant issue detected',
-  },
-
-  'SIG-091': {
-    id: 'SIG-091',
-    name: 'Electronic Interlocking Signal',
-    type: 'Signal',
-    location: 'Panipat Junction',
-    health: '65%',
-    healthState: 'critical',
-    inspection: '24 Aug 2026',
-    maintenance: '03 Sep 2026',
-    status: 'Critical',
-    priority: 'Critical',
-    risk: '88%',
-    due: 'Due tomorrow',
-    impact: 'High',
-    issue: 'Signal degradation detected',
-  },
-
-  'OHE-106': {
-    id: 'OHE-106',
-    name: 'Traction Mast Assembly',
-    type: 'Overhead Equipment',
-    location: 'Gurugram – Rewari',
-    health: '88%',
-    healthState: 'healthy',
-    inspection: '30 Aug 2026',
-    maintenance: '19 Sep 2026',
-    status: 'Healthy',
-    priority: 'Low',
-    risk: '27%',
-    due: 'Due in 15 days',
-    impact: 'Low',
-    issue: 'No significant issue detected',
-  },
-
-  'PTM-031': {
-    id: 'PTM-031',
-    name: 'Point Machine No. 31',
-    type: 'Point Machine',
-    location: 'New Delhi Yard',
-    health: '79%',
-    healthState: 'warning',
-    inspection: '28 Aug 2026',
-    maintenance: '09 Sep 2026',
-    status: 'At Risk',
-    priority: 'Medium',
-    risk: '63%',
-    due: 'Due in 5 days',
-    impact: 'Medium',
-    issue: 'Point machine inspection recommended',
-  },
-}
 
 function StatusPill({ state, children }) {
   return (
@@ -211,6 +41,8 @@ function StatusPill({ state, children }) {
 
 export default function AssetPage() {
   const params = useParams()
+  const [asset, setAsset] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const assetId = Array.isArray(params?.assetId)
     ? params.assetId[0]
@@ -220,7 +52,146 @@ export default function AssetPage() {
     .trim()
     .toUpperCase()
 
-  const asset = assetData[id]
+  useEffect(() => {
+    async function loadAsset() {
+      try {
+        const [assetData, riskData, maintenanceData] =
+          await Promise.all([
+            apiFetch(`/api/assets/${id}`),
+            apiFetch(`/api/assets/${id}/risk`),
+             apiFetch(`/api/maintenance?assetId=${id}`),
+          ])
+
+        const backendAsset = assetData?.asset || assetData
+        const backendRisk = riskData?.risk || riskData
+        const maintenanceTasks = maintenanceData?.tasks || []
+
+        if (backendAsset?.id) {
+          const health = Math.round(
+            (1 - (backendAsset.failureRisk ?? 0)) * 100
+          )
+
+          const healthState =
+            backendAsset.condition === 'critical'
+              ? 'critical'
+              : backendAsset.condition === 'warning'
+                ? 'warning'
+                : 'healthy'
+
+          const priority =
+            backendAsset.criticality >= 9
+              ? 'Critical'
+              : backendAsset.criticality >= 7
+                ? 'High'
+                : backendAsset.criticality >= 4
+                  ? 'Medium'
+                  : 'Low'
+
+          setAsset({
+            ...backendAsset,
+
+            type: backendAsset.type
+              ? backendAsset.type.charAt(0).toUpperCase() +
+                backendAsset.type.slice(1)
+              : '—',
+
+            location:
+              backendAsset.location &&
+              typeof backendAsset.location === 'object'
+                ? `${backendAsset.location.latitude}, ${backendAsset.location.longitude}`
+                : backendAsset.location || '—',
+
+            health: `${health}%`,
+            healthState,
+
+            inspection:
+  backendAsset.maintenanceHistory?.length > 0
+    ? new Date(
+        backendAsset.maintenanceHistory[0].performedAt
+      ).toLocaleDateString('en-IN')
+    : '—',
+
+maintenance:
+  maintenanceTasks.length > 0
+    ? new Date(
+        maintenanceTasks
+          .filter((task) => task.status !== 'completed')
+          .sort(
+            (a, b) =>
+              new Date(a.deadline) -
+              new Date(b.deadline)
+          )[0]?.deadline
+      ).toLocaleDateString('en-IN')
+    : '—',
+
+            status:
+              backendAsset.condition === 'critical'
+                ? 'Critical'
+                : backendAsset.condition === 'warning'
+                  ? 'At Risk'
+                  : 'Healthy',
+
+            priority,
+
+            risk: `${Math.round(
+  (backendRisk?.failureRisk ??
+    backendRisk?.risk ??
+    backendAsset.failureRisk ??
+    0) * 100
+)}%`,
+
+            due:
+  maintenanceTasks.length > 0
+    ? maintenanceTasks
+        .filter((task) => task.status !== 'completed')
+        .sort(
+          (a, b) =>
+            new Date(a.deadline) -
+            new Date(b.deadline)
+        )[0]?.description || 'Scheduled'
+    : '—',
+
+            impact:
+              backendAsset.condition === 'critical'
+                ? 'High'
+                : backendAsset.condition === 'warning'
+                  ? 'Medium'
+                  : 'Low',
+
+            issue:
+              backendAsset.condition === 'critical'
+                ? 'Asset degradation detected'
+                : backendAsset.condition === 'warning'
+                  ? 'Asset inspection recommended'
+                  : 'No significant issue detected',
+          })
+        }
+      } catch (err) {
+        console.error('Failed to load asset:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (id) {
+      loadAsset()
+    }
+  }, [id])
+
+  if (loading) {
+    return (
+      <main className="dashboard">
+        <div className="page-intro">
+          <div>
+            <div className="breadcrumb">
+              OPERATIONS <span>/</span> ASSETS
+            </div>
+            <h1>Loading Asset...</h1>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   if (!asset) {
     return (

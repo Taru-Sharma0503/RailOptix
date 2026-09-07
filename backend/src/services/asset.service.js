@@ -155,7 +155,18 @@ class AssetService {
       factors,
     };
   }
+async getAssetMaintenance(id) {
+  const asset = await assetRepo.findById(id);
+  if (!asset) throw NotFoundError.resource('Asset');
 
+  const maintenanceHistory =
+    await maintenanceHistoryRepo.findByAssetId(id);
+
+  return successResponse({
+    assetId: id,
+    maintenance: maintenanceHistory,
+  });
+}
   async addAssetFailure(id, data) {
     const asset = await assetRepo.findById(id);
     if (!asset) throw NotFoundError.resource('Asset');

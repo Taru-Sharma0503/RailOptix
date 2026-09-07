@@ -12,17 +12,17 @@ class MaintenanceRepository extends BaseRepository {
     let idx = 1;
 
     if (filters.status) {
-      conditions.push(`status = $${idx++}`);
-      params.push(filters.status);
-    }
-    if (filters.assetId) {
-      conditions.push(`asset_id = $${idx++}`);
-      params.push(filters.assetId);
-    }
-    if (filters.departmentId) {
-      conditions.push(`department_id = $${idx++}`);
-      params.push(filters.departmentId);
-    }
+  conditions.push(`mt.status = $${idx++}`);
+  params.push(filters.status);
+}
+if (filters.assetId) {
+  conditions.push(`mt.asset_id = $${idx++}`);
+  params.push(filters.assetId);
+}
+if (filters.departmentId) {
+  conditions.push(`mt.department_id = $${idx++}`);
+  params.push(filters.departmentId);
+}
     if (filters.corridorId) {
       conditions.push(`EXISTS (SELECT 1 FROM assets a WHERE a.id = maintenance_tasks.asset_id AND a.corridor_id = $${idx++})`);
       params.push(filters.corridorId);

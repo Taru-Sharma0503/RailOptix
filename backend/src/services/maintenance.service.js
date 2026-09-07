@@ -22,7 +22,7 @@ class MaintenanceService {
     const asset = await assetRepo.findById(data.assetId);
     if (!asset) throw NotFoundError.resource('Asset');
 
-    const id = await nextSequentialId('MT', () => maintenanceRepo.count());
+    const id = `MT-${Date.now()}`;
 
     const failureRisk = await this._calculateFailureRisk(data.assetId);
     const priorityScore = this._calculatePriorityScore({

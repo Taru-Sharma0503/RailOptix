@@ -3,18 +3,20 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, LockKeyhole, UserRound } from 'lucide-react'
+import { apiFetch } from '@/lib/api'
 
 export default function SignupPage() {
   const [name,setName] = useState('')
-  const [employeeId,setEmployeeId] = useState('')
+  const [email,setEmail] = useState('')
   const [password,setPassword] = useState('')
   const [confirmPassword,setConfirmPassword] = useState('')
   const [error,setError] = useState('')
 
-  function handleSignup(e) {
+  async function handleSignup(e) {
     e.preventDefault()
+    setError('')
 
-    if (!name.trim() || !employeeId.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       setError('Please fill in all fields.')
       return
     }
@@ -24,25 +26,24 @@ export default function SignupPage() {
       return
     }
 
-    const users = JSON.parse(localStorage.getItem('railoptix-users') || '[]')
+    try {
+      const data = await apiFetch('/api/auth/register', {
+        method:'POST',
+        body:JSON.stringify({
+          name:name.trim(),
+          email:email.trim(),
+          password,
+          role:'operator'
+        })
+      })
 
-    if (users.some(user => user.employeeId === employeeId.trim())) {
-      setError('An account with this Employee ID already exists.')
-      return
+      localStorage.setItem('railoptix-token',data.token)
+      localStorage.setItem('railoptix-user',JSON.stringify(data.user))
+
+      window.location.href='/dashboard'
+    } catch (err) {
+      setError(err.message || 'Unable to create account.')
     }
-
-    const newUser = {
-      name:name.trim(),
-      employeeId:employeeId.trim(),
-      password
-    }
-
-    users.push(newUser)
-
-    localStorage.setItem('railoptix-users',JSON.stringify(users))
-    localStorage.setItem('railoptix-user',newUser.name)
-
-    window.location.href = '/dashboard'
   }
 
   return (
@@ -99,15 +100,16 @@ export default function SignupPage() {
             </div>
 
             <label style={{display:'block',fontSize:'10px',letterSpacing:'.08em',color:'var(--muted)',marginBottom:'8px'}}>
-              EMPLOYEE ID
+              EMAIL
             </label>
 
             <div style={{position:'relative',marginBottom:'17px'}}>
               <UserRound size={15} style={{position:'absolute',left:'13px',top:'50%',transform:'translateY(-50%)',color:'var(--muted)'}} />
               <input
-                value={employeeId}
-                onChange={e=>setEmployeeId(e.target.value)}
-                placeholder="Enter employee ID"
+                type="email"
+                value={email}
+                onChange={e=>setEmail(e.target.value)}
+                placeholder="Enter your email"
                 style={{width:'100%',boxSizing:'border-box',height:'46px',padding:'0 14px 0 40px',border:'1px solid var(--line)',background:'var(--panel)',color:'var(--text)',outline:'none',fontSize:'12px'}}
               />
             </div>

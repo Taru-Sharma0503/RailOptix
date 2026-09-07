@@ -13,21 +13,21 @@ class BlockRepository extends BaseRepository {
     let idx = 1;
 
     if (filters.corridorId) {
-      conditions.push(`corridor_id = $${idx++}`);
-      params.push(filters.corridorId);
-    }
-    if (filters.departmentId) {
-      conditions.push(`department_id = $${idx++}`);
-      params.push(filters.departmentId);
-    }
-    if (filters.date) {
-      conditions.push(`date = $${idx++}`);
-      params.push(filters.date);
-    }
-    if (filters.status) {
-      conditions.push(`status = $${idx++}`);
-      params.push(filters.status);
-    }
+  conditions.push(`b.corridor_id = $${idx++}`);
+  params.push(filters.corridorId);
+}
+if (filters.departmentId) {
+  conditions.push(`b.department_id = $${idx++}`);
+  params.push(filters.departmentId);
+}
+if (filters.date) {
+  conditions.push(`b.date = $${idx++}`);
+  params.push(filters.date);
+}
+if (filters.status) {
+  conditions.push(`b.status = $${idx++}`);
+  params.push(filters.status);
+}
 
     let sql = `SELECT b.id, b.corridor_id, b.department_id, b.date, b.start_time, b.end_time, b.reason, b.status, b.maintenance_task_ids, b.duration_minutes, b.created_at, d.name as department_name, c.name as corridor_name
                FROM blocks b

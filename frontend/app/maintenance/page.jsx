@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { CheckCircle2, ClipboardList, Clock3, Download, Plus, TriangleAlert, Wrench } from 'lucide-react'
+import {
+  CheckCircle2,
+  ClipboardList,
+  Clock3,
+  Download,
+  Plus,
+  TriangleAlert,
+  Wrench,
+} from 'lucide-react'
+import { apiFetch } from '@/lib/api'
 
 const mockTasks = [
   { id: 'MNT-260901', asset: 'TRK-102 · Main Line Track', location: 'New Delhi – Ghaziabad', priority: 'Critical', priorityState: 'critical', type: 'Track geometry correction', scheduled: '02 Sep 2026 · 10:15', duration: '4 hrs', status: 'In Progress', statusState: 'info', impact: '30 min traffic restriction', department: 'Engineering' },
@@ -26,78 +35,505 @@ const metrics = [
 ]
 
 function StateTag({ children, state }) {
-  const colors = { critical: 'var(--red)', high: 'var(--orange)', warning: 'var(--yellow)', healthy: 'var(--green)', info: 'var(--cyan)' }
-  return <span className={`block-state ${state === 'warning' ? 'soon' : ''}`} style={{ color: colors[state], borderColor: colors[state] ? `color-mix(in srgb, ${colors[state]} 45%, transparent)` : undefined }}>{children}</span>
+  const colors = {
+    critical: 'var(--red)',
+    high: 'var(--orange)',
+    warning: 'var(--yellow)',
+    healthy: 'var(--green)',
+    info: 'var(--cyan)',
+  }
+
+  return (
+    <span
+      className={`block-state ${state === 'warning' ? 'soon' : ''}`}
+      style={{
+        color: colors[state],
+        borderColor: colors[state]
+          ? `color-mix(in srgb, ${colors[state]} 45%, transparent)`
+          : undefined,
+      }}
+    >
+      {children}
+    </span>
+  )
 }
 
 export default function MaintenancePage() {
   const [tasks, setTasks] = useState(mockTasks)
-  const [selectedId, setSelectedId] = useState(mockTasks[0].id)
-  const selected = tasks.find((task) => task.id === selectedId) || tasks[0]
+  const [selectedId, setSelectedId] = useState(null)
+
+  const selected =
+    tasks.find((task) => task.id === selectedId) || tasks[0]
 
   useEffect(() => {
+  async function loadMaintenanceTasks() {
     try {
-      const savedTasks = JSON.parse(window.localStorage.getItem('railoptix-maintenance-tasks') || '[]')
-      if (Array.isArray(savedTasks)) {
-        setTasks((currentTasks) => [...currentTasks, ...savedTasks.filter((task) => task?.id && !currentTasks.some((currentTask) => currentTask.id === task.id))])
-      }
-    } catch {
-      // Ignore unavailable or malformed browser storage and retain the mock register.
-    }
-  }, [])
+      const data = await apiFetch('/api/maintenance')
 
+      const realTasks =
+        Array.isArray(data?.tasks)
+          ? data.tasks
+          : Array.isArray(data)
+            ? data
+            : null
+
+      if (!realTasks) {
+        console.warn(
+          'Unexpected maintenance API response:',
+          data
+        )
+        return
+      }
+
+      const safeTasks = realTasks.map((task) => {
+        const priority =
+          task.priorityScore >= 90
+            ? 'Critical'
+            : task.priorityScore >= 70
+              ? 'High'
+              : task.priorityScore >= 40
+                ? 'Medium'
+                : 'Low'
+
+        const priorityState =
+          priority === 'Critical'
+            ? 'critical'
+            : priority === 'High'
+              ? 'high'
+              : priority === 'Medium'
+                ? 'warning'
+                : 'healthy'
+
+        const statusState =
+          task.status === 'completed'
+            ? 'healthy'
+            : task.status === 'pending'
+              ? 'warning'
+              : task.status === 'in_progress'
+                ? 'info'
+                : task.status === 'delayed'
+                  ? 'critical'
+                  : 'neutral'
+
+        return {
+          ...task,
+
+          asset:
+            task.assetId && task.assetName
+              ? `${task.assetId} · ${task.assetName}`
+              : task.assetName || task.assetId || '—',
+
+          location:
+            task.corridorId || '—',
+
+          priority,
+          priorityState,
+
+          type:
+            task.description || 'Maintenance',
+
+          scheduled:
+            task.deadline
+              ? new Date(
+                  task.deadline
+                ).toLocaleString('en-IN', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : '—',
+
+          duration:
+            task.estimatedDuration
+              ? task.estimatedDuration >= 60
+                ? `${Math.floor(
+                    task.estimatedDuration / 60
+                  )} hrs${
+                    task.estimatedDuration % 60
+                      ? ` ${task.estimatedDuration % 60} min`
+                      : ''
+                  }`
+                : `${task.estimatedDuration} min`
+              : '—',
+
+          status:
+            task.status === 'in_progress'
+              ? 'In Progress'
+              : task.status === 'pending'
+                ? 'Scheduled'
+                : task.status === 'completed'
+                  ? 'Completed'
+                  : task.status === 'delayed'
+                    ? 'Delayed'
+                    : task.status || '—',
+
+          statusState,
+
+          impact:
+            task.operationalImpact || '—',
+
+          department:
+            task.departmentName ||
+            task.departmentId ||
+            '—',
+
+          requiredBlock:
+            task.requiredBlock || 'No',
+
+          notes:
+            task.notes || 'No additional notes',
+        }
+      })
+
+      if (safeTasks.length > 0) {
+        setTasks(safeTasks)
+        setSelectedId(safeTasks[0].id)
+      } else {
+        setTasks([])
+        setSelectedId(null)
+      }
+    } catch (err) {
+      console.error(
+        'Failed to load maintenance tasks from backend:',
+        err
+      )
+    }
+  }
+
+  loadMaintenanceTasks()
+}, [])
   return (
     <main className="dashboard">
       <div className="page-intro">
         <div>
-          <div className="breadcrumb">OPERATIONS <span>/</span> MAINTENANCE</div>
+          <div className="breadcrumb">
+            OPERATIONS <span>/</span> MAINTENANCE
+          </div>
+
           <h1>Maintenance Management</h1>
-          <p>Monitor maintenance work, priorities, schedules, and operational impact.</p>
+
+          <p>
+            Monitor maintenance work, priorities, schedules, and
+            operational impact.
+          </p>
         </div>
+
         <div className="intro-actions">
-          <Link href="/maintenance/import" className="secondary-btn hover:!bg-[#E7F4F1] hover:!text-[#172126]"><Download /> IMPORT TASKS</Link>
-          <Link href="/maintenance/new" className="primary-btn"><Plus /> NEW MAINTENANCE TASK</Link>
+          <Link
+            href="/maintenance/import"
+            className="secondary-btn hover:!bg-[#E7F4F1] hover:!text-[#172126]"
+          >
+            <Download /> IMPORT TASKS
+          </Link>
+
+          <Link
+            href="/maintenance/new"
+            className="primary-btn"
+          >
+            <Plus /> NEW MAINTENANCE TASK
+          </Link>
         </div>
       </div>
 
-      <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(165px, 1fr))' }}>
-        {metrics.map(([label, value, detail, Icon, state]) => <div className="metric" key={label}><div className="metric-top"><span>{label}</span><Icon /></div><div className="metric-bottom"><strong>{value}</strong><small className={state}>{detail}</small></div></div>)}
+      <div
+        className="metric-grid"
+        style={{
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(165px, 1fr))',
+        }}
+      >
+        {metrics.map(
+          ([label, value, detail, Icon, state]) => (
+            <div className="metric" key={label}>
+              <div className="metric-top">
+                <span>{label}</span>
+                <Icon />
+              </div>
+
+              <div className="metric-bottom">
+                <strong>{value}</strong>
+
+                <small className={state}>
+                  {detail}
+                </small>
+              </div>
+            </div>
+          )
+        )}
       </div>
 
       <div className="main-grid">
-        <section className="panel" style={{ overflow: 'hidden' }}>
+        <section
+          className="panel"
+          style={{ overflow: 'hidden' }}
+        >
           <div className="panel-head compact">
-            <div><div className="section-kicker"><ClipboardList /> MAINTENANCE REGISTER</div><h2>Maintenance Tasks</h2><p>11 priority tasks shown · Delhi Division</p></div>
+            <div>
+              <div className="section-kicker">
+                <ClipboardList /> MAINTENANCE REGISTER
+              </div>
+
+              <h2>Maintenance Tasks</h2>
+
+              <p>
+                {tasks.length} priority tasks shown · Delhi
+                Division
+              </p>
+            </div>
           </div>
+
           <div style={{ overflowX: 'auto' }}>
-            <div className="table-head" style={{ minWidth: '900px', display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.35fr .75fr 1.45fr 1.35fr .7fr .95fr', gap: '12px' }}><span>TASK ID</span><span>ASSET</span><span>LOCATION</span><span>PRIORITY</span><span>TYPE</span><span>SCHEDULED</span><span>DURATION</span><span>STATUS</span></div>
+            <div
+              className="table-head"
+              style={{
+                minWidth: '900px',
+                display: 'grid',
+                gridTemplateColumns:
+                  '1fr 1.5fr 1.35fr .75fr 1.45fr 1.35fr .7fr .95fr',
+                gap: '12px',
+              }}
+            >
+              <span>TASK ID</span>
+              <span>ASSET</span>
+              <span>LOCATION</span>
+              <span>PRIORITY</span>
+              <span>TYPE</span>
+              <span>SCHEDULED</span>
+              <span>DURATION</span>
+              <span>STATUS</span>
+            </div>
+
             <div style={{ minWidth: '900px' }}>
               {tasks.map((task) => {
                 const isSelected = task.id === selectedId
-                return <button key={task.id} onClick={() => setSelectedId(task.id)} aria-pressed={isSelected} style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1.5fr 1.35fr .75fr 1.45fr 1.35fr .7fr .95fr', gap: '12px', alignItems: 'center', padding: '13px 16px', border: 0, borderBottom: '1px solid var(--line)', borderLeft: isSelected ? '3px solid var(--teal)' : '3px solid transparent', background: isSelected ? '#E7F4F1' : 'var(--panel)', textAlign: 'left', minHeight: '62px' }}>
-                  <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--cyan)' }}>{task.id}</strong>
-                  <span><strong style={{ display: 'block', fontSize: '13px', fontWeight: 600 }}>{task.asset}</strong>{isSelected && <small style={{ color: 'var(--teal)', fontSize: '10px', fontFamily: 'var(--font-mono)', letterSpacing: '.08em' }}>SELECTED</small>}</span>
-                  <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{task.location}</span>
-                  <StateTag state={task.priorityState}>{task.priority}</StateTag>
-                  <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{task.type}</span>
-                  <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{task.scheduled}</span>
-                  <span style={{ color: 'var(--muted)', fontSize: '12px' }}>{task.duration}</span>
-                  <StateTag state={task.statusState}>{task.status}</StateTag>
-                </button>
+
+                return (
+                  <button
+                    key={task.id}
+                    onClick={() =>
+                      setSelectedId(task.id)
+                    }
+                    aria-pressed={isSelected}
+                    style={{
+                      width: '100%',
+                      display: 'grid',
+                      gridTemplateColumns:
+                        '1fr 1.5fr 1.35fr .75fr 1.45fr 1.35fr .7fr .95fr',
+                      gap: '12px',
+                      alignItems: 'center',
+                      padding: '13px 16px',
+                      border: 0,
+                      borderBottom:
+                        '1px solid var(--line)',
+                      borderLeft: isSelected
+                        ? '3px solid var(--teal)'
+                        : '3px solid transparent',
+                      background: isSelected
+                        ? '#E7F4F1'
+                        : 'var(--panel)',
+                      textAlign: 'left',
+                      minHeight: '62px',
+                    }}
+                  >
+                    <strong
+                      style={{
+                        fontFamily:
+                          'var(--font-mono)',
+                        fontSize: '12px',
+                        color: 'var(--cyan)',
+                      }}
+                    >
+                      {task.id}
+                    </strong>
+
+                    <span>
+                      <strong
+                        style={{
+                          display: 'block',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {task.asset}
+                      </strong>
+
+                      {isSelected && (
+                        <small
+                          style={{
+                            color: 'var(--teal)',
+                            fontSize: '10px',
+                            fontFamily:
+                              'var(--font-mono)',
+                            letterSpacing: '.08em',
+                          }}
+                        >
+                          SELECTED
+                        </small>
+                      )}
+                    </span>
+
+                    <span
+                      style={{
+                        color: 'var(--muted)',
+                        fontSize: '12px',
+                      }}
+                    >
+                      {task.location}
+                    </span>
+
+                    <StateTag
+                      state={task.priorityState}
+                    >
+                      {task.priority}
+                    </StateTag>
+
+                    <span
+                      style={{
+                        color: 'var(--muted)',
+                        fontSize: '12px',
+                      }}
+                    >
+                      {task.type}
+                    </span>
+
+                    <span
+                      style={{
+                        color: 'var(--muted)',
+                        fontSize: '12px',
+                      }}
+                    >
+                      {task.scheduled}
+                    </span>
+
+                    <span
+                      style={{
+                        color: 'var(--muted)',
+                        fontSize: '12px',
+                      }}
+                    >
+                      {task.duration}
+                    </span>
+
+                    <StateTag
+                      state={task.statusState}
+                    >
+                      {task.status}
+                    </StateTag>
+                  </button>
+                )
               })}
             </div>
           </div>
         </section>
 
         <aside className="panel">
-          <div className="panel-head compact"><div><div className="section-kicker"><Clock3 /> SELECTED MAINTENANCE TASK</div><h2>Selected Maintenance Task</h2></div><StateTag state={selected.statusState}>{selected.status}</StateTag></div>
-          <div style={{ padding: '2px 18px 18px' }}>
-            <h3 style={{ margin: '12px 0 5px', fontSize: '17px', fontWeight: 600 }}>{selected.asset}</h3>
-            <p style={{ marginBottom: '17px', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>{selected.id}</p>
+          <div className="panel-head compact">
+            <div>
+              <div className="section-kicker">
+                <Clock3 /> SELECTED MAINTENANCE TASK
+              </div>
+
+              <h2>Selected Maintenance Task</h2>
+            </div>
+
+            <StateTag state={selected.statusState}>
+              {selected.status}
+            </StateTag>
+          </div>
+
+          <div
+            style={{
+              padding: '2px 18px 18px',
+            }}
+          >
+            <h3
+              style={{
+                margin: '12px 0 5px',
+                fontSize: '17px',
+                fontWeight: 600,
+              }}
+            >
+              {selected.asset}
+            </h3>
+
+            <p
+              style={{
+                marginBottom: '17px',
+                color: 'var(--cyan)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
+              }}
+            >
+              {selected.id}
+            </p>
+
             {[
-              ['LOCATION', selected.location], ['MAINTENANCE TYPE', selected.type], ['PRIORITY', selected.priority], ['SCHEDULED DATE', selected.scheduled], ['ESTIMATED DURATION', selected.duration], ['REQUIRED BLOCK', selected.requiredBlock || 'No'], ['STATUS', selected.status], ['OPERATIONAL IMPACT', selected.impact], ['ASSIGNED DEPARTMENT', selected.department], ['NOTES', selected.notes || 'No additional notes'],
-            ].map(([label, value]) => <div key={label} className="table-head" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '10px 0', borderBottom: label === 'NOTES' ? '1px solid var(--line)' : undefined }}><span>{label}</span><span style={{ textAlign: 'right', fontSize: '12px', color: label === 'PRIORITY' ? ({ Critical: 'var(--red)', High: 'var(--orange)', Medium: 'var(--yellow)', Low: 'var(--green)' }[value]) : undefined }}>{value}</span></div>)}
-            <div style={{ marginTop: '16px', color: 'var(--teal)', fontSize: '9px', fontFamily: 'var(--font-mono)', letterSpacing: '.12em' }}><span className="pulse-dot" style={{ marginRight: '7px' }} /> TASK SELECTED</div>
+              ['LOCATION', selected.location],
+              ['MAINTENANCE TYPE', selected.type],
+              ['PRIORITY', selected.priority],
+              ['SCHEDULED DATE', selected.scheduled],
+              ['ESTIMATED DURATION', selected.duration],
+              ['REQUIRED BLOCK', selected.requiredBlock || 'No'],
+              ['STATUS', selected.status],
+              ['OPERATIONAL IMPACT', selected.impact],
+              ['ASSIGNED DEPARTMENT', selected.department],
+              ['NOTES', selected.notes || 'No additional notes'],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="table-head"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  padding: '10px 0',
+                  borderBottom:
+                    label === 'NOTES'
+                      ? '1px solid var(--line)'
+                      : undefined,
+                }}
+              >
+                <span>{label}</span>
+
+                <span
+                  style={{
+                    textAlign: 'right',
+                    fontSize: '12px',
+                    color:
+                      label === 'PRIORITY'
+                        ? {
+                            Critical: 'var(--red)',
+                            High: 'var(--orange)',
+                            Medium: 'var(--yellow)',
+                            Low: 'var(--green)',
+                          }[value]
+                        : undefined,
+                  }}
+                >
+                  {value}
+                </span>
+              </div>
+            ))}
+
+            <div
+              style={{
+                marginTop: '16px',
+                color: 'var(--teal)',
+                fontSize: '9px',
+                fontFamily: 'var(--font-mono)',
+                letterSpacing: '.12em',
+              }}
+            >
+              <span
+                className="pulse-dot"
+                style={{
+                  marginRight: '7px',
+                }}
+              />
+
+              TASK SELECTED
+            </div>
           </div>
         </aside>
       </div>

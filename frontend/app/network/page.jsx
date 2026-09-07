@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { Activity, CircleDot, GitBranch, RefreshCw, ShieldCheck, TrainFront, TriangleAlert } from 'lucide-react'
-
+import { apiFetch } from '@/lib/api'
 const sections = {
   newDelhi: { name: 'New Delhi Central', status: 'Operational', availability: '99.2%', assets: '186 active assets', tasks: '3 scheduled tasks', block: 'No active block', delay: '3.1 min', state: 'healthy' },
   gurugram: { name: 'Gurugram Section', status: 'Operational', availability: '98.6%', assets: '94 active assets', tasks: '2 scheduled tasks', block: 'Block at 18:30', delay: '5.4 min', state: 'warning' },
@@ -11,17 +11,11 @@ const sections = {
   meerut: { name: 'Meerut Section', status: 'Operational', availability: '98.1%', assets: '83 active assets', tasks: '1 scheduled task', block: 'Block planned 22:15', delay: '4.7 min', state: 'warning' },
 }
 
-const metrics = [
+const mockMetrics = [
   ['Network Availability', '97.8%', 'Across 248.6 route km', Activity, 'up'],
   ['Active Sections', '42', 'All monitored', GitBranch, 'info'],
   ['Assets at Risk', '27', '6 need attention', TriangleAlert, 'critical'],
   ['Active Blocks', '18', '4 in progress', ShieldCheck, 'warn'],
-]
-
-const refreshSnapshots = [
-  ['97.8%', '42', '27', '18'],
-  ['98.0%', '42', '25', '17'],
-  ['97.9%', '43', '26', '18'],
 ]
 
 function Node({ id, x, y, label, selected, onSelect }) {
@@ -38,21 +32,75 @@ function Node({ id, x, y, label, selected, onSelect }) {
 export default function NetworkPage() {
   const [selected, setSelected] = useState('newDelhi')
   const [refreshing, setRefreshing] = useState(false)
-  const [refreshIndex, setRefreshIndex] = useState(0)
   const [refreshed, setRefreshed] = useState(false)
-  const section = sections[selected]
-  const snapshot = refreshSnapshots[refreshIndex]
+  const [network, setNetwork] = useState(null)
 
-  function refreshStatus() {
+  const section = sections[selected]
+
+  async function loadNetwork() {
+    try {
+      const data = await apiFetch('/api/network?corridorId=COR-001')
+      setNetwork(data)
+      setRefreshed(true)
+    } catch (err) {
+      console.error('Failed to load network from backend:', err)
+    }
+  }
+
+  useEffect(() => {
+    loadNetwork()
+  }, [])
+
+  async function refreshStatus() {
     if (refreshing) return
 
     setRefreshing(true)
-    window.setTimeout(() => {
-      setRefreshIndex((current) => (current + 1) % refreshSnapshots.length)
-      setRefreshing(false)
-      setRefreshed(true)
-    }, 250)
+
+    await loadNetwork()
+
+    setRefreshing(false)
   }
+
+  const networkData = network || {}
+
+  const metrics = [
+    [
+      'Network Availability',
+      '97.8%',
+      networkData.corridors
+        ? `${networkData.corridors.length} corridors monitored`
+        : 'Across 248.6 route km',
+      Activity,
+      'up',
+    ],
+    [
+      'Active Sections',
+      networkData.stations?.length ?? '42',
+      'All monitored',
+      GitBranch,
+      'info',
+    ],
+    [
+      'Assets at Risk',
+      networkData.assets
+        ? networkData.assets.filter((asset) =>
+            ['high', 'critical'].includes(
+              String(asset.risk || asset.riskLevel || '').toLowerCase()
+            )
+          ).length
+        : '27',
+      '6 need attention',
+      TriangleAlert,
+      'critical',
+    ],
+    [
+      'Active Blocks',
+      networkData.activeBlocks?.length ?? '18',
+      '4 in progress',
+      ShieldCheck,
+      'warn',
+    ],
+  ]
 
   return (
     <main className="dashboard">
@@ -66,12 +114,18 @@ export default function NetworkPage() {
       </div>
 
       <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
-        {metrics.map(([label, value, detail, Icon, type], index) => (
+        {metrics.map(([label, value, detail, Icon, type]) => (
           <div className="metric" key={label}>
-            <div className="metric-top"><span>{label}</span><Icon /></div>
-            <div className="metric-bottom"><strong>{snapshot[index] || value}</strong><small className={type}>{detail}</small></div>
-          </div>
-        ))}
+            <div className="metric-top">
+              <span>{label}</span>
+              <Icon />
+            </div>
+            <div className="metric-bottom">
+              <strong>{value}</strong>
+              <small className={type}>{detail}</small>
+           </div>
+      </div>
+    ))}
       </div>
 
       <div className="main-grid" style={{ gridTemplateColumns: 'minmax(0, 1.65fr) minmax(290px, .75fr)' }}>

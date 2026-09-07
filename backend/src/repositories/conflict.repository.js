@@ -12,13 +12,13 @@ class ConflictRepository extends BaseRepository {
     let idx = 1;
 
     if (filters.corridorId) {
-      conditions.push(`corridor_id = $${idx++}`);
-      params.push(filters.corridorId);
-    }
-    if (filters.status) {
-      conditions.push(`status = $${idx++}`);
-      params.push(filters.status);
-    }
+  conditions.push(`c.corridor_id = $${idx++}`);
+  params.push(filters.corridorId);
+}
+if (filters.status) {
+  conditions.push(`c.status = $${idx++}`);
+  params.push(filters.status);
+}
 
     let sql = `SELECT c.id, c.corridor_id, c.date, c.type, c.severity, c.status, c.block_ids, c.department_ids, c.description, c.resolution, c.created_at, c.resolved_at,
                cor.name as corridor_name
