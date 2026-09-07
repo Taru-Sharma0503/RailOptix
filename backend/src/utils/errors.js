@@ -46,6 +46,13 @@ class ConflictError extends AppError {
   }
 }
 
+class ServiceUnavailableError extends AppError {
+  constructor(message = 'AI Engine service is unavailable') {
+    super(message, 503);
+    this.name = 'ServiceUnavailableError';
+  }
+}
+
 module.exports = {
   AppError,
   ValidationError,
@@ -53,4 +60,6 @@ module.exports = {
   UnauthorizedError,
   ForbiddenError,
   ConflictError,
+  ServiceUnavailableError,
 };
+

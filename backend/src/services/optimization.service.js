@@ -4,9 +4,9 @@ const blockRepo = require('../repositories/block.repository');
 const trainScheduleRepo = require('../repositories/trainSchedule.repository');
 const assetRepo = require('../repositories/asset.repository');
 const conflictRepo = require('../repositories/conflict.repository');
-const { query } = require('../config/db');
+const aiClient = require('../utils/aiClient');
 const { NotFoundError } = require('../utils/errors');
-const { successResponse, nextSequentialId, timeToMinutes, minutesToTime, timesOverlap, clamp } = require('../utils/helpers');
+const { nextSequentialId, timeToMinutes, minutesToTime, timesOverlap, clamp } = require('../utils/helpers');
 
 let io = null;
 function setSocketIO(socketInstance) {
@@ -14,6 +14,10 @@ function setSocketIO(socketInstance) {
 }
 
 class OptimizationService {
+  /**
+   * Accepts optimization request, creates persistent database record,
+   * and delegates optimization solver execution to FastAPI AI Engine.
+   */
   async startOptimization({ corridorId, planningDate, maintenanceTaskIds, blockIds, objective }) {
     const runId = await nextSequentialId('OPT', () => optimizationRunRepo.count());
 
@@ -41,106 +45,183 @@ class OptimizationService {
     return { success: true, runId, status: 'queued' };
   }
 
+  /**
+   * Asynchronous task executing FastAPI AI Engine optimization and persisting results.
+   */
   async _runOptimizationAsync(runId, params) {
     const emit = (progress, message) => {
       optimizationRunRepo.update(runId, { progress, message, status: progress < 100 ? 'running' : 'completed' });
       if (io) io.emit('optimization:progress', { runId, progress, message });
     };
 
-    emit(5, 'Loading maintenance tasks');
+    emit(10, 'Submitting optimization request to AI Engine (OR-Tools CP-SAT)');
 
-    const tasks = [];
-    for (const tid of params.maintenanceTaskIds) {
-      const t = await maintenanceRepo.findById(tid);
-      if (t) tasks.push(t);
-    }
+    const payload = {
+      corridorId: params.corridorId || 'COR-001',
+      planningDate: params.planningDate || new Date().toISOString().split('T')[0],
+      maintenanceTaskIds: params.maintenanceTaskIds || [],
+      blockIds: params.blockIds || [],
+      objective: params.objective || undefined,
+    };
 
-    emit(15, 'Loading candidate blocks');
-    const blocks = [];
-    for (const bid of params.blockIds) {
-      const b = await blockRepo.findById(bid);
-      if (b) blocks.push(b);
-    }
+    // Delegate to FastAPI AI Engine synchronous solver
+    const aiResponse = await aiClient.post('/api/optimize', payload);
+    const aiRunId = aiResponse.runId;
 
-    emit(25, 'Loading train schedules');
-    const trainSchedules = await trainScheduleRepo.findWithFilters({
-      corridorId: params.corridorId,
-      date: params.planningDate,
-    });
+    emit(60, 'Fetching optimization results from AI Engine');
 
-    emit(35, 'Checking conflicts');
-    const conflicts = await conflictRepo.findWithFilters({ corridorId: params.corridorId, status: 'open' });
+    // Fetch full result schedule and metrics from FastAPI cache
+    const aiResult = await aiClient.get(`/api/optimize/${aiRunId}/result`);
 
-    emit(45, 'Checking maintenance deadlines');
-    const deadlineIssues = tasks.filter((t) => {
-      if (!t.deadline) return false;
-      const daysLeft = (new Date(t.deadline) - new Date(params.planningDate)) / (1000 * 60 * 60 * 24);
-      return daysLeft < 0;
-    });
+    emit(90, 'Persisting optimization results to backend database');
 
-    emit(55, 'Evaluating safety constraints');
-    const safetyIssues = tasks.filter((t) => t.safetyRisk >= 8);
-
-    emit(65, 'Generating candidate schedules');
-
-    const candidates = this._generateCandidates(tasks, blocks, trainSchedules, params.objective);
-
-    emit(80, 'Scoring candidate schedules');
-    let bestCandidate = null;
-    let bestScore = -Infinity;
-
-    for (const candidate of candidates) {
-      const score = this._scoreCandidate(candidate, params.objective, trainSchedules, tasks);
-      candidate.totalScore = score;
-      if (score > bestScore) {
-        bestScore = score;
-        bestCandidate = candidate;
-      }
-    }
-
-    emit(90, 'Selecting optimal schedule');
-    if (!bestCandidate) {
-      bestCandidate = {
-        schedule: tasks.map((t) => ({
-          maintenanceTaskId: t.id,
-          blockId: blocks[0] ? blocks[0].id : null,
-          start: blocks[0] ? blocks[0].start : '09:00',
-          end: blocks[0] ? minutesToTime(timeToMinutes(blocks[0].start) + t.estimatedDuration) : '12:00',
-          score: 0,
-          estimatedDuration: t.estimatedDuration,
-        })),
-        metrics: this._calculateMetrics(tasks, blocks, [], trainSchedules),
-        explanations: [{ factor: 'Default schedule', impact: 'neutral', score: 0 }],
-      };
-    }
-
-    emit(95, 'Storing optimization result');
-
-    const result = {
-      schedule: bestCandidate.schedule,
-      metrics: bestCandidate.metrics,
-      explanation: this._generateExplanation(bestCandidate, params.objective, tasks, trainSchedules, conflicts),
+    const resultData = {
+      aiRunId,
+      schedule: aiResult.schedule || [],
+      metrics: aiResult.metrics || {},
+      conflictsResolved: aiResult.conflictsResolved || 0,
+      totalDelayMinutes: aiResult.totalDelayMinutes || 0,
+      corridorId: aiResult.corridorId || params.corridorId,
+      planningDate: aiResult.planningDate || params.planningDate,
     };
 
     await optimizationRunRepo.update(runId, {
       status: 'completed',
       progress: 100,
-      message: 'Optimization completed successfully',
-      result,
+      message: 'Optimization completed successfully via OR-Tools CP-SAT',
+      result: resultData,
       completedAt: new Date(),
     });
 
-    if (io) io.emit('optimization:completed', { runId, result });
+    if (io) io.emit('optimization:completed', { runId, result: resultData });
   }
+
+  /**
+   * Fetches optimization run status from DB and resolves AI Engine runId.
+   */
+  async getStatus(runId) {
+    const run = await optimizationRunRepo.findById(runId);
+    if (!run) throw NotFoundError.resource('Optimization run');
+
+    const aiRunId = run.result?.aiRunId;
+    if (aiRunId) {
+      try {
+        const aiStatus = await aiClient.get(`/api/optimize/${aiRunId}`);
+        return {
+          success: true,
+          runId: run.id,
+          aiRunId,
+          status: aiStatus.status || run.status,
+          progress: aiStatus.progress !== undefined ? aiStatus.progress : run.progress,
+          message: aiStatus.message || run.message,
+        };
+      } catch (err) {
+        // Fall back to stored DB status if AI Engine is restarted/unavailable
+      }
+    }
+
+    return {
+      success: true,
+      runId: run.id,
+      status: run.status,
+      progress: run.progress,
+      message: run.message,
+    };
+  }
+
+  /**
+   * Fetches optimization run result from AI Engine using persisted aiRunId.
+   */
+  async getResult(runId) {
+    const run = await optimizationRunRepo.findById(runId);
+    if (!run) throw NotFoundError.resource('Optimization run');
+
+    if (run.status !== 'completed') {
+      return {
+        success: true,
+        runId: run.id,
+        status: run.status,
+        message: run.status === 'failed' ? run.message : 'Optimization is still running',
+      };
+    }
+
+    const aiRunId = run.result?.aiRunId;
+    if (aiRunId) {
+      try {
+        const aiResult = await aiClient.get(`/api/optimize/${aiRunId}/result`);
+        return {
+          success: true,
+          runId: run.id,
+          aiRunId,
+          status: 'completed',
+          schedule: aiResult.schedule || [],
+          metrics: aiResult.metrics || {},
+          conflictsResolved: aiResult.conflictsResolved,
+          totalDelayMinutes: aiResult.totalDelayMinutes,
+        };
+      } catch (err) {
+        // Fall back to stored DB result if AI Engine cache cleared
+      }
+    }
+
+    return {
+      success: true,
+      runId: run.id,
+      status: run.status,
+      schedule: run.result?.schedule || [],
+      metrics: run.result?.metrics || {},
+    };
+  }
+
+  /**
+   * Fetches SHAP feature explanations from AI Engine while preserving CP-SAT distinction.
+   */
+  async getExplanation(runId) {
+    const run = await optimizationRunRepo.findById(runId);
+    if (!run) throw NotFoundError.resource('Optimization run');
+
+    if (run.status !== 'completed' || !run.result) {
+      return {
+        success: true,
+        runId: run.id,
+        whyOptimal: [],
+      };
+    }
+
+    const aiRunId = run.result?.aiRunId;
+    if (aiRunId) {
+      try {
+        const aiExplanation = await aiClient.get(`/api/optimize/${aiRunId}/explanation`);
+        return {
+          success: true,
+          runId: run.id,
+          aiRunId,
+          explanation: aiExplanation.explanation || {},
+          shapValues: aiExplanation.shapValues || {},
+          topFeatures: aiExplanation.topFeatures || [],
+          note: "CP-SAT constraint solver performed discrete schedule optimization. SHAP feature contributions explain predictive model feature impacts.",
+        };
+      } catch (err) {
+        // Fall back to stored DB explanation if available
+      }
+    }
+
+    return {
+      success: true,
+      runId: run.id,
+      whyOptimal: run.result?.explanation || [],
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Legacy Heuristic Methods (Preserved for backward-compatibility)
+  // ---------------------------------------------------------------------------
 
   _generateCandidates(tasks, blocks, trainSchedules, objective) {
     if (blocks.length === 0 || tasks.length === 0) return [];
-
     const candidates = [];
     const maxCandidates = 20;
-
     const sortedTasks = [...tasks].sort((a, b) => b.priorityScore - a.priorityScore || b.severity - a.severity);
-
     const blockOrderings = this._generateBlockOrderings(blocks, Math.min(maxCandidates, 6));
 
     for (let bi = 0; bi < blockOrderings.length; bi++) {
@@ -338,56 +419,6 @@ class OptimizationService {
     }
 
     return explanations;
-  }
-
-  async getStatus(runId) {
-    const run = await optimizationRunRepo.findById(runId);
-    if (!run) throw NotFoundError.resource('Optimization run');
-    return {
-      success: true,
-      runId: run.id,
-      status: run.status,
-      progress: run.progress,
-      message: run.message,
-    };
-  }
-
-  async getResult(runId) {
-    const run = await optimizationRunRepo.findById(runId);
-    if (!run) throw NotFoundError.resource('Optimization run');
-    if (run.status !== 'completed') {
-      return {
-        success: true,
-        runId: run.id,
-        status: run.status,
-        message: run.status === 'failed' ? run.message : 'Optimization is still running',
-      };
-    }
-    return {
-      success: true,
-      runId: run.id,
-      status: run.status,
-      schedule: run.result.schedule,
-      metrics: run.result.metrics,
-    };
-  }
-
-  async getExplanation(runId) {
-    const run = await optimizationRunRepo.findById(runId);
-    if (!run) throw NotFoundError.resource('Optimization run');
-    if (run.status !== 'completed' || !run.result) {
-      return {
-        success: true,
-        runId: run.id,
-        status: run.status,
-        whyOptimal: [],
-      };
-    }
-    return {
-      success: true,
-      runId: run.id,
-      whyOptimal: run.result.explanation || [],
-    };
   }
 }
 
