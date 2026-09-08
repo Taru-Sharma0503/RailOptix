@@ -381,12 +381,14 @@ class RailOptixOptimizer:
                     t_end = blk["end"]
 
                 schedule.append({
-                    "maintenanceTaskId": tasks[i]["taskId"],
-                    "blockId": blk["blockId"],
-                    "start": t_start,
-                    "end": t_end,
-                    "departmentId": tasks[i].get("department", "Engineering")
-                })
+    "maintenanceTaskId": tasks[i]["taskId"],
+    "blockId": blk["blockId"],
+    "start": t_start,
+    "end": t_end,
+    "estimatedDuration": task_durations[i],
+    "score": int(tasks[i].get("priorityScore", 50)),
+    "departmentId": tasks[i].get("department", "Engineering")
+})
 
                 total_prio_scheduled += tasks[i].get("priorityScore", 50)
                 scheduled_count += 1
