@@ -63,18 +63,226 @@ export default function AnalyticsPage() {
 
       <div className="main-grid">
         <section className="panel">
-          <div className="panel-head compact">
-            <div><div className="section-kicker"><TrendingDown /> TRAIN DELAY TREND</div><h2>Simulated Delay by Date</h2></div>
+  <div className="panel-head compact">
+    <div>
+      <div className="section-kicker">
+        <TrendingDown /> TRAIN DELAY TREND
+      </div>
+      <h2>Simulated Delay by Date</h2>
+    </div>
+  </div>
+
+  <div style={{ padding: '18px' }}>
+    {delays.length === 0 ? (
+      <p style={{ fontSize: '12px', color: 'var(--muted)' }}>
+        No simulation delay data yet — run a what-if simulation to populate this chart.
+      </p>
+    ) : (
+      <>
+        <div
+          style={{
+            position: 'relative',
+            height: '190px',
+            marginTop: '8px',
+            paddingLeft: '42px',
+            paddingBottom: '28px',
+          }}
+        >
+          {/* Top guide line */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '42px',
+              right: '0',
+              top: '10px',
+              borderTop: '1px dashed var(--border)',
+            }}
+          />
+
+          {/* Middle guide line */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '42px',
+              right: '0',
+              top: '50%',
+              borderTop: '1px dashed var(--border)',
+            }}
+          />
+
+          {/* Bottom axis */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '42px',
+              right: '0',
+              bottom: '28px',
+              borderTop: '1px solid var(--border)',
+            }}
+          />
+
+          {/* Y-axis labels */}
+          <span
+            style={{
+              position: 'absolute',
+              left: '0',
+              top: '2px',
+              fontSize: '10px',
+              color: 'var(--muted)',
+            }}
+          >
+            {maxDelay}m
+          </span>
+
+          <span
+            style={{
+              position: 'absolute',
+              left: '0',
+              top: 'calc(50% - 6px)',
+              fontSize: '10px',
+              color: 'var(--muted)',
+            }}
+          >
+            {Math.round(maxDelay / 2)}m
+          </span>
+
+          <span
+            style={{
+              position: 'absolute',
+              left: '0',
+              bottom: '22px',
+              fontSize: '10px',
+              color: 'var(--muted)',
+            }}
+          >
+            0m
+          </span>
+
+          {/* Chart points */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '42px',
+              right: '0',
+              top: '10px',
+              bottom: '28px',
+              display: 'flex',
+              alignItems: 'stretch',
+              gap: '8px',
+            }}
+          >
+            {delays.slice(0, 20).reverse().map((d, i) => {
+              const delay = Number(d.delayMinutes) || 0
+
+              const percentage =
+                maxDelay > 0
+                  ? (delay / maxDelay) * 100
+                  : 0
+
+              return (
+                <div
+                  key={i}
+                  title={`${d.date}: ${delay} min`}
+                  style={{
+                    flex: 1,
+                    minWidth: '10px',
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {/* Vertical guide from point */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      height: `${Math.max(percentage, 3)}%`,
+                      width: '1px',
+                      background: 'var(--teal)',
+                      opacity: delay === 0 ? 0.25 : 0.5,
+                    }}
+                  />
+
+                  {/* Data point */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: `calc(${Math.max(percentage, 3)}% - 5px)`,
+                      width: delay === 0 ? '8px' : '11px',
+                      height: delay === 0 ? '8px' : '11px',
+                      borderRadius: '50%',
+                      background: 'var(--teal)',
+                      border: '2px solid var(--panel)',
+                      boxShadow: '0 0 0 1px var(--teal)',
+                      zIndex: 2,
+                    }}
+                  />
+                </div>
+              )
+            })}
           </div>
-          <div style={{ padding: '16px 18px' }}>
-            {delays.length === 0 && <p style={{ fontSize: '12px', color: 'var(--muted)' }}>No simulation delay data yet — run a what-if simulation to populate this chart.</p>}
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '160px' }}>
-              {delays.slice(0, 20).reverse().map((d, i) => (
-                <div key={i} title={`${d.date}: ${d.delayMinutes} min`} style={{ flex: 1, height: `${Math.max(4, (d.delayMinutes / maxDelay) * 100)}%`, background: 'var(--teal)', borderRadius: '2px 2px 0 0' }} />
-              ))}
-            </div>
+
+          {/* Date labels */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '42px',
+              right: '0',
+              bottom: '0',
+              display: 'flex',
+              gap: '8px',
+            }}
+          >
+            {delays.slice(0, 20).reverse().map((d, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  minWidth: '10px',
+                  textAlign: 'center',
+                  fontSize: '9px',
+                  color: 'var(--muted)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {String(d.date).slice(5)}
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
+
+        {/* Chart summary */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: '12px',
+            paddingTop: '12px',
+            borderTop: '1px solid var(--border)',
+            fontSize: '11px',
+          }}
+        >
+          <span style={{ color: 'var(--muted)' }}>
+            Simulations:{' '}
+            <strong style={{ color: 'var(--text)' }}>
+              {delays.length}
+            </strong>
+          </span>
+
+          <span style={{ color: 'var(--muted)' }}>
+            Peak delay:{' '}
+            <strong style={{ color: 'var(--text)' }}>
+              {maxDelay} min
+            </strong>
+          </span>
+        </div>
+      </>
+    )}
+  </div>
+</section>
 
         <aside className="panel">
           <div className="panel-head compact">
