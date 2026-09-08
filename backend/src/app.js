@@ -25,7 +25,7 @@ function createApp() {
   const app = express();
 
   app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: env.frontendUrl || 'http://localhost:3000',
     credentials: true,
   }));
   app.use(express.json());
